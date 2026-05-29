@@ -1,0 +1,178 @@
+@model ChangSpaBeauty.Web.ViewModels.ProductListViewModel
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<div class="container">
+
+    <!-- BANNER -->
+    <div class="banner">
+        <div class="banner-text">
+            <div class="banner-label">✦ Bộ sưu tập mới 2025</div>
+            <div class="banner-title">Toả sáng với<br><span>vẻ đẹp tự nhiên</span></div>
+            <div class="banner-sub">Sản phẩm chăm sóc da cao cấp<br>từ thiên nhiên thuần tuý – dịu nhẹ &amp; hiệu quả</div>
+            <a asp-controller="Products" asp-action="Index" class="banner-btn">Khám phá ngay →</a>
+        </div>
+        <div class="banner-deco">
+            <div class="deco-circle" style="width:110px;height:110px;background:rgba(255,64,129,0.1);"></div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:24px;">
+                <div class="deco-circle" style="width:65px;height:65px;background:rgba(214,51,108,0.09);"></div>
+                <div class="deco-circle" style="width:40px;height:40px;background:rgba(255,182,193,0.35);"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE LAYOUT -->
+    <div class="page-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-title">Danh mục</div>
+                <a asp-controller="Products" asp-action="Index" asp-route-category="kem-duong" class="sidebar-item">
+                    Kem dưỡng da <span class="count">42</span>
+                </a>
+                <a asp-controller="Products" asp-action="Index" asp-route-category="serum" class="sidebar-item">
+                    Serum <span class="count">28</span>
+                </a>
+                <a asp-controller="Products" asp-action="Index" asp-route-category="mat-na" class="sidebar-item">
+                    Mặt nạ <span class="count">19</span>
+                </a>
+                <a asp-controller="Products" asp-action="Index" asp-route-category="sua-rua-mat" class="sidebar-item">
+                    Sữa rửa mặt <span class="count">15</span>
+                </a>
+                <a asp-controller="Products" asp-action="Index" asp-route-category="chong-nang" class="sidebar-item">
+                    Chống nắng <span class="count">23</span>
+                </a>
+                <a asp-controller="Products" asp-action="Index" asp-route-category="son-moi" class="sidebar-item">
+                    Son môi <span class="count">37</span>
+                </a>
+                <a asp-controller="Products" asp-action="Index" asp-route-category="phan-nen" class="sidebar-item">
+                    Phấn nền <span class="count">21</span>
+                </a>
+                <a asp-controller="Products" asp-action="Index" asp-route-category="nuoc-tay-trang" class="sidebar-item">
+                    Nước tẩy trang <span class="count">11</span>
+                </a>
+            </div>
+
+            <div class="sidebar-card">
+                <div class="sidebar-title">Lọc theo giá</div>
+                <input type="range" class="price-range-input" min="0" max="2000000" value="1000000">
+                <div class="price-current">Dưới 1,000,000đ</div>
+                <div class="price-labels"><span>0đ</span><span>2,000,000đ</span></div>
+            </div>
+
+            <div class="sidebar-card">
+                <div class="sidebar-title">Thương hiệu</div>
+                <div class="sidebar-item">Innisfree <span class="count">18</span></div>
+                <div class="sidebar-item">The Ordinary <span class="count">14</span></div>
+                <div class="sidebar-item">Cetaphil <span class="count">9</span></div>
+                <div class="sidebar-item">La Roche-Posay <span class="count">12</span></div>
+                <div class="sidebar-item">Bioderma <span class="count">7</span></div>
+                <div class="sidebar-item">Laneige <span class="count">11</span></div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <div class="section-header">
+                <div class="section-title">Sản phẩm nổi bật</div>
+                <a asp-controller="Products" asp-action="Index" class="section-link">Xem tất cả →</a>
+            </div>
+
+            <div class="filter-tabs">
+                <a asp-controller="Products" asp-action="Index" asp-route-sort="popular"
+                   class="tab @(Model.SortBy == "popular" ? "active" : "")">Phổ biến</a>
+                <a asp-controller="Products" asp-action="Index" asp-route-sort="newest"
+                   class="tab @(Model.SortBy == "newest" ? "active" : "")">Mới nhất</a>
+                <a asp-controller="Products" asp-action="Index" asp-route-sort="bestselling"
+                   class="tab @(Model.SortBy == "bestselling" ? "active" : "")">Bán chạy</a>
+                <a asp-controller="Products" asp-action="Index" asp-route-sort="price-asc"
+                   class="tab @(Model.SortBy == "price-asc" ? "active" : "")">Giá thấp ↑</a>
+                <a asp-controller="Products" asp-action="Index" asp-route-sort="price-desc"
+                   class="tab @(Model.SortBy == "price-desc" ? "active" : "")">Giá cao ↓</a>
+            </div>
+
+            <div class="product-grid">
+                @if (Model.Products.Any())
+                {
+                    @foreach (var p in Model.Products)
+                    {
+                        <div class="product-card">
+                            <a asp-controller="Products" asp-action="Details" asp-route-id="@p.ProductId">
+                                <div class="product-img" style="background:#FFF0F5;">
+                                    @if (!string.IsNullOrEmpty(p.Image))
+                                    {
+                                        <img src="@p.Image" alt="@p.Name" />
+                                    }
+                                    else
+                                    {
+                                        <span>🧴</span>
+                                    }
+                                    <span class="product-fav" onclick="toggleFav(this); event.preventDefault();">♡</span>
+                                </div>
+                            </a>
+                            <div class="product-info">
+                                <div class="product-name">@p.Name</div>
+                                <div class="product-price">@p.Price.ToString("N0")đ</div>
+                                <div class="product-sold">Đã bán @p.Sold</div>
+                                <form asp-controller="Cart" asp-action="Add" method="post">
+                                    <input type="hidden" name="productId" value="@p.ProductId" />
+                                    <button type="submit" class="product-add" onclick="addToCart(this); return false;">+ Thêm vào giỏ</button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <!-- Placeholder cards khi chưa có dữ liệu -->
+                    
+                        var placeholders = new[] {
+                            ("🧴","Kem dưỡng ẩm Rose Hydra","285,000","⭐ 4.8 · Đã bán 1.2k","-20%","","#FFF0F5"),
+                            ("✨","Serum Vitamin C sáng da","420,000","⭐ 4.9 · Đã bán 856","Mới","new","#FEF0F8"),
+                            ("💆","Mặt nạ đất sét Charcoal","175,000","⭐ 4.7 · Đã bán 3.4k","","","#FFF5FB"),
+                            ("🌸","Son dưỡng môi hồng nude","145,000","⭐ 4.6 · Đã bán 2.1k","-15%","","#FFF0F5"),
+                            ("🧖","Kem chống nắng SPF50+","320,000","⭐ 4.8 · Đã bán 987","","","#FEF5FF"),
+                            ("💄","Phấn nước cushion lâu trôi","550,000","⭐ 4.9 · Đã bán 4.2k","Hot","hot","#FFF0F8"),
+                            ("🌿","Tẩy tế bào chết dâu tây","195,000","⭐ 4.5 · Đã bán 621","Mới","new","#FFF5F8"),
+                            ("💐","Nước hoa hồng cân bằng da","230,000","⭐ 4.7 · Đã bán 1.8k","-30%","","#FEF0F5"),
+                            ("🫧","Sữa rửa mặt dịu nhẹ Foam","160,000","⭐ 4.6 · Đã bán 2.9k","","","#FFF5FB"),
+                        };
+                        foreach (var (icon, name, price, sold, badge, badgeClass, bg) in placeholders)
+                        {
+                            <div class="product-card">
+                                <div class="product-img" style="background:@bg;">
+                                    @if (!string.IsNullOrEmpty(badge))
+                                    {
+                                        <span class="product-badge @badgeClass">@badge</span>
+                                    }
+                                    <span class="product-fav" onclick="toggleFav(this)">♡</span>
+                                    @icon
+                                </div>
+                                <div class="product-info">
+                                    <div class="product-name">@name</div>
+                                    <div class="product-price">@price đ</div>
+                                    <div class="product-sold">@sold</div>
+                                    <button class="product-add" onclick="addToCart(this)">+ Thêm vào giỏ</button>
+                                </div>
+                            </div>
+                        }
+                    }  
+            </div>
+
+            <!-- PAGINATION -->
+            <div class="pagination">
+                <button class="page-btn">‹</button>
+                <button class="page-btn active" onclick="setPage(this)">1</button>
+                <button class="page-btn" onclick="setPage(this)">2</button>
+                <button class="page-btn" onclick="setPage(this)">3</button>
+                <button class="page-btn" onclick="setPage(this)">4</button>
+                <button class="page-btn">…</button>
+                <button class="page-btn" onclick="setPage(this)">12</button>
+                <button class="page-btn">›</button>
+            </div>
+        </main>
+
+    </div>
+</div>

@@ -1,0 +1,18 @@
+﻿
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div class="header-user">
+        <span>Xin chào, @User.Identity.Name</span>
+        <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-logout">Đăng xuất</button>
+        </form>
+    </div>
+}
+else
+{
+    <div class="header-auth">
+        <a asp-controller="Account" asp-action="Login" class="btn-login">Đăng nhập</a>
+        <a asp-controller="Account" asp-action="Register" class="btn-register">Đăng ký</a>
+    </div>
+}

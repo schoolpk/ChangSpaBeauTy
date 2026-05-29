@@ -1,0 +1,91 @@
+﻿@model ChangSpaBeauty.Application.DTOs.UserRegisterDTO
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css" />
+}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Đăng ký tài khoản</h2>
+            <p>Tham gia ChangSpaBeauTy để trải nghiệm mua sắm tuyệt vời</p>
+        </div>
+
+        <form asp-action="Register" method="post">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Name">Họ và tên</label>
+                <input asp-for="Name" class="form-control" placeholder="Nhập họ tên đầy đủ" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" class="form-control" placeholder="Nhập email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Phone">Số điện thoại</label>
+                <input asp-for="Phone" class="form-control" placeholder="Nhập số điện thoại (tuỳ chọn)" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Address">Địa chỉ</label>
+                <input asp-for="Address" class="form-control" placeholder="Nhập địa chỉ (tuỳ chọn)" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password">Mật khẩu</label>
+                <div class="input-password">
+                    <input asp-for="Password" class="form-control" placeholder="Tối thiểu 6 ký tự" id="passwordInput" />
+                    <button type="button" class="btn-toggle-password" onclick="togglePassword('passwordInput','eyeIcon1')">
+                        <i class="fas fa-eye" id="eyeIcon1"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">Xác nhận mật khẩu</label>
+                <div class="input-password">
+                    <input asp-for="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" id="confirmInput" />
+                    <button type="button" class="btn-toggle-password" onclick="togglePassword('confirmInput','eyeIcon2')">
+                        <i class="fas fa-eye" id="eyeIcon2"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn-auth">Đăng ký</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Đã có tài khoản? <a asp-action="Login">Đăng nhập</a></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+    </script>
+}
