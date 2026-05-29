@@ -1,0 +1,6 @@
+@ChangSpaBeauty.Api_HostAddress = http://localhost:5255
+
+GET {{ChangSpaBeauty.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

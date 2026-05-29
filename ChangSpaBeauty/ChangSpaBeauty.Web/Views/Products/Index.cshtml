@@ -1,0 +1,99 @@
+@model ChangSpaBeauty.Web.ViewModels.ProductListViewModel
+@{
+    ViewData["Title"] = "Sản phẩm";
+}
+
+<div class="container">
+    <div class="page-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-title">Danh mục</div>
+                <a asp-action="Index" asp-route-category="kem-duong" class="sidebar-item">Kem dưỡng da <span class="count">42</span></a>
+                <a asp-action="Index" asp-route-category="serum" class="sidebar-item">Serum <span class="count">28</span></a>
+                <a asp-action="Index" asp-route-category="mat-na" class="sidebar-item">Mặt nạ <span class="count">19</span></a>
+                <a asp-action="Index" asp-route-category="sua-rua-mat" class="sidebar-item">Sữa rửa mặt <span class="count">15</span></a>
+                <a asp-action="Index" asp-route-category="chong-nang" class="sidebar-item">Chống nắng <span class="count">23</span></a>
+                <a asp-action="Index" asp-route-category="son-moi" class="sidebar-item">Son môi <span class="count">37</span></a>
+                <a asp-action="Index" asp-route-category="phan-nen" class="sidebar-item">Phấn nền <span class="count">21</span></a>
+                <a asp-action="Index" asp-route-category="nuoc-tay-trang" class="sidebar-item">Nước tẩy trang <span class="count">11</span></a>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Lọc theo giá</div>
+                <input type="range" class="price-range-input" min="0" max="2000000" value="1000000">
+                <div class="price-current">Dưới 1,000,000đ</div>
+                <div class="price-labels"><span>0đ</span><span>2,000,000đ</span></div>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Thương hiệu</div>
+                <div class="sidebar-item">Innisfree <span class="count">18</span></div>
+                <div class="sidebar-item">The Ordinary <span class="count">14</span></div>
+                <div class="sidebar-item">Cetaphil <span class="count">9</span></div>
+                <div class="sidebar-item">La Roche-Posay <span class="count">12</span></div>
+                <div class="sidebar-item">Bioderma <span class="count">7</span></div>
+                <div class="sidebar-item">Laneige <span class="count">11</span></div>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+            <div class="section-header">
+                <div class="section-title">
+                    @(string.IsNullOrEmpty(Model.SelectedCategory) ? "Tất cả sản phẩm" : Model.SelectedCategory)
+                </div>
+            </div>
+
+            <div class="filter-tabs">
+                <a asp-action="Index" asp-route-sort="popular" asp-route-category="@Model.SelectedCategory" asp-route-keyword="@Model.SearchKeyword"
+                   class="tab @(Model.SortBy == "popular" ? "active" : "")">Phổ biến</a>
+                <a asp-action="Index" asp-route-sort="newest" asp-route-category="@Model.SelectedCategory" asp-route-keyword="@Model.SearchKeyword"
+                   class="tab @(Model.SortBy == "newest" ? "active" : "")">Mới nhất</a>
+                <a asp-action="Index" asp-route-sort="bestselling" asp-route-category="@Model.SelectedCategory" asp-route-keyword="@Model.SearchKeyword"
+                   class="tab @(Model.SortBy == "bestselling" ? "active" : "")">Bán chạy</a>
+                <a asp-action="Index" asp-route-sort="price-asc" asp-route-category="@Model.SelectedCategory" asp-route-keyword="@Model.SearchKeyword"
+                   class="tab @(Model.SortBy == "price-asc" ? "active" : "")">Giá thấp ↑</a>
+                <a asp-action="Index" asp-route-sort="price-desc" asp-route-category="@Model.SelectedCategory" asp-route-keyword="@Model.SearchKeyword"
+                   class="tab @(Model.SortBy == "price-desc" ? "active" : "")">Giá cao ↓</a>
+            </div>
+
+            <div class="product-grid">
+                @foreach (var p in Model.Products)
+                {
+                    <div class="product-card">
+                        <a asp-action="Details" asp-route-id="@p.ProductId">
+                            <div class="product-img" style="background:#FFF0F5;">
+                                @if (!string.IsNullOrEmpty(p.Image))
+                                {
+                                    <img src="@p.Image" alt="@p.Name" />
+                                }
+                                else
+                                {
+                                    <span>🧴</span>
+                                }
+                                <span class="product-fav" onclick="toggleFav(this); event.preventDefault();">♡</span>
+                            </div>
+                        </a>
+                        <div class="product-info">
+                            <div class="product-name">@p.Name</div>
+                            <div class="product-price">@p.Price.ToString("N0")đ</div>
+                            <div class="product-sold">@p.CategoryName · Đã bán @p.Sold</div>
+                            <form asp-controller="Cart" asp-action="Add" method="post">
+                                <input type="hidden" name="productId" value="@p.ProductId" />
+                                <button type="submit" class="product-add" onclick="addToCart(this); return false;">+ Thêm vào giỏ</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="pagination">
+                <button class="page-btn">‹</button>
+                <button class="page-btn active" onclick="setPage(this)">1</button>
+                <button class="page-btn" onclick="setPage(this)">2</button>
+                <button class="page-btn" onclick="setPage(this)">3</button>
+                <button class="page-btn">›</button>
+            </div>
+        </main>
+    </div>
+</div>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] – ChangSpaBeauTy</title>
+    <link rel="stylesheet" href="~/css/changspa.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+
+<!-- ══ HEADER ══════════════════════════════════════ -->
+<header>
+    <div class="brand-bar">
+        <div class="brand-name">✿ ChangSpaBeauTy ✿</div>
+        <div class="brand-tagline">Chăm sóc vẻ đẹp tự nhiên</div>
+    </div>
+    <div class="header-bar">
+        <div class="search-wrap">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <form asp-controller="Products" asp-action="Index" method="get">
+                <input type="text" name="keyword" placeholder="Tìm kiếm sản phẩm..."
+                       value="@ViewData["Keyword"]" />
+            </form>
+        </div>
+            <div class="header-actions">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <span class="btn btn-outline">Xin chào, @User.Identity.Name</span>
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-solid">Đăng xuất</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-outline">Đăng ký</a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-solid">Đăng nhập</a>
+                }
+
+                <a asp-controller="Cart" asp-action="Index" class="cart-btn" aria-label="Giỏ hàng">
+                    <svg width="18" height="18" fill="none" stroke="#D6336C" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                    <div class="cart-badge">@(ViewData["CartCount"] ?? 0)</div>
+                </a>
+            </div>
+    </div>
+</header>
+
+<!-- ══ NAV ════════════════════════════════════════ -->
+<nav>
+    <div class="nav-inner">
+        <a asp-controller="Home" asp-action="Index"
+           class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">Trang chủ</a>
+        <a asp-controller="Products" asp-action="Index" asp-route-category="duong-da"
+           class="nav-item">Dưỡng da <span class="arrow">▾</span></a>
+        <a asp-controller="Products" asp-action="Index" asp-route-category="trang-diem"
+           class="nav-item">Trang điểm <span class="arrow">▾</span></a>
+        <a asp-controller="Products" asp-action="Index" asp-route-category="cham-soc-toc"
+           class="nav-item">Chăm sóc tóc <span class="arrow">▾</span></a>
+        <a asp-controller="Products" asp-action="Index" asp-route-category="nuoc-hoa"
+           class="nav-item">Nước hoa <span class="arrow">▾</span></a>
+        <a asp-controller="Products" asp-action="Index" asp-route-category="combo"
+           class="nav-item">Combo tiết kiệm <span class="arrow">▾</span></a>
+        <a asp-controller="Products" asp-action="Sale"
+           class="nav-item" style="margin-left:auto; background:rgba(255,255,255,0.15); color:white;">🔥 Khuyến mãi</a>
+    </div>
+</nav>
+
+<!-- ══ MAIN CONTENT ════════════════════════════════ -->
+<main>
+    @RenderBody()
+</main>
+
+<!-- ══ FOOTER ══════════════════════════════════════ -->
+<footer>
+    <div class="footer-inner">
+        <div>
+            <div class="footer-brand-name">✿ ChangSpaBeauTy</div>
+            <p class="footer-desc">Chúng tôi mang đến những sản phẩm làm đẹp cao cấp từ thiên nhiên, giúp bạn toả sáng mỗi ngày. Chất lượng uy tín, an toàn cho mọi loại da.</p>
+            <div class="footer-social">
+                <div class="social-btn" title="Facebook">f</div>
+                <div class="social-btn" title="Instagram">ig</div>
+                <div class="social-btn" title="TikTok">tt</div>
+                <div class="social-btn" title="Zalo">zl</div>
+            </div>
+        </div>
+        <div>
+            <div class="footer-col-title">Sản phẩm</div>
+            <a asp-controller="Products" asp-action="Index" asp-route-category="duong-da" class="footer-link">Dưỡng da</a>
+            <a asp-controller="Products" asp-action="Index" asp-route-category="trang-diem" class="footer-link">Trang điểm</a>
+            <a asp-controller="Products" asp-action="Index" asp-route-category="cham-soc-toc" class="footer-link">Chăm sóc tóc</a>
+            <a asp-controller="Products" asp-action="Index" asp-route-category="nuoc-hoa" class="footer-link">Nước hoa</a>
+            <a asp-controller="Products" asp-action="Index" asp-route-category="combo" class="footer-link">Combo tiết kiệm</a>
+        </div>
+        <div>
+            <div class="footer-col-title">Hỗ trợ</div>
+            <a class="footer-link">Chính sách đổi trả</a>
+            <a class="footer-link">Hướng dẫn mua hàng</a>
+            <a class="footer-link">Câu hỏi thường gặp</a>
+            <a asp-controller="Home" asp-action="Contact" class="footer-link">Liên hệ</a>
+        </div>
+        <div>
+            <div class="footer-col-title">Liên hệ</div>
+            <span class="footer-link"> Hà Nội, Việt Nam</span>
+            <span class="footer-link"> 0123 456 789</span>
+            <span class="footer-link">hello@changspa.vn</span>
+            <span class="footer-link"> 8:00 – 21:00 mỗi ngày</span>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        © 2025 ChangSpaBeauTy. Tất cả quyền được bảo lưu.
+    </div>
+</footer>
+
+<script src="~/js/changspa.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
