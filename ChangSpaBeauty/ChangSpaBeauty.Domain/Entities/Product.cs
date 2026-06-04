@@ -8,4 +8,7 @@ public class Product
     public int CategoryId { get; set; }
     public Category? Category { get; set; }
     public int Sold { get; set; }
+    public string? Description { get; set; }
+    public int Stock { get; set; }
+    public DateTime? CreatedAt { get; set; }
 }

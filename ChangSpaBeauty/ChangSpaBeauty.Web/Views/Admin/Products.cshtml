@@ -1,0 +1,92 @@
+﻿@model IEnumerable<ChangSpaBeauty.Application.DTOs.ProductDto>
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/category.css" />
+}
+<div class="admin-page">
+
+    <div class="admin-breadcrumb">
+        <a asp-controller="Home" asp-action="Index">Trang chủ</a>
+        <span>›</span>
+        <a asp-controller="Admin" asp-action="Index">Admin</a>
+        <span>›</span>
+        <span style="color:#D6336C;">Sản phẩm</span>
+    </div>
+
+    <div class="page-header">
+        <div class="page-title">🗂️ Quản lý sản phẩm</div>
+        <a asp-action="CreateProduct" class="btn-add">＋ Thêm sản phẩm</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">✅ @TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">⚠️ @TempData["Error"]</div>
+    }
+
+    <div class="admin-card">
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📂</div>
+                <p>
+                    Chưa có sản phẩm nào.
+                    <a asp-action="CreateProduct" style="color:#D6336C;">Thêm ngay →</a>
+                </p>
+            </div>
+        }
+        else
+        {
+            <table class="cat-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Tồn kho</th>
+                        <th>Danh mục</th>
+                        <th>Ảnh</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int stt = 1;
+                    }
+                    @foreach (var pro in Model)
+                    {
+                        <tr>
+                            <td style="color:#bbb; width:40px;">@stt</td>
+                            <td style="font-weight:600; color:#2d2d2d;">@pro.Name</td>
+                            <td style="font-weight:100; color:#2d2d2d;">@pro.Price</td>
+                            <td>
+                                <span class="badge-count">@pro.Sold</span>
+                            </td>
+                            <td style="font-weight:100; color:#2d2d2d;">@pro.CategoryName</td>
+                            <td style="font-weight:100; color:#2d2d2d;">@pro.Image</td>
+                            <td>
+                                <div class="action-btns">
+                                    <a asp-action="EditProduct" asp-route-id="@pro.ProductId"
+                                       class="btn-edit">✏️ Sửa</a>
+
+                                    <form asp-action="DeleteProduct" method="post" style="margin:0;"
+                                          onsubmit="return confirm('Xóa danh mục \'@pro.Name\'?\nLưu ý: không thể xóa nếu còn sản phẩm!')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@pro.ProductId" />
+                                        <button type="submit" class="btn-delete">🗑 Xóa</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        stt++;
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

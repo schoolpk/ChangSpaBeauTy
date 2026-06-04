@@ -1,5 +1,7 @@
 using ChangSpaBeauty.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Text;
 namespace ChangSpaBeauty.Infrastructure.Persistence;
 public class AppDbContext : DbContext
 {
@@ -8,6 +10,7 @@ public class AppDbContext : DbContext
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+    public DbSet<CartItem> CartItems { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -22,16 +25,56 @@ public class AppDbContext : DbContext
             entity.Property(p => p.Image).HasColumnName("image");
             entity.Property(p => p.CategoryId).HasColumnName("category_id");
             entity.Property(p => p.Sold).HasColumnName("sold");
+            entity.Property(p => p.Description).HasColumnName("description"); 
+            entity.Property(p => p.Stock).HasColumnName("stock");             
+            entity.Property(p => p.CreatedAt).HasColumnName("created_at");
             entity.HasOne(p => p.Category)
                   .WithMany(c => c.Products)
                   .HasForeignKey(p => p.CategoryId);
         });
 
 
-        modelBuilder.Entity<ShoppingCart>()
-            .HasOne(sc => sc.User)
-            .WithOne(u => u.ShoppingCart)
-            .HasForeignKey<ShoppingCart>(sc => sc.UserId);
+        modelBuilder.Entity<ShoppingCart>(entity =>
+        {
+            entity.ToTable("ShoppingCart");
+            entity.HasKey(sc => sc.ShoppingCartId);
+            entity.Property(sc => sc.ShoppingCartId).HasColumnName("shoppingcart_id");
+            entity.Property(sc=>sc.UserId).HasColumnName("user_id");
+            entity.HasOne(sc => sc.User)
+                    .WithOne(u=>u.ShoppingCart)
+                    .HasForeignKey<ShoppingCart>(sc => sc.UserId);
+        });
+
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.ToTable("Category");
+            entity.HasKey(c => c.CategoryId);
+            entity.Property(c=>c.CategoryId).HasColumnName("category_id");
+            entity.Property(c => c.Name).HasColumnName("name");
+            entity.Property(c => c.Total).HasColumnName("total");
+            entity.Property(c => c.Trademark).HasColumnName("trademark");
+        });
+
+
+
+        modelBuilder.Entity<CartItem>(entity =>
+        {
+            entity.ToTable("CartItem");
+            entity.HasKey(ci => ci.Id);
+            entity.Property(ci=>ci.Id).HasColumnName("id");
+            entity.Property(ci => ci.ShoppingCartId).HasColumnName("shoppingcart_id");
+            entity.Property(ci=>ci.ProductId).HasColumnName("product_id");
+            entity.Property(ci => ci.Quantity).HasColumnName("quantity");
+
+            entity.HasOne(ci => ci.ShoppingCart)
+                    .WithMany(sc => sc.CartItems)
+                    .HasForeignKey(ci => ci.ShoppingCartId);
+
+            entity.HasOne(ci => ci.Product)
+                    .WithMany()
+                    .HasForeignKey(ci => ci.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+        });
 
         modelBuilder.Entity<User>(entity =>
         {

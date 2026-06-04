@@ -1,0 +1,63 @@
+﻿@model ChangSpaBeauty.Web.ViewModels.CategoryCreateViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa danh mục";
+    Layout = "_Layout";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/createproduct.css" />
+}
+<div class="create-page">
+    <div class="create-header">
+        <a asp-controller="Home" asp-action="Index">← Quay lại</a>
+        <span style="color:#ccc">|</span>
+        <h1>✨ Thêm danh mục mới</h1>
+    </div>
+    @if(!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+    {
+        <div class="alert alert-danger">
+            ⚠️ Vui lòng kiểm tra lại thông tin bên dưới.
+        </div>
+    }
+    @if(TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            ✅ @TempData["Success"]
+        </div>
+    }
+
+    <div class="create-card">
+        <form asp-controller="Admin" asp-action="CreateCategory" method="post"
+                enctype="multipart/form-data" id="createForm" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="form-section">
+                <div class="form-section-title">Thông tin cơ bản</div>
+                <div class="form-group">
+                    <label asp-for="Name">Tên danh mục<span class="required">*</span></label>
+                    <input asp-for="Name" class="form-control" placeholder="Tên danh mục">
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="TradeMark">Tên thương hiệu<span class="required">*</span></label>
+                    <input asp-for="TradeMark" class="form-control" placeholder="Tên thương hiệu">
+                    <span asp-validation-for="TradeMark" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="btn-row">
+                <a asp-controller="Admin" asp-action="Index" class="btn-cancel">Hủy</a>
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span class="spinner" id="spinner"></span>
+                    💾 Lưu sản phẩm
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/createproduct.js" asp-append-version="true"></script>
+}
+
+  

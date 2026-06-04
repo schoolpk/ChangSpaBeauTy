@@ -1,0 +1,71 @@
+﻿@model ChangSpaBeauty.Web.ViewModels.Product.ProductCreateViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa sản phẩm";
+    int proId = (int)ViewBag.ProductId;
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/editcategory.css" />
+}
+
+<div class="admin-page">
+
+    <div class="admin-breadcrumb">
+        <a asp-controller="Home" asp-action="Index">Trang chủ</a>
+        <span>›</span>
+        <a asp-controller="Admin" asp-action="Products">Sản phẩm</a>
+        <span>›</span>
+        <span style="color:#D6336C;">Chỉnh sửa</span>
+    </div>
+
+    <div class="admin-title">✏️ Chỉnh sửa sản phẩm</div>
+
+    <div class="edit-badge">ID: #@proId</div>
+
+    <div class="admin-card">
+        <div class="card-section-title">📋 Thông tin sản phẩm</div>
+
+        <form asp-action="EditProduct" asp-route-id="@proId" method="post" id="editForm" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Name">
+                    Tên sản phẩm <span class="req">*</span>
+                </label>
+                <input asp-for="Name" class="form-control" id="nameInput"
+                       placeholder="Tên sản phẩm" maxlength="100" />
+                <div class="char-count"><span id="nameCount">0</span>/100</div>
+                <span asp-validation-for="Name" class="text-danger"></span>
+
+                <label class="form-label" asp-for="Price">
+                    Giá <span class="req">*</span>
+                </label>
+                <input asp-for="Price" class="form-control" id="priceInput"
+                       placeholder="Giá sản phẩm" maxlength="100" />
+                <div class="char-count"><span id="nameCount">0</span>/100</div>
+                <span asp-validation-for="Price" class="text-danger"></span>
+
+                <label class="form-label" asp-for="CategoryId">
+                    Danh mục <span class="req">*</span>
+                </label>
+                <select asp-for="CategoryId" class="form-control"
+                        asp-items="ViewBag.Categories">
+                    <option value="">-- Chọn danh mục --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+
+                <input asp-for="Description" class="form-control" id="priceInput"
+                       placeholder="Mô tả" maxlength="100" />
+                <div class="char-count"><span id="nameCount">0</span>/100</div>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="btn-row">
+                <a asp-action="Index" class="btn-cancel">Hủy bỏ</a>
+                <button type="submit" class="btn-save" id="saveBtn">
+                    <span class="spinner" id="spinner"></span>
+                    <span id="saveLabel">💾 Lưu thay đổi</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

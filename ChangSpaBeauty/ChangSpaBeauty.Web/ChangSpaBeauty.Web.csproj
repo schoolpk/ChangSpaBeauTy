@@ -12,6 +12,11 @@
     <ProjectReference Include="..\ChangSpaBeauty.Infrastructure\ChangSpaBeauty.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Categories\" />
+    <Folder Include="wwwroot\images\products\" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
