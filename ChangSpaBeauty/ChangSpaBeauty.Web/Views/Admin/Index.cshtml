@@ -1,0 +1,259 @@
+﻿@using ChangSpaBeauty.Domain.Entities
+@using ChangSpaBeauty.Application.DTOs
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/changspa.css" />
+    <link rel="stylesheet" href="~/css/admin.css" />
+}
+
+<div class="admin-topbar">
+    <span class="admin-topbar-title">✦ ChangSpaBeauTy — Admin</span>
+    <div class="admin-topbar-right">
+        <span class="admin-topbar-badge">Xin chào, @(User.Identity?.Name ?? "Admin")</span>
+    </div>
+</div>
+
+<div class="admin-wrap">
+
+    @* ===== STATS ===== *@
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">👥 Người dùng</div>
+            <div class="stat-value">@ViewBag.TotalUsers</div>
+            <div class="stat-sub">+@ViewBag.NewUsersThisMonth mới tháng này</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">📦 Sản phẩm</div>
+            <div class="stat-value">@ViewBag.TotalProducts</div>
+            <div class="stat-sub">Đang kinh doanh</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">🗂️ Danh mục</div>
+            <div class="stat-value">@ViewBag.TotalCategories</div>
+            <div class="stat-sub">Đang hoạt động</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">🛒 Đơn hàng</div>
+            <div class="stat-value">@ViewBag.TotalOrders</div>
+            <div class="stat-sub">Tổng cộng</div>
+        </div>
+    </div>
+
+    @* ===== TAB NAV — dùng class .tab từ changspa.css ===== *@
+    <div class="admin-tab-nav">
+        <button class="tab active" onclick="switchTab('users', this)">👥 Người dùng</button>
+        <button class="tab" onclick="switchTab('products', this)">📦 Sản phẩm</button>
+        <button class="tab" onclick="switchTab('categories', this)">🗂️ Danh mục</button>
+    </div>
+
+    @* ===== PANEL: NGƯỜI DÙNG ===== *@
+    <div id="panel-users" class="admin-panel active">
+        <div class="admin-card">
+            <div class="admin-toolbar">
+                <div class="admin-search-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input type="text" placeholder="Tìm kiếm theo tên hoặc email..."
+                           oninput="filterTable('tbl-users', this.value)" />
+                </div>
+            </div>
+            <table class="admin-table" id="tbl-users">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên</th>
+                        <th>Email</th>
+                        <th>Điện thoại</th>
+                        <th>Địa chỉ</th>
+                        <th>Vai trò</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.Users != null)
+                    {
+                        @foreach (var user in ViewBag.Users)
+                        {
+                            <tr>
+                                <td class="id-cell">#@user.Id</td>
+                                <td>
+                                    <div class="user-cell">
+                                        <span class="avatar">@(user.Name?.Length > 0 ? user.Name.Substring(0, 1).ToUpper() : "?")</span>
+                                        @user.Name
+                                    </div>
+                                </td>
+                                <td>@user.Email</td>
+                                <td>@user.Phone</td>
+                                <td>@user.Address</td>
+                                <td>
+                                    @if (user.Role == "Admin")
+                                    {
+                                        <span class="badge badge-admin">Admin</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-user">User</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="empty-state">Không có dữ liệu người dùng</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @* ===== PANEL: SẢN PHẨM ===== *@
+    <div id="panel-products" class="admin-panel">
+        <div class="admin-card">
+            <div class="admin-toolbar">
+                <div class="admin-search-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input type="text" placeholder="Tìm kiếm sản phẩm..."
+                           oninput="filterTable('tbl-products', this.value)" />
+                </div>
+                <a  asp-action="CreateProduct" class="btn-add">+ Thêm sản phẩm</a>
+            </div>
+            <table class="admin-table" id="tbl-products">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Danh mục</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.Products != null)
+                    {
+                        @foreach (var pro in ViewBag.Products)
+                        {
+                            <tr>
+                                <td class="id-cell">#@pro.ProductId</td>
+                                <td>
+                                    <div class="prod-cell">
+                                        <div class="img-thumb">
+                                            @if (!string.IsNullOrEmpty(pro.Image))
+                                            {
+                                                <img src="@pro.Image" alt="@pro.Name" />
+                                            }
+                                            else
+                                            {
+                                                <span>🌸</span>
+                                            }
+                                        </div>
+                                        @pro.Name
+                                    </div>
+                                </td>
+                                <td class="price">@pro.Price.ToString("N0") ₫</td>
+                                <td><span class="badge badge-cat">@pro.CategoryName</span></td>
+                                <td>
+                                    <div class="action-group">
+                                        <a asp-action="EditProduct"
+                                           asp-route-id="@pro.ProductId" class="btn-edit">Sửa</a>
+                                        <form asp-action="DeleteProduct" method="post" style="margin:0;"
+                                              onsubmit="return confirm('Xóa danh mục \'@pro.Name)">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@pro.ProductId" />
+                                            <button type="submit" class="btn-delete">🗑 Xóa</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="empty-state">Không có dữ liệu sản phẩm</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @* ===== PANEL: DANH MỤC ===== *@
+    <div id="panel-categories" class="admin-panel">
+        <div class="admin-card">
+            <div class="admin-toolbar">
+                <div class="admin-search-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input type="text" placeholder="Tìm kiếm danh mục..."
+                           oninput="filterTable('tbl-categories', this.value)" />
+                </div>
+                <a  asp-action="CreateCategory" class="btn-add">+ Thêm danh mục</a>
+            </div>
+            <table class="admin-table" id="tbl-categories">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên danh mục</th>
+                        <th>Số sản phẩm</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.Categories != null)
+                    {
+                        @foreach (var cat in ViewBag.Categories)
+                        {
+                            <tr>
+                                <td class="id-cell">#@cat.CategoryId</td>
+                                <td><span class="cat-chip">🏷️ @cat.Name</span></td>
+                                <td>
+                                    <span class="badge-count">@(cat.Products?.Count ?? 0)</span>
+                                </td>
+                                <td>
+                                    <div class="action-group">
+                                        <a asp-action="EditCategory"
+                                           asp-route-id="@cat.CategoryId" class="btn-edit">Sửa</a>
+                                        <form asp-action="DeleteCategory" method="post" style="margin:0;"
+                                              onsubmit="return confirm('Xóa danh mục \'@cat.Name\'?\nLưu ý: không thể xóa nếu còn sản phẩm!')">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@cat.CategoryId" />
+                                            <button type="submit" class="btn-delete">🗑 Xóa</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="empty-state">Không có dữ liệu danh mục</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>@* end admin-wrap *@
+
+@section Scripts {
+    <script src="~/js/admin.js" asp-append-version="true"></script>
+}

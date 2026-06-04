@@ -1,15 +1,81 @@
+﻿using ChangSpaBeauty.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ChangSpaBeauty.Web.Controllers;
 
+[Authorize]
 public class CartController : Controller
 {
-    public IActionResult Index() => View();
+    private readonly IShoppingCartService _cartService;
 
-    [HttpPost]
-    public IActionResult Add(int productId)
+    public CartController(IShoppingCartService cartService)
     {
-        // TODO: implement cart logic with session/cookie
-        return RedirectToAction("Index", "Home");
+        _cartService = cartService;
+    }
+
+    private int GetUserId()
+    {
+        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(value))
+            throw new UnauthorizedAccessException("User not authenticated");
+        return int.Parse(value);
+    }
+
+
+    // ==================== XEM GIỎ HÀNG ====================
+    public async Task<IActionResult> Index()
+    {
+        var cart = await _cartService.GetCartAsync(GetUserId());
+        return View(cart);
+    }
+
+    // ==================== THÊM VÀO GIỎ ====================
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
+    {
+        await _cartService.AddToCartAsync(GetUserId(), productId, quantity);
+        TempData["SuccessMessage"] = "Đã thêm sản phẩm vào giỏ hàng!";
+        return RedirectToAction("Index");
+    }
+
+    // ==================== CẬP NHẬT SỐ LƯỢNG ====================
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateQuantity(int cartItemId, int quantity)
+    {
+        await _cartService.UpdateQuantityAsync(GetUserId(), cartItemId, quantity);
+        return RedirectToAction("Index");
+    }
+
+    // ==================== XÓA SẢN PHẨM ====================
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteCartItem(int cartItemId)
+    {
+        await _cartService.DeleteAsync(GetUserId(), cartItemId);
+        TempData["SuccessMessage"] = "Đã xóa sản phẩm khỏi giỏ hàng.";
+        return RedirectToAction("Index");
+    }
+
+    // ==================== XÓA TOÀN BỘ GIỎ ====================
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ClearCart()
+    {
+        await _cartService.ClearCartAsync(GetUserId());
+        return RedirectToAction("Index");
+    }
+
+    // ==================== THÊM AJAX (trả JSON) ====================
+    [HttpPost]
+    public async Task<IActionResult> AddToCartAjax(int productId, int quantity = 1)
+    {
+        var userId = GetUserId();
+        await _cartService.AddToCartAsync(userId, productId, quantity);
+        var count = await _cartService.GetCartItemCountAsync(GetUserId());
+        return Json(new { success = true, cartCount = count });
     }
 }

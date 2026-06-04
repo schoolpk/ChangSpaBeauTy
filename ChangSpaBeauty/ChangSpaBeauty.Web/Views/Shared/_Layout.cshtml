@@ -1,3 +1,4 @@
+@using System.Security.Claims
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -12,7 +13,7 @@
 <!-- ══ HEADER ══════════════════════════════════════ -->
 <header>
     <div class="brand-bar">
-        <div class="brand-name">✿ ChangSpaBeauTy ✿</div>
+        <div class="brand-name"> ChangSpaBeauTy </div>
         <div class="brand-tagline">Chăm sóc vẻ đẹp tự nhiên</div>
     </div>
     <div class="header-bar">
@@ -33,6 +34,15 @@
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-solid">Đăng xuất</button>
                     </form>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <select id="options" onchange="location = this.value;" class="btn btn-solid">
+                            <option value="">Chose</option>
+                            <option value="/Admin/Index">⚙️ Admin</option>
+                            <option value="/Admin/Categories">Categogies</option>
+                            <option value="/Admin/Products">Products</option>
+                        </select>
+                    }
                 }
                 else
                 {
@@ -61,14 +71,14 @@
            class="nav-item">Dưỡng da <span class="arrow">▾</span></a>
         <a asp-controller="Products" asp-action="Index" asp-route-category="trang-diem"
            class="nav-item">Trang điểm <span class="arrow">▾</span></a>
-        <a asp-controller="Products" asp-action="Index" asp-route-category="cham-soc-toc"
-           class="nav-item">Chăm sóc tóc <span class="arrow">▾</span></a>
+        <a asp-controller="Products" asp-action="Index" asp-route-category="cham-soc-co-the"
+           class="nav-item">Chăm sóc cơ thể <span class="arrow">▾</span></a>
         <a asp-controller="Products" asp-action="Index" asp-route-category="nuoc-hoa"
            class="nav-item">Nước hoa <span class="arrow">▾</span></a>
         <a asp-controller="Products" asp-action="Index" asp-route-category="combo"
            class="nav-item">Combo tiết kiệm <span class="arrow">▾</span></a>
-        <a asp-controller="Products" asp-action="Sale"
-           class="nav-item" style="margin-left:auto; background:rgba(255,255,255,0.15); color:white;">🔥 Khuyến mãi</a>
+        @* <a asp-controller="Products" asp-action="Sale"
+           class="nav-item" style="margin-left:auto; background:rgba(255,255,255,0.15); color:white;">🔥 Khuyến mãi</a> *@
     </div>
 </nav>
 
@@ -81,7 +91,7 @@
 <footer>
     <div class="footer-inner">
         <div>
-            <div class="footer-brand-name">✿ ChangSpaBeauTy</div>
+            <div class="footer-brand-name"> ChangSpaBeauTy</div>
             <p class="footer-desc">Chúng tôi mang đến những sản phẩm làm đẹp cao cấp từ thiên nhiên, giúp bạn toả sáng mỗi ngày. Chất lượng uy tín, an toàn cho mọi loại da.</p>
             <div class="footer-social">
                 <div class="social-btn" title="Facebook">f</div>

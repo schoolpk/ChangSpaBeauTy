@@ -18,17 +18,17 @@ public class ProductRepository : IProductRepository
     {
        return await _context.Products.Include(p => p.Category).ToListAsync();
     }
-    public async Task AddAsync(Product entity)
+    public async Task AddAsync(Product product)
     {
-        await _context.Products.AddAsync(entity);
+        await _context.Products.AddAsync(product);
     }
-    public void Update(Product entity)
+    public void UpdateAsync(Product product)
     {
-        _context.Products.Update(entity);
+        _context.Products.Update(product);
     }
-    public void Delete(Product entity)
+    public void DeleteAsync(Product product)
     { 
-        _context.Products.Remove(entity);
+        _context.Products.Remove(product);
     }
     public async Task<IEnumerable<Product>> GetByCategoryAsync(int categoryId) 
     { 

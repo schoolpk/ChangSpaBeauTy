@@ -1,0 +1,58 @@
+﻿@model ChangSpaBeauty.Web.ViewModels.CategoryCreateViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa danh mục";
+    int catId = (int)(ViewBag.CategoryId ?? 0);
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/editcategory.css" />
+}
+
+<div class="admin-page">
+
+    <div class="admin-breadcrumb">
+        <a asp-controller="Home" asp-action="Index">Trang chủ</a>
+        <span>›</span>
+        <a asp-controller="Admin" asp-action="Categories">Danh mục</a>
+        <span>›</span>
+        <span style="color:#D6336C;">Chỉnh sửa</span>
+    </div>
+
+    <div class="admin-title">✏️ Chỉnh sửa danh mục</div>
+
+    <div class="edit-badge">ID: #@catId</div>
+
+    <div class="admin-card">
+        <div class="card-section-title">📋 Thông tin danh mục</div>
+
+        <form asp-action="EditCategory" asp-route-id="@catId" method="post" id="editForm" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Name">
+                    Tên danh mục <span class="req">*</span>
+                </label>
+                <input asp-for="Name" class="form-control" id="nameInput"
+                       placeholder="VD: Kem dưỡng da, Son môi..." maxlength="100" />
+                <div class="char-count"><span id="nameCount">0</span>/100</div>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="btn-row">
+                <a asp-action="Index" class="btn-cancel">Hủy bỏ</a>
+                <button type="submit" class="btn-save" id="saveBtn">
+                    <span class="spinner" id="spinner"></span>
+                    <span id="saveLabel">💾 Lưu thay đổi</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/editcategory.js" asp-append-version="true"></script>
+}
+

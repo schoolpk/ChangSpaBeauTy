@@ -2,6 +2,7 @@
 using ChangSpaBeauty.Domain.Entities;
 using ChangSpaBeauty.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,9 +23,21 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
             await _context.Users.AddAsync(user);
         }
 
+        public void DeleteUser(User user)
+        {
+            _context.Users.Remove(user);
+        }
+
         public async Task<bool> EmailExistAsync(string email)
         {
             return await _context.Users.AnyAsync(u => u.Email == email);
+        }
+
+        public async Task<IEnumerable<User>> GetAllAsync()
+        {
+            return await _context.Users
+                .OrderBy(u => u.Id)
+                .ToListAsync();
         }
 
         public async Task<User?> GetByEmailAsync(string email)

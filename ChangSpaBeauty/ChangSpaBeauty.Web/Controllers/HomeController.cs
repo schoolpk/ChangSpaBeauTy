@@ -1,14 +1,17 @@
+using ChangSpaBeauty.Application.Interfaces;
 using ChangSpaBeauty.Application.Services;
 using ChangSpaBeauty.Web.ViewModels;
+using ChangSpaBeauty.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChangSpaBeauty.Web.Controllers;
 
-public class HomeController : Controller
+public class HomeController : BaseController
 {
     private readonly ProductService _productService;
 
-    public HomeController(ProductService productService)
+    public HomeController(IShoppingCartService cartService,ProductService productService)
+        : base(cartService)
     {
         _productService = productService;
     }

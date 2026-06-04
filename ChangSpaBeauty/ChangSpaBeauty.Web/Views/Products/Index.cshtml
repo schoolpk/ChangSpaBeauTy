@@ -1,4 +1,6 @@
-@model ChangSpaBeauty.Web.ViewModels.ProductListViewModel
+@using ChangSpaBeauty.Domain.Entities
+@using ChangSpaBeauty.Web.ViewModels.Product
+@model ProductListViewModel
 @{
     ViewData["Title"] = "Sản phẩm";
 }
@@ -58,6 +60,22 @@
             </div>
 
             <div class="product-grid">
+                @if (!Model.Products.Any())
+                {
+                    <div class="no-result">
+                        <div class="no-result-icon">🔍</div>
+                        @if (!string.IsNullOrEmpty(Model.SearchKeyword))
+                        {
+                            <p>Không tìm thấy sản phẩm nào cho <strong>"@Model.SearchKeyword"</strong></p>
+                        }
+                        else
+                        {
+                            <p>Danh mục này hiện chưa có sản phẩm nào.</p>
+                        }
+
+                        <a asp-action="Index" class="btn-back">← Xem tất cả sản phẩm</a>
+                    </div>
+                }
                 @foreach (var p in Model.Products)
                 {
                     <div class="product-card">
@@ -65,7 +83,7 @@
                             <div class="product-img" style="background:#FFF0F5;">
                                 @if (!string.IsNullOrEmpty(p.Image))
                                 {
-                                    <img src="@p.Image" alt="@p.Name" />
+                                    <img src="~/images/products/@p.Image" alt="@p.Name" />
                                 }
                                 else
                                 {
@@ -78,10 +96,23 @@
                             <div class="product-name">@p.Name</div>
                             <div class="product-price">@p.Price.ToString("N0")đ</div>
                             <div class="product-sold">@p.CategoryName · Đã bán @p.Sold</div>
-                            <form asp-controller="Cart" asp-action="Add" method="post">
-                                <input type="hidden" name="productId" value="@p.ProductId" />
-                                <button type="submit" class="product-add" onclick="addToCart(this); return false;">+ Thêm vào giỏ</button>
-                            </form>
+
+                            @* Kiểm tra đăng nhập bên trong từng sản phẩm *@
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="productId" value="@p.ProductId" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <button type="submit" class="product-add">+ Thêm vào giỏ</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a asp-controller="Account" asp-action="Login" class="product-add">
+                                    Đăng nhập để mua
+                                </a>
+                            }
                         </div>
                     </div>
                 }
