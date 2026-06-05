@@ -21,6 +21,7 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
         public async Task AddCartItemAsync(CartItem item)
         {
             await _context.CartItems.AddAsync(item);
+            await _context.SaveChangesAsync();
         }
         
         public async Task ClearCartAsync(int shoppingCartId)
@@ -58,10 +59,10 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public Task UpdateCartItemAsync(CartItem item)
+        public async Task UpdateCartItemAsync(CartItem item)
         {
             _context.CartItems.Update(item);
-            return Task.CompletedTask;
+            await _context.SaveChangesAsync();
         }
     }
 }

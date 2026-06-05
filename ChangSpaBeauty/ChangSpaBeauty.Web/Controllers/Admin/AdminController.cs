@@ -2,6 +2,8 @@
 using ChangSpaBeauty.Application.DTOs;
 using ChangSpaBeauty.Application.Interfaces;
 using ChangSpaBeauty.Application.Services;
+using ChangSpaBeauty.Domain.Interfaces;
+using ChangSpaBeauty.Infrastructure.Repositories;
 using ChangSpaBeauty.Web.ViewModels;
 using ChangSpaBeauty.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
@@ -16,15 +18,17 @@ public class AdminController : Controller
 {
     private readonly CategoryService _categoryService;
     private readonly ProductService _productService;
+    private readonly IOrderRepository _orderRepository;
     private readonly IUserRepository _userRepository;
     private readonly IWebHostEnvironment _env;
 
-    public AdminController(CategoryService categoryService, ProductService productService, IUserRepository userRepository, IWebHostEnvironment env)
+    public AdminController(CategoryService categoryService, ProductService productService, IUserRepository userRepository, IWebHostEnvironment env, IOrderRepository orderRepository)
     {
         _categoryService = categoryService;
         _productService = productService;
         _userRepository = userRepository;
         _env = env;
+        _orderRepository = orderRepository;
     }
 
     public async Task<IActionResult> Index()
@@ -45,8 +49,12 @@ public class AdminController : Controller
         var categoryList = categories.ToList();
         ViewBag.Categories = categories;
         ViewBag.TotalCategories = categoryList.Count;
+        // Order
+        var orders = await _orderRepository.GetAllAsync();
+        var orderList = orders.ToList();
+        ViewBag.Orders = orders;
+        ViewBag.TotalOrders = orderList.Count;
 
-        ViewBag.TotalOrders = 0;
         return View();
 
     }

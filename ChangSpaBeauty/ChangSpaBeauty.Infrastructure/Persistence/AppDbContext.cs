@@ -11,6 +11,8 @@ public class AppDbContext : DbContext
     public DbSet<Category> Categories { get; set; }
     public DbSet<ShoppingCart> ShoppingCarts { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderDetail> OrderDetails { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -74,6 +76,44 @@ public class AppDbContext : DbContext
                     .WithMany()
                     .HasForeignKey(ci => ci.ProductId)
                     .OnDelete(DeleteBehavior.Cascade);
+        });
+
+
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.ToTable("Order");
+            entity.HasKey(o => o.OrderId);
+            entity.Property(o => o.OrderId).HasColumnName("order_id");
+            entity.Property(o => o.UserId).HasColumnName("user_id");
+            entity.Property(o => o.TotalPrice).HasColumnName("total_price");
+            entity.Property(o => o.Status).HasColumnName("status");
+            entity.Property(o => o.Address).HasColumnName("address");
+            entity.Property(o => o.Phone).HasColumnName("phone");
+            entity.Property(o => o.CreatedAt).HasColumnName("created_at");
+
+            entity.HasOne(o => o.User)
+                    .WithMany()
+                    .HasForeignKey(o => o.UserId);
+        });
+
+
+        modelBuilder.Entity<OrderDetail>(entity => 
+        {
+            entity.ToTable("OrderDetail");
+            entity.HasKey(od => od.Id);
+            entity.Property(od=>od.Id).HasColumnName("id");
+            entity.Property(od=>od.OrderId).HasColumnName("order_id");
+            entity.Property(od=>od.ProductId).HasColumnName("product_id");
+            entity.Property(od=>od.Quantity).HasColumnName("quantity");
+            entity.Property(od=>od.UnitPrice).HasColumnName("unit_price");
+
+            entity.HasOne(od => od.Order)
+                    .WithMany(o => o.OrderDetails)
+                    .HasForeignKey(od => od.OrderId);
+
+            entity.HasOne(od=>od.Product)
+                    .WithMany()
+                    .HasForeignKey(od => od.ProductId);
         });
 
         modelBuilder.Entity<User>(entity =>

@@ -1,0 +1,99 @@
+﻿@model ChangSpaBeauty.Application.DTOs.Order.CheckoutDto
+@{
+    ViewData["Title"] = "Thanh toán";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var cart = ViewBag.Cart as ChangSpaBeauty.Application.DTOs.ShoppingCart.ShoppingCartDTO;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/changspa.css" />
+    <link rel="stylesheet" href="~/css/checkout.css" />
+}
+
+<div class="checkout-wrap">
+
+    <h1 class="checkout-title">💳 Thanh toán</h1>
+
+    <div class="checkout-grid">
+
+        @* FORM *@
+        <div class="form-card">
+            <h2>📦 Thông tin giao hàng</h2>
+
+            <form asp-controller="Order" asp-action="PlaceOrder" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    <label>Họ và tên *</label>
+                    <input type="text" value="@User.Identity?.Name" readonly
+                           style="opacity:.7; cursor:not-allowed;" />
+                    <div class="field-hint">Tên tài khoản của bạn</div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Phone">Số điện thoại *</label>
+                    <input asp-for="Phone" type="tel" placeholder="Ví dụ: 0901 234 567" required />
+                    <span asp-validation-for="Phone" class="field-hint" style="color:red"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Address">Địa chỉ giao hàng *</label>
+                    <textarea asp-for="Address" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" required></textarea>
+                    <span asp-validation-for="Address" class="field-hint" style="color:red"></span>
+                </div>
+
+                <div class="payment-note">
+                    <span>💵</span>
+                    <span>Hiện tại chúng tôi chỉ hỗ trợ <strong>thanh toán khi nhận hàng (COD)</strong>. Vui lòng chuẩn bị tiền mặt khi nhận hàng.</span>
+                </div>
+
+                <button type="submit" class="btn-place-order" style="margin-top:1.5rem">
+                    ✅ Đặt hàng ngay
+                </button>
+            </form>
+
+            <a asp-controller="Cart" asp-action="Index" class="btn-back">
+                ← Quay lại giỏ hàng
+            </a>
+        </div>
+
+        @* ORDER SUMMARY *@
+        <div class="summary-card">
+            <h2>🛍️ Đơn hàng của bạn</h2>
+
+            @if (cart != null)
+            {
+                <ul class="order-items">
+                    @foreach (var item in cart.Items)
+                    {
+                        <li class="order-item">
+                            <img src="~/images/products/@item.ProductImage" alt="@item.ProductName"
+                                 onerror="this.src='/images/placeholder.png'" />
+                            <div class="order-item-info">
+                                <div class="order-item-name">@item.ProductName</div>
+                                <div class="order-item-qty">x@item.Quantity</div>
+                            </div>
+                            <div class="order-item-price">@((item.Price * item.Quantity).ToString("N0")) ₫</div>
+                        </li>
+                    }
+                </ul>
+
+                <div class="summary-rows">
+                    <div class="summary-row">
+                        <span>Số lượng sản phẩm</span>
+                        <span>@cart.TotalItems</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Phí vận chuyển</span>
+                        <span style="color:green">Miễn phí 🎉</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Tổng thanh toán</span>
+                        <span>@cart.GrandTotal.ToString("N0") ₫</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>

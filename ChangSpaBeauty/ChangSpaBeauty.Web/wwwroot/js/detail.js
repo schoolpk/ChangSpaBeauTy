@@ -13,36 +13,44 @@ function changeQty(delta) {
 function addToCart(productId) {
     const qty = parseInt(document.getElementById('qty')?.value || 1);
 
-    // Lấy AntiForgeryToken từ hidden input trong form bất kỳ trên trang
     const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
 
-    fetch('/Cart/AddItem', {
+    // Gửi FormData để controller bind được
+    const formData = new FormData();
+    formData.append('productId', productId);
+    formData.append('quantity', qty);
+
+    fetch('/Cart/AddToCartAjax', {   // ✅ đúng tên action
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'RequestVerificationToken': token
+            'RequestVerificationToken': token   // AddToCartAjax không có [ValidateAntiForgeryToken] nên OK
         },
-        body: JSON.stringify({ productId: productId, quantity: qty })
+        body: formData              // ✅ FormData thay vì JSON
     })
         .then(async res => {
             if (res.ok) {
-                showToast('✅ Đã thêm ' + qty + ' sản phẩm vào giỏ!');
-                updateCartBadge(qty);
+                const data = await res.json();
+                if (data.success) {
+                    showToast('✅ Đã thêm ' + qty + ' sản phẩm vào giỏ!');
+                    updateCartBadge(data.cartCount);  // ✅ dùng số thực từ server
+                } else {
+                    showToast('❌ Có lỗi xảy ra!');
+                }
+            } else if (res.status === 401) {
+                // Chưa đăng nhập → redirect login
+                window.location.href = '/Account/Login';
             } else {
-                const text = await res.text();
-                showToast('❌ ' + (text || 'Có lỗi xảy ra!'));
+                showToast('❌ Có lỗi xảy ra!');
             }
         })
         .catch(() => showToast('❌ Không thể kết nối, thử lại nhé!'));
 }
 
 // ── Cập nhật badge giỏ hàng trên header ────────────────────────────
-function updateCartBadge(addedQty) {
+function updateCartBadge(newCount) {
     const badge = document.querySelector('.cart-badge');
     if (!badge) return;
-    const current = parseInt(badge.textContent) || 0;
-    badge.textContent = current + addedQty;
-    // Hiệu ứng nhỏ
+    badge.textContent = newCount;   // ✅ dùng count thực từ server thay vì cộng dồn
     badge.style.transform = 'scale(1.4)';
     setTimeout(() => badge.style.transform = 'scale(1)', 250);
 }

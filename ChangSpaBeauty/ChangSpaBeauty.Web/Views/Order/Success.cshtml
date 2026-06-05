@@ -1,0 +1,93 @@
+﻿@model ChangSpaBeauty.Application.DTOs.Order.OrderDto
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/changspa.css" />
+    <link rel="stylesheet" href="~/css/success.css" />
+}
+
+<div class="success-wrap">
+
+    @* HERO *@
+    <div class="success-hero">
+        <div class="success-icon">🎉</div>
+        <h1 class="success-title">Đặt hàng thành công!</h1>
+        <p class="success-sub">Cảm ơn bạn đã tin tưởng ChangSpaBeauTy 🌸</p>
+        <div class="order-id-badge">Mã đơn hàng #@Model.OrderId</div>
+    </div>
+
+    @* DELIVERY INFO *@
+    <div class="info-card">
+        <h3>📦 Thông tin giao hàng</h3>
+        <div class="delivery-grid">
+            <div class="delivery-item">
+                <label>Trạng thái</label>
+                <p>
+                    <span class="status-badge status-@Model.Status">
+                        @(Model.Status switch {
+                            "pending"   => "⏳ Chờ xác nhận",
+                            "confirmed" => "✅ Đã xác nhận",
+                            "shipping"  => "🚚 Đang giao",
+                            "done"      => "✔️ Hoàn thành",
+                            "cancelled" => "❌ Đã hủy",
+                            _           => Model.Status
+                        })
+                    </span>
+                </p>
+            </div>
+            <div class="delivery-item">
+                <label>Ngày đặt</label>
+                <p>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+            <div class="delivery-item">
+                <label>Số điện thoại</label>
+                <p>@Model.Phone</p>
+            </div>
+            <div class="delivery-item">
+                <label>Địa chỉ nhận hàng</label>
+                <p>@Model.Address</p>
+            </div>
+        </div>
+    </div>
+
+    @* ORDER ITEMS *@
+    <div class="info-card">
+        <h3>🛍️ Sản phẩm đã đặt</h3>
+
+        <ul class="order-items">
+            @foreach (var item in Model.Items)
+            {
+                <li class="order-item">
+                    <img src="~/images/products/@item.ProductImage" alt="@item.ProductName"
+                         onerror="this.src='/images/placeholder.png'" />
+                    <div class="order-item-info">
+                        <div class="order-item-name">@item.ProductName</div>
+                        <div class="order-item-meta">
+                            @item.UnitPrice.ToString("N0") ₫ × @item.Quantity
+                        </div>
+                    </div>
+                    <div class="order-item-price">@item.Subtotal.ToString("N0") ₫</div>
+                </li>
+            }
+        </ul>
+
+        <div class="total-row">
+            <span>Tổng thanh toán</span>
+            <span>@Model.TotalPrice.ToString("N0") ₫</span>
+        </div>
+    </div>
+
+    @* ACTIONS *@
+    <div class="action-row">
+        <a asp-controller="Home" asp-action="Index" class="btn-home">
+            🏠 Về trang chủ
+        </a>
+        <a asp-controller="Products" asp-action="Index" class="btn-shop">
+            🛒 Tiếp tục mua sắm
+        </a>
+    </div>
+
+</div>

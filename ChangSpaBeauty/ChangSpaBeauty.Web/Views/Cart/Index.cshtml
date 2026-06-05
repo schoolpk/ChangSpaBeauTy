@@ -87,7 +87,7 @@
                         <span>Tổng tiền:</span>
                         <span class="grand-total">@Model.GrandTotal.ToString("N0") ₫</span>
                     </div>
-                    <button class="btn-checkout">Thanh toán</button>
+                    <a asp-controller="Order" asp-action="Checkout" class="btn-checkout">Thanh toán</a>
                     <a asp-controller="Products" asp-action="Index" class="btn-continue">
                         ← Tiếp tục mua sắm
                     </a>

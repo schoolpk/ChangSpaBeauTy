@@ -368,3 +368,36 @@
     color: var(--text-light);
     padding: 32px;
 }
+
+.badge-status {
+    display: inline-block;
+    padding: .25rem .7rem;
+    border-radius: 50px;
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-confirmed {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-shipping {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.status-done {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #842029;
+}
