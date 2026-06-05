@@ -50,4 +50,24 @@ public class ProductRepository : IProductRepository
     {
        return await _context.Products.Where(p => p.Name.Contains(keyword)).ToListAsync();
     }
+
+    public async Task DeleteWithCartItemAsync(int productId)
+    {
+        var cartItems = await _context.Set<CartItem>()
+                                    .Where(ci=>ci.ProductId == productId)
+                                    .ToListAsync();
+        if (cartItems.Any())
+        {
+            _context.Set<CartItem>().RemoveRange(cartItems);
+        }
+        
+        var product = await _context.Set<Product>()
+                                    .FindAsync(productId);
+        if (product != null)
+        {
+            _context.Set<Product>().Remove(product);
+        }
+        
+        await _context.SaveChangesAsync();
+    }
 }
