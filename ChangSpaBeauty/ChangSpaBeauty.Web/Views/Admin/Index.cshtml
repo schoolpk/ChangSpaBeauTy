@@ -170,7 +170,7 @@
                                         <a asp-action="EditProduct"
                                            asp-route-id="@pro.ProductId" class="btn-edit">Sửa</a>
                                         <form asp-action="DeleteProduct" method="post" style="margin:0;"
-                                              onsubmit="return confirm('Xóa danh mục \'@pro.Name)">
+                                              onsubmit="return confirm('Xóa danh mục \'@pro.Name\?'\nCó chắc: muốn xóa sản phẩm)">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@pro.ProductId" />
                                             <button type="submit" class="btn-delete">🗑 Xóa</button>

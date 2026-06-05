@@ -82,15 +82,11 @@ public class ProductService
 
     public async Task DeleteProductAsync(int id)
     {
-        var product = await _unitOfWork.Products.GetByIdAsync(id);
-        if (product == null) return;
 
 
         //await _context.Set<CartItem>()
         //              .Where(ci => ci.ProductId == id)
         //              .ExecuteDeleteAsync();
-        
-        _unitOfWork.Products.DeleteAsync(product);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.Products.DeleteWithCartItemAsync(id);
     }
 }

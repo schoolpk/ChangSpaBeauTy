@@ -8,4 +8,5 @@ public interface IProductRepository : IRepository<Product>
     Task<IEnumerable<Product>> GetNewestProductsAsync();
     Task<IEnumerable<Product>> GetBestSellingProductsAsync();
     Task<IEnumerable<Product>> SearchAsync(string keyword);
+    Task DeleteWithCartItemAsync(int productId);
 }
