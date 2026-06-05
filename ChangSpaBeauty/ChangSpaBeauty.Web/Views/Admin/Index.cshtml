@@ -48,6 +48,7 @@
         <button class="tab active" onclick="switchTab('users', this)">👥 Người dùng</button>
         <button class="tab" onclick="switchTab('products', this)">📦 Sản phẩm</button>
         <button class="tab" onclick="switchTab('categories', this)">🗂️ Danh mục</button>
+        <button class="tab" onclick="switchTab('orders', this)">🛒 Đơn hàng</button>
     </div>
 
     @* ===== PANEL: NGƯỜI DÙNG ===== *@
@@ -245,6 +246,73 @@
                     {
                         <tr>
                             <td colspan="4" class="empty-state">Không có dữ liệu danh mục</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @* ===== PANEL: ĐƠN HÀNG ===== *@
+    <div id="panel-orders" class="admin-panel">
+        <div class="admin-card">
+            <div class="admin-toolbar">
+                <div class="admin-search-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input type="text" placeholder="Tìm kiếm đơn hàng..."
+                           oninput="filterTable('tbl-orders', this.value)" />
+                </div>
+            </div>
+            <table class="admin-table" id="tbl-orders">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Đơn hàng</th>
+                        <th>Số lượng SP</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày đặt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.Orders != null)
+                    {
+                        @foreach (var ord in ViewBag.Orders)
+                        {
+                            <tr>
+                                <td>#@ord.OrderId</td>
+                                <td>
+                                    <div style="font-weight:600">@ord.User?.Name</div>
+                                    <div style="font-size:.82rem;color:#888">@ord.Address</div>
+                                    <div style="font-size:.82rem;color:#888">📞 @ord.Phone</div>
+                                </td>
+                                <td>@ord.OrderDetails?.Count sản phẩm</td>
+                                <td style="font-weight:700;color:var(--pink-dark)">
+                                    @(((decimal)ord.TotalPrice).ToString("N0")) ₫
+                                </td>
+                                <td>
+                                    <span class="badge-status status-@ord.Status">
+                                        @(ord.Status switch {
+                                            "pending"   => "⏳ Chờ xác nhận",
+                                            "confirmed" => "✅ Đã xác nhận",
+                                            "shipping"  => "🚚 Đang giao",
+                                            "done"      => "✔️ Hoàn thành",
+                                            "cancelled" => "❌ Đã hủy",
+                                            _           => ord.Status
+                                        })
+                                    </span>
+                                </td>
+                                <td>@ord.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="empty-state">Không có dữ liệu đơn hàng</td>
                         </tr>
                     }
                 </tbody>

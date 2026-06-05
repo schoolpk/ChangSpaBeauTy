@@ -1,0 +1,89 @@
+﻿using ChangSpaBeauty.Application.DTOs.Order;
+using ChangSpaBeauty.Application.Interfaces;
+using ChangSpaBeauty.Domain.Entities;
+using ChangSpaBeauty.Domain.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ChangSpaBeauty.Application.Services
+{
+    public class OrderService : IOrderService
+    {
+        private readonly IShoppingCartRepository _cartRepo;
+        private readonly IOrderRepository _orderRepo;
+        private readonly IProductRepository _productRepo;
+
+        public OrderService(IShoppingCartRepository cartRepo, IOrderRepository orderRepo, IProductRepository productRepo)
+        {
+            _cartRepo = cartRepo;
+            _orderRepo = orderRepo;
+            _productRepo = productRepo;
+        }
+
+        public async Task<OrderDto?> GetOrderAsync(int orderId, int userId)
+        {
+            var order = await _orderRepo.GetOrderAsync(orderId, userId);
+            if(order == null)
+            {
+                return null;
+            }
+            return new OrderDto
+            {
+                OrderId = orderId,
+                TotalPrice = order.TotalPrice,
+                Status = order.Status,
+                Address = order.Address,
+                Phone = order.Phone,
+                CreatedAt = order.CreatedAt,
+                Items = order.OrderDetails.Select(od => new OrderDetailDto
+                {
+                    ProductName = od.Product?.Name ?? "",
+                    ProductImage = od.Product?.Image ?? "",
+                    Quantity = od.Quantity,
+                    UnitPrice = od.UnitPrice
+                }).ToList()
+            };
+        }
+
+        public async Task<int> PlaceOrderAsync(int userId, OrderDto dto)
+        {
+            var cart = await _cartRepo.GetShoppingCartByUserAsync(userId);
+            if(cart == null || !cart.CartItems.Any())
+            {
+                throw new InvalidOperationException("Không có sản phẩm");
+            }
+            var order = new Order
+            {
+                UserId = userId,
+                Address = dto.Address,
+                Phone= dto.Phone,
+                Status = "pending",
+                CreatedAt = DateTime.Now,
+                TotalPrice = cart.CartItems.Sum(ci=>ci.Quantity * (ci.Product?.Price ?? 0)),
+                OrderDetails = cart.CartItems.Select(ci=>new OrderDetail
+                {
+                    ProductId = ci.ProductId,
+                    Quantity = ci.Quantity,
+                    UnitPrice = ci.Product?.Price ?? 0
+                }).ToList()
+            };
+            await _orderRepo.CreateOrderAsync(order);
+            foreach (var item in cart.CartItems)
+            {
+                if (item.Product != null)
+                {
+                    item.Product.Sold += item.Quantity;
+                    _productRepo.UpdateAsync(item.Product);
+                }
+            }
+
+            await _cartRepo.ClearCartAsync(cart.ShoppingCartId);
+            await _cartRepo.SaveChangeAsync();
+
+            return order.OrderId;
+        }
+    }
+}

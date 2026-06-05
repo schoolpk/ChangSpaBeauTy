@@ -22,7 +22,7 @@ function toggleFav(el) {
     }
 }
 
-function addToCart(btn) {
+function addCart(btn) {
     const badge = document.querySelector('.cart-badge');
     if (badge) {
         let count = parseInt(badge.textContent) + 1;

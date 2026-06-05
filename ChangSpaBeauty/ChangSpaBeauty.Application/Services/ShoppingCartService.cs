@@ -36,8 +36,6 @@ public class ShoppingCartService : IShoppingCartService
             };
             await _shoppingCartRepo.AddCartItemAsync(newItem);
         }
-
-        await _shoppingCartRepo.SaveChangeAsync();
     }
 
     public async Task<ShoppingCartDTO> GetCartAsync(int userId)
