@@ -52,8 +52,11 @@ public class AdminController : Controller
         // Order
         var orders = await _orderRepository.GetAllAsync();
         var orderList = orders.ToList();
-        ViewBag.Orders = orders;
+        ViewBag.Orders = orderList;
         ViewBag.TotalOrders = orderList.Count;
+        ViewBag.TotalProductsSold = orderList
+                            .SelectMany(o => o.OrderDetails)
+                            .Sum(od => od.Quantity);
 
         return View();
 
@@ -244,7 +247,20 @@ public class AdminController : Controller
     }
 
 
-
+    // ORDER - UPDATE
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateOrderStatus(int orderId, string status)
+    {
+        var allowed = new[] { "pending", "confirmed", "shipping", "done", "cancelled" };
+        if (!allowed.Contains(status))
+        {
+            TempData["Error"] = "Không hợp lệ";
+        }
+        await _orderRepository.UpdateOrderAsync(orderId, status);
+        TempData["Sucess"] = "Đã cập nhật";
+        return RedirectToAction(nameof(Index));
+    }
     private async Task LoadCategoriesAsync()
     {
         var categories = await _categoryService.GetAllAsync();

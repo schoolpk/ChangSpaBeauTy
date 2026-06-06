@@ -4,6 +4,7 @@ using ChangSpaBeauty.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +26,12 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
 
         public async Task<IEnumerable<Order>> GetAllAsync()
         {
-            return await _context.Orders.Include(o=>o.OrderDetails).ToListAsync();
+            return await _context.Orders
+                .Include(u => u.User)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Product)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<Order?> GetOrderAsync(int orderId, int userId)
@@ -34,6 +40,17 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
                 .Include(o=>o.OrderDetails)
                 .ThenInclude(od=>od.Product)
                 .FirstOrDefaultAsync(o=>o.OrderId == orderId && o.UserId == userId);
+        }
+
+        public async Task UpdateOrderAsync(int orderId, string status)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            if(order == null)
+            {
+                return;
+            }
+            order.Status = status;
+            await _context.SaveChangesAsync();
         }
     }
 }
