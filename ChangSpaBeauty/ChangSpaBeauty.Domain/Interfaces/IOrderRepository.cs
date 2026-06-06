@@ -10,6 +10,7 @@ namespace ChangSpaBeauty.Domain.Interfaces
     public interface IOrderRepository
     {
         Task CreateOrderAsync(Order order);
+        Task UpdateOrderAsync(int  orderId, string status);
         Task<Order?> GetOrderAsync(int orderId, int userId);
         Task<IEnumerable<Order>> GetAllAsync();
     }

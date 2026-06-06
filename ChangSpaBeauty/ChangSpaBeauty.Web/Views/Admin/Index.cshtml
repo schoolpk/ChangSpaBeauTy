@@ -271,10 +271,12 @@
                     <tr>
                         <th>ID</th>
                         <th>Đơn hàng</th>
+                        <th> SP</th>
                         <th>Số lượng SP</th>
                         <th>Tổng tiền</th>
                         <th>Trạng thái</th>
                         <th>Ngày đặt</th>
+                        <th>Xác nhận</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -289,7 +291,14 @@
                                     <div style="font-size:.82rem;color:#888">@ord.Address</div>
                                     <div style="font-size:.82rem;color:#888">📞 @ord.Phone</div>
                                 </td>
-                                <td>@ord.OrderDetails?.Count sản phẩm</td>
+                                <td>@ord.OrderDetails?.Count </td>
+                                <td>
+                                @{
+                                    var details = ord.OrderDetails as IEnumerable<ChangSpaBeauty.Domain.Entities.OrderDetail>;
+                                    var totalQty = details?.Sum(od => od.Quantity) ?? 0;
+                                }
+                                @totalQty 
+                                </td>
                                 <td style="font-weight:700;color:var(--pink-dark)">
                                     @(((decimal)ord.TotalPrice).ToString("N0")) ₫
                                 </td>
@@ -306,6 +315,34 @@
                                     </span>
                                 </td>
                                 <td>@ord.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @* Dropdown đổi trạng thái *@
+                                    <form asp-controller="Admin" asp-action="UpdateOrderStatus"
+                                          method="post" style="display:flex;gap:.4rem;align-items:center">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderId" value="@ord.OrderId" />
+                                        @{
+                                            string ordStatus = ord.Status?.ToString() ?? "pending";
+                                            var statusOptions = new[]
+                                            {
+                                                ("pending",   "⏳ Chờ xác nhận"),
+                                                ("confirmed", "✅ Đã xác nhận"),
+                                                ("shipping",  "🚚 Đang giao"),
+                                                ("done",      "✔️ Hoàn thành"),
+                                                ("cancelled", "❌ Đã hủy")
+                                            };
+                                            var selectHtml = "<select name='status' class='status-select'>";
+                                            foreach (var (val, label) in statusOptions)
+                                            {
+                                                var sel = ordStatus == val ? " selected" : "";
+                                                selectHtml += $"<option value='{val}'{sel}>{label}</option>";
+                                            }
+                                            selectHtml += "</select>";
+                                        }
+                                        @Html.Raw(selectHtml)
+                                        <button type="submit" class="btn-status-save">Lưu</button>
+                                    </form>
+                                </td>
                             </tr>
                         }
                     }
