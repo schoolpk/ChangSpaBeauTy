@@ -9,7 +9,6 @@ namespace ChangSpaBeauty.Application.Services;
 public class ProductService
 {
     private readonly IUnitOfWork _unitOfWork;
-    //private readonly AppDbContext _context;   // ← thêm để xử lý FK
 
     public ProductService(IUnitOfWork unitOfWork)
     {
@@ -29,6 +28,13 @@ public class ProductService
             Description = productDto.Description
         };
         await _unitOfWork.Products.AddAsync(product);
+
+        var category = await _unitOfWork.Categories.GetByIdAsync(productDto.CategoryId);
+        if(category!= null)
+        {
+            category.Total += 1;
+        }
+
         await _unitOfWork.SaveChangesAsync();
         return productDto;
     }
@@ -46,7 +52,8 @@ public class ProductService
             CategoryName = p.Category?.Name ?? "",
             Sold = p.Sold,
             Stock = p.Stock,
-            Description = p.Description
+            Description = p.Description,
+            Trademark = p.Category?.Trademark,
         });
     }
 
@@ -82,11 +89,17 @@ public class ProductService
 
     public async Task DeleteProductAsync(int id)
     {
-
-
-        //await _context.Set<CartItem>()
-        //              .Where(ci => ci.ProductId == id)
-        //              .ExecuteDeleteAsync();
+        var product = await _unitOfWork.Products.GetByIdAsync(id);
+        if (product != null)
+        {
+            var category = await _unitOfWork.Categories.GetByIdAsync(product.CategoryId);
+            if (category != null && category.Total > 0)
+            {
+                category.Total -= 1;
+            }
+            await _unitOfWork.SaveChangesAsync();
+        }
         await _unitOfWork.Products.DeleteWithCartItemAsync(id);
     }
+
 }

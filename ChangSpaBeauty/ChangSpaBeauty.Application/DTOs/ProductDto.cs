@@ -11,5 +11,6 @@ public class ProductDto
     public int Sold { get; set; }
     public int Stock { get; set; }
     public string? Description { get; set; }
+    public string? Trademark { get; set; }
 
 }

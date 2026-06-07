@@ -23,9 +23,41 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
             await _context.Users.AddAsync(user);
         }
 
-        public void DeleteUser(User user)
+        public async Task DeteleAsync(int userId)
         {
-            _context.Users.Remove(user);
+            var orderDs = await _context.Orders
+                .Where(o => o.UserId == userId)
+                .Select(o => o.OrderId)
+                .ToListAsync();
+            if (orderDs.Any())
+            {
+                var orderDetails = await _context.OrderDetails
+                    .Where(od => orderDs.Contains(od.OrderId))
+                    .ToListAsync();
+                _context.OrderDetails.RemoveRange(orderDetails);
+
+                var orders = await _context.Orders
+                    .Where(o => orderDs.Contains(o.OrderId))
+                    .ToListAsync();
+                _context.Orders.RemoveRange(orders);
+            }
+
+            var cart = await _context.ShoppingCarts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+            if (cart!=null)
+            {
+                _context.CartItems.RemoveRange(cart.CartItems);
+                _context.ShoppingCarts.Remove(cart);
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+            if(user != null)
+            {
+                _context.Users.Remove(user);
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> EmailExistAsync(string email)
