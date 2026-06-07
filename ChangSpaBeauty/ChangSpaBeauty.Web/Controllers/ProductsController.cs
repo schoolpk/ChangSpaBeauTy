@@ -1,6 +1,7 @@
 ﻿using ChangSpaBeauty.Application.Interfaces;
 using ChangSpaBeauty.Application.Services;
 using ChangSpaBeauty.Web.ViewModels;
+using ChangSpaBeauty.Web.ViewModels.Category;
 using ChangSpaBeauty.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,11 +10,13 @@ namespace ChangSpaBeauty.Web.Controllers;
 public class ProductsController : BaseController
 {
     private readonly ProductService _productService;
-
-    public ProductsController(ProductService productService, IShoppingCartService cartService)
+    private readonly IUnitOfWork _unitOfWork;
+    public ProductsController(ProductService productService, IShoppingCartService cartService, IUnitOfWork unitOfWork)
         : base(cartService)
     {
         _productService = productService;
+        _unitOfWork = unitOfWork;
+
     }
     public static readonly Dictionary<string, string> _categoryMap = new()
     {
@@ -24,8 +27,24 @@ public class ProductsController : BaseController
         { "combo",       "Combo tiết kiệm" },
     };
 
-    public async Task<IActionResult> Index(string? category, string? keyword, string sort = "popular")
+    public async Task<IActionResult> Index(string? category, string? keyword,string? trademark, string sort = "popular")
     {
+        var allCategories = await _unitOfWork.Categories.GetAllAsync();
+        var categorySidebar = allCategories.Select(c => new CategorySidebar
+        {
+            CategoryId = c.CategoryId,
+            Name = c.Name,
+            Total = c.Total,
+            Slug = _categoryMap.FirstOrDefault(x=>x.Value == c.Name).Key ?? ""
+        });
+
+        var trademarks = allCategories
+                        .Where(c=> !string.IsNullOrEmpty(c.Trademark))
+                        .Select(c=>c.Trademark)
+                        .Distinct()
+                        .ToList();
+
+
         var products = await _productService.GetAllProductsAsync();
 
         if (!string.IsNullOrEmpty(category) && _categoryMap.TryGetValue(category, out var categoryName))
@@ -36,6 +55,10 @@ public class ProductsController : BaseController
             p.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase) 
             || (p.CategoryName != null)
             && p.CategoryName.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+        }
+        if (!string.IsNullOrEmpty(trademark))
+        {
+            products = products.Where(p => p.Trademark == trademark);
         }
 
         products = sort switch
@@ -54,7 +77,9 @@ public class ProductsController : BaseController
             Products         = products,
             SortBy           = sort,
             SelectedCategory = category,
-            SearchKeyword    = keyword
+            SearchKeyword    = keyword,
+            Categories       = categorySidebar,
+            Trademarks       = trademarks
         };
 
         return View(vm);

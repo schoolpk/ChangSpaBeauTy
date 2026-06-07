@@ -24,6 +24,25 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteOrderAsync(int orderId)
+        {
+            var orderDetails = await _context.OrderDetails
+                .Where(od => od.OrderId == orderId)
+                .ToListAsync();
+
+            if (orderDetails.Any())
+            {
+                _context.OrderDetails.RemoveRange(orderDetails);
+            }
+
+            var order = await _context.Orders.FindAsync(orderId);
+            if(order != null)
+            {
+                _context.Orders.Remove(order);
+            }
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Order>> GetAllAsync()
         {
             return await _context.Orders

@@ -2,6 +2,7 @@ using ChangSpaBeauty.Application.Interfaces;
 using ChangSpaBeauty.Domain.Entities;
 using ChangSpaBeauty.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+
 namespace ChangSpaBeauty.Infrastructure.Repositories;
 public class ProductRepository : IProductRepository
 {
@@ -53,8 +54,17 @@ public class ProductRepository : IProductRepository
 
     public async Task DeleteWithCartItemAsync(int productId)
     {
+        var orderDetails = await _context.Set<OrderDetail>()
+                                .Where(od => od.ProductId == productId)
+                                .ToListAsync();
+        if (orderDetails.Any())
+        {
+            _context.Set<OrderDetail>().RemoveRange(orderDetails);
+        }
+
+        
         var cartItems = await _context.Set<CartItem>()
-                                    .Where(ci=>ci.ProductId == productId)
+                                    .Where(ci => ci.ProductId == productId)
                                     .ToListAsync();
         if (cartItems.Any())
         {
@@ -69,5 +79,10 @@ public class ProductRepository : IProductRepository
         }
         
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<Category>> GetAllCategoryAsync()
+    {
+        return await _context.Categories.ToListAsync();
     }
 }

@@ -103,6 +103,14 @@
                                         <span class="badge badge-user">User</span>
                                     }
                                 </td>
+                                <td>
+                                    <form asp-controller="Admin" asp-action="DeleteUser" method="post" 
+                                          onsubmit="return confirm('Xóa user này?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@user.Id" />
+                                        <button type="submit" class="btn-delete">Xóa</button>
+                                    </form>
+                                </td>
                             </tr>
                         }
                     }

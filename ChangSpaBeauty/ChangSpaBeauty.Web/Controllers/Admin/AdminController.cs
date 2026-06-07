@@ -9,6 +9,7 @@ using ChangSpaBeauty.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.VisualBasic;
 using System.Threading.Tasks;
 
 namespace ChangSpaBeauty.Web.Controllers;
@@ -61,6 +62,16 @@ public class AdminController : Controller
         return View();
 
     }
+
+    // USER - DELETE
+    public async Task<IActionResult> DeleteUser(int id)
+    {
+        await _userRepository.DeteleAsync(id);
+        TempData["Success"] = "Xoa user thanh cong";
+        return RedirectToAction(nameof(Index));
+    }
+
+
 
     // CATEGORY - LIST
     public async Task<IActionResult> Categories()
@@ -256,9 +267,18 @@ public class AdminController : Controller
         if (!allowed.Contains(status))
         {
             TempData["Error"] = "Không hợp lệ";
+            return RedirectToAction(nameof(Index));
         }
-        await _orderRepository.UpdateOrderAsync(orderId, status);
-        TempData["Sucess"] = "Đã cập nhật";
+        if (status == "cancelled")
+        {
+            await _orderRepository.DeleteOrderAsync(orderId);
+            TempData["Success"] = "Đã hủy";
+        }
+        else
+        {
+            await _orderRepository.UpdateOrderAsync(orderId, status);
+            TempData["Success"] = "Đã cập nhật thành công";
+        }
         return RedirectToAction(nameof(Index));
     }
     private async Task LoadCategoriesAsync()
