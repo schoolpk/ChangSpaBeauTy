@@ -23,6 +23,29 @@ namespace ChangSpaBeauty.Application.Services
             _productRepo = productRepo;
         }
 
+        public async Task CancelOrderAsync(int orderId)
+        {
+            var order = await _orderRepo.GetOrderWithDetailAsync(orderId);
+            if(order == null)
+            {
+                return;
+            }
+            foreach(var detail in order.OrderDetails)
+            {
+                if(detail.Product != null)
+                {
+                    detail.Product.Sold -= detail.Quantity;
+                    detail.Product.Stock += detail.Quantity;
+                    if(detail.Product.Sold < 0)
+                    {
+                        detail.Product.Sold = 0;
+                    }
+                    _productRepo.UpdateAsync(detail.Product);
+                }
+            }
+            await _orderRepo.DeleteOrderAsync(orderId);
+        }
+
         public async Task<OrderDto?> GetOrderAsync(int orderId, int userId)
         {
             var order = await _orderRepo.GetOrderAsync(orderId, userId);
@@ -76,6 +99,7 @@ namespace ChangSpaBeauty.Application.Services
                 if (item.Product != null)
                 {
                     item.Product.Sold += item.Quantity;
+                    item.Product.Stock -= item.Quantity;
                     _productRepo.UpdateAsync(item.Product);
                 }
             }
