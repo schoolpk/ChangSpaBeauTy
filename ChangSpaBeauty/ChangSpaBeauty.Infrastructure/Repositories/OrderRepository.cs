@@ -68,13 +68,6 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
                 .FirstOrDefaultAsync(o=>o.OrderId == orderId && o.UserId == userId);
         }
 
-        public async Task<Order?> GetOrderByIdWithUserAsync(int orderId)
-        {
-            return await _context.Orders
-                .Include(o=>o.User)
-                .FirstOrDefaultAsync(o=>o.OrderId==orderId);
-        }
-
         public async Task UpdateOrderAsync(int orderId, string status)
         {
             var order = await _context.Orders.FindAsync(orderId);
