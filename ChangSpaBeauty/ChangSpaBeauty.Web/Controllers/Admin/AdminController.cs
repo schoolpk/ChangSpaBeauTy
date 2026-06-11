@@ -2,8 +2,11 @@
 using ChangSpaBeauty.Application.DTOs;
 using ChangSpaBeauty.Application.Interfaces;
 using ChangSpaBeauty.Application.Services;
+using ChangSpaBeauty.Domain.Entities;
 using ChangSpaBeauty.Domain.Interfaces;
 using ChangSpaBeauty.Infrastructure.Repositories;
+using ChangSpaBeauty.Web.Models;
+using ChangSpaBeauty.Web.Models.Services;
 using ChangSpaBeauty.Web.ViewModels;
 using ChangSpaBeauty.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
@@ -22,14 +25,16 @@ public class AdminController : Controller
     private readonly IOrderRepository _orderRepository;
     private readonly IUserRepository _userRepository;
     private readonly IWebHostEnvironment _env;
+    private readonly NotificationService _notificationService;
 
-    public AdminController(CategoryService categoryService, ProductService productService, IUserRepository userRepository, IWebHostEnvironment env, IOrderRepository orderRepository)
+    public AdminController(CategoryService categoryService, ProductService productService, IUserRepository userRepository, IWebHostEnvironment env, IOrderRepository orderRepository, NotificationService notificationService)
     {
         _categoryService = categoryService;
         _productService = productService;
         _userRepository = userRepository;
         _env = env;
         _orderRepository = orderRepository;
+        _notificationService = notificationService;
     }
 
     public async Task<IActionResult> Index()
@@ -269,6 +274,12 @@ public class AdminController : Controller
             TempData["Error"] = "Không hợp lệ";
             return RedirectToAction(nameof(Index));
         }
+        var order = await _orderRepository.GetByIdWithUserAsync(orderId);
+        if (order == null)
+        {
+            TempData["Error"] = "Không tìm thấy đơn hàng";
+            return RedirectToAction(nameof(Index));
+        }
         if (status == "cancelled")
         {
             await _orderRepository.DeleteOrderAsync(orderId);
@@ -279,6 +290,19 @@ public class AdminController : Controller
             await _orderRepository.UpdateOrderAsync(orderId, status);
             TempData["Success"] = "Đã cập nhật thành công";
         }
+        var statusText = status switch
+        {
+            "confirmed" => "✅ Đã xác nhận",
+            "shipping" => "🚚 Đang giao hàng",
+            "done" => "🎉 Giao hàng thành công",
+            "cancelled" => "❌ Đã hủy",
+            _ => status
+        };
+        _notificationService.AddNotification(HttpContext.Session, order.UserId, new Notification {
+            OrderId = orderId,
+            OrderStatus = status,
+            Message = $"Đơn hàng #{orderId} của bạn: {statusText}"
+        });
         return RedirectToAction(nameof(Index));
     }
     private async Task LoadCategoriesAsync()

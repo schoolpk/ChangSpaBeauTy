@@ -132,3 +132,94 @@ footer { background: var(--text-dark); color: rgba(255,255,255,0.7); padding: 36
 .footer-link { font-size: 12px; display: block; margin-bottom: 8px; cursor: pointer; transition: color 0.2s; color: rgba(255,255,255,0.7); text-decoration: none; }
 .footer-link:hover { color: var(--pink-light); }
 .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; text-align: center; font-size: 11px; max-width: 1200px; margin: 0 auto; }
+
+/* Bell notification */
+.notif-wrap {
+    position: relative;
+}
+
+.notif-bell {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    position: relative;
+    padding: 4px;
+}
+
+.notif-badge {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    background: var(--pink-dark);
+    color: #fff;
+    font-size: .68rem;
+    font-weight: 700;
+    border-radius: 99px;
+    padding: 1px 5px;
+    min-width: 16px;
+    text-align: center;
+}
+
+.notif-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 300px;
+    background: #fff;
+    border: 1px solid var(--pink-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(214,51,108,.12);
+    z-index: 999;
+    overflow: hidden;
+}
+
+    .notif-dropdown.open {
+        display: block;
+    }
+
+.notif-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    font-weight: 600;
+    font-size: .9rem;
+    border-bottom: 1px solid var(--pink-border);
+}
+
+.notif-clear {
+    background: none;
+    border: none;
+    color: var(--pink-dark);
+    font-size: .78rem;
+    cursor: pointer;
+}
+
+.notif-item {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--pink-pale);
+    transition: background .15s;
+}
+
+    .notif-item:hover {
+        background: var(--pink-pale);
+    }
+
+.notif-msg {
+    font-size: .88rem;
+}
+
+.notif-time {
+    font-size: .75rem;
+    color: #aaa;
+    margin-top: 2px;
+}
+
+.notif-empty {
+    padding: 20px;
+    text-align: center;
+    color: #aaa;
+    font-size: .88rem;
+}
