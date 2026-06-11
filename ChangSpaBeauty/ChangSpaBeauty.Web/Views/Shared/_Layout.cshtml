@@ -36,12 +36,7 @@
                     </form>
                     @if (User.IsInRole("Admin"))
                     {
-                        <select id="options" onchange="location = this.value;" class="btn btn-solid">
-                            <option value="">Chose</option>
-                            <option value="/Admin/Index">⚙️ Admin</option>
-                            <option value="/Admin/Categories">Categogies</option>
-                            <option value="/Admin/Products">Products</option>
-                        </select>
+                        <a asp-controller="Admin" asp-action="Index" class="btn btn-solid">Admin</a>
                     }
                 }
                 else

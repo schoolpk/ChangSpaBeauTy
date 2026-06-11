@@ -8,6 +8,7 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/changspa.css" />
     <link rel="stylesheet" href="~/css/admin.css" />
+    <link rel="stylesheet" href="~/css/create.css" />
 }
 
 <div class="admin-topbar">
@@ -17,6 +18,14 @@
     </div>
 </div>
 
+  <div class="create-page">
+        @if(TempData["Success"] != null)
+          {
+              <div class="alert alert-success">
+                  ✅ @TempData["Success"]
+              </div>
+          }
+  </div>
 <div class="admin-wrap">
 
     @* ===== STATS ===== *@
@@ -42,8 +51,6 @@
             <div class="stat-sub">Tổng cộng</div>
         </div>
     </div>
-
-    @* ===== TAB NAV — dùng class .tab từ changspa.css ===== *@
     <div class="admin-tab-nav">
         <button class="tab active" onclick="switchTab('users', this)">👥 Người dùng</button>
         <button class="tab" onclick="switchTab('products', this)">📦 Sản phẩm</button>
@@ -112,6 +119,7 @@
                                     </form>
                                 </td>
                             </tr>
+
                         }
                     }
                     else
@@ -143,6 +151,7 @@
             <table class="admin-table" id="tbl-products">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>ID</th>
                         <th>Tên sản phẩm</th>
                         <th>Giá</th>
@@ -333,9 +342,9 @@
                                             string ordStatus = ord.Status?.ToString() ?? "pending";
                                             var statusOptions = new[]
                                             {
-                                                ("pending",   "⏳ Chờ xác nhận"),
-                                                ("confirmed", "✅ Đã xác nhận"),
-                                                ("shipping",  "🚚 Đang giao"),
+                                                // ("pending",   "⏳ Chờ xác nhận"),
+                                                ("confirmed", "✅ Xác nhận"),
+                                                ("shipping",  "🚚 Giao hàng"),
                                                 ("done",      "✔️ Hoàn thành"),
                                                 ("cancelled", "❌ Hủy")
                                             };
