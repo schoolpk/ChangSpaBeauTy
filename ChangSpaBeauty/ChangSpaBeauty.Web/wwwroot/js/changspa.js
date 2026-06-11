@@ -50,3 +50,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+function toggleNotif() {
+    document.getElementById('notif-dropdown').classList.toggle('open');
+}
+
+// Click ngoài thì đóng
+document.addEventListener('click', function (e) {
+    const wrap = document.querySelector('.notif-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+        document.getElementById('notif-dropdown')?.classList.remove('open');
+    }
+});
