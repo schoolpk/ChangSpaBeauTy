@@ -4,7 +4,7 @@
     Layout = "_Layout";
 }
 @section Styles {
-    <link rel="stylesheet" href="~/css/createproduct.css" />
+    <link rel="stylesheet" href="~/css/create.css" />
 }
 
 <div class="create-page">
@@ -21,12 +21,6 @@
         </div>
     }
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">
-            ✅ @TempData["Success"]
-        </div>
-    }
 
     <div class="create-card">
         <form asp-controller="Admin" asp-action="CreateProduct" method="post"
