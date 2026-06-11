@@ -23,11 +23,18 @@ public class AdminController : Controller
     private readonly CategoryService _categoryService;
     private readonly ProductService _productService;
     private readonly IOrderRepository _orderRepository;
+    private readonly IOrderService _orderService;
     private readonly IUserRepository _userRepository;
     private readonly IWebHostEnvironment _env;
     private readonly NotificationService _notificationService;
 
-    public AdminController(CategoryService categoryService, ProductService productService, IUserRepository userRepository, IWebHostEnvironment env, IOrderRepository orderRepository, NotificationService notificationService)
+    public AdminController(CategoryService categoryService,
+        ProductService productService,
+        IUserRepository userRepository,
+        IWebHostEnvironment env,
+        IOrderRepository orderRepository,
+        NotificationService notificationService,
+        IOrderService orderService)
     {
         _categoryService = categoryService;
         _productService = productService;
@@ -35,6 +42,7 @@ public class AdminController : Controller
         _env = env;
         _orderRepository = orderRepository;
         _notificationService = notificationService;
+        _orderService = orderService;
     }
 
     public async Task<IActionResult> Index()
@@ -257,6 +265,16 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteProductAsync(int id)
     {
+        var products = await _productService.GetAllProductsAsync();
+        var product = products.FirstOrDefault(p=>p.ProductId == id);
+        if(product?.Image != null)
+        {
+            var image = Path.Combine(_env.WebRootPath,"images","products",product.Image);
+            if(System.IO.File.Exists(image))
+            {
+                System.IO.File.Delete(image);
+            }
+        }
         await _productService.DeleteProductAsync(id);
         TempData["Success"] = "Xoa thanh cong";
         return RedirectToAction(nameof(Index));
@@ -282,7 +300,7 @@ public class AdminController : Controller
         }
         if (status == "cancelled")
         {
-            await _orderRepository.DeleteOrderAsync(orderId);
+            await _orderService.CancelOrderAsync(orderId);
             TempData["Success"] = "Đã hủy";
         }
         else
