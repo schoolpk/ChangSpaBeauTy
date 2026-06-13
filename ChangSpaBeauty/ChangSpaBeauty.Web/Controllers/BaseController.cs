@@ -1,5 +1,6 @@
 ﻿using ChangSpaBeauty.Application.Interfaces;
-using ChangSpaBeauty.Web.Models.Services;
+using ChangSpaBeauty.Application.Services;
+using ChangSpaBeauty.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
@@ -9,9 +10,12 @@ namespace ChangSpaBeauty.Web.Controllers
     public class BaseController : Controller
     {
         private readonly IShoppingCartService _cartService;
-        public BaseController(IShoppingCartService cartService)
+        private readonly INotificationRepository _notiRepo;
+        private readonly ProductService _productService;
+        public BaseController(IShoppingCartService cartService, INotificationRepository notiRepo)
         {
             _cartService = cartService;
+            _notiRepo = notiRepo;
         }
         public override async Task OnActionExecutionAsync(
             ActionExecutingContext context, ActionExecutionDelegate next)
@@ -22,10 +26,9 @@ namespace ChangSpaBeauty.Web.Controllers
                 var cart = await _cartService.GetCartAsync(userId);
                 ViewBag.CartCount = cart?.Items?.Sum(i=>i.Quantity) ?? 0;
 
-                var notificationService = HttpContext.RequestServices.GetRequiredService<NotificationService>();
-                var notifications = notificationService.GetNotifications(HttpContext.Session, userId);
-                ViewBag.Notifications = notifications;
-                ViewBag.UnreadCount = notifications.Count;
+                var notifRepo = HttpContext.RequestServices.GetRequiredService<INotificationRepository>();
+                ViewBag.Notifications = await notifRepo.GetByUserAsync(userId);
+                ViewBag.UnreadCount = await notifRepo.GetUnreadCountAsync(userId);
             }
             await next();
         }

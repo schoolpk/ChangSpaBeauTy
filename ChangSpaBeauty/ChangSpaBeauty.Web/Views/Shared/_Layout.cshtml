@@ -49,8 +49,7 @@
                     <a asp-controller="Account" asp-action="Login" class="btn btn-solid">Đăng nhập</a>
                 }
                 @{
-                    var notifications = ViewBag.Notifications as List<ChangSpaBeauty.Web.Models.Notification>
-                    ?? new List<ChangSpaBeauty.Web.Models.Notification>();
+                    var notifications = ViewBag.Notifications ?? new List<dynamic>();
                     var unreadCount = ViewBag.UnreadCount ?? 0;
                 }
                 @if (User.Identity?.IsAuthenticated == true)
@@ -79,7 +78,7 @@
                             {
                                 @foreach (var n in notifications)
                                 {
-                                    <div class="notif-item status-@n.OrderStatus">
+                                    <div class="notif-item @(n.IsRead ? "" : "unread")">
                                         <div class="notif-msg">@n.Message</div>
                                         <div class="notif-time">@n.CreatedAt.ToString("HH:mm dd/MM")</div>
                                     </div>
