@@ -11,6 +11,7 @@ namespace ChangSpaBeauty.Domain.Interfaces
     {
         Task<Order?> GetByIdWithUserAsync(int orderId);
         Task<Order?> GetOrderWithDetailAsync(int orderId);
+        Task<List<Order>> GetOrdersByUserAsync(int userId);
         Task CreateOrderAsync(Order order);
         Task UpdateOrderAsync(int  orderId, string status);
         Task<Order?> GetOrderAsync(int orderId, int userId);
