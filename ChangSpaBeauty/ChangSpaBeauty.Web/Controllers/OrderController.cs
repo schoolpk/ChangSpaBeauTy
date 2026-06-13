@@ -1,5 +1,6 @@
 ﻿using ChangSpaBeauty.Application.DTOs.Order;
 using ChangSpaBeauty.Application.Interfaces;
+using ChangSpaBeauty.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -7,11 +8,11 @@ using System.Security.Claims;
 namespace ChangSpaBeauty.Web.Controllers
 {
     [Authorize]
-    public class OrderController : Controller
+    public class OrderController : BaseController
     {
         private readonly IOrderService _orderService;
         private readonly IShoppingCartService _cartService;
-        public OrderController(IOrderService orderService, IShoppingCartService cartService)
+        public OrderController(IOrderService orderService, IShoppingCartService cartService, INotificationRepository notiRepo):base(cartService,notiRepo) 
         {
             _orderService = orderService;
             _cartService = cartService;
