@@ -1,5 +1,5 @@
 ﻿using ChangSpaBeauty.Application.Interfaces;
-using ChangSpaBeauty.Web.Models.Services;
+using ChangSpaBeauty.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -9,17 +9,22 @@ namespace ChangSpaBeauty.Web.Controllers
     [Authorize]
     public class NotificationController : BaseController
     {
-        private readonly NotificationService _notificationService;
-        public NotificationController(IShoppingCartService cartService,NotificationService notificationService) : base(cartService)
+      
+        private readonly INotificationRepository _notiRepo;
+
+        public NotificationController(
+            IShoppingCartService cartService,
+            INotificationRepository notiRepo) : base(cartService, notiRepo)
         {
-            _notificationService = notificationService;
+            _notiRepo = notiRepo;
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ClearAll()
+        public async Task<IActionResult> ClearAll()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            _notificationService.MarkAllRead(HttpContext.Session, userId);
+            await _notiRepo.MarkAllReadAsync(userId);
             return Redirect(Request.Headers["Referer"].ToString());
         }
     }

@@ -46,6 +46,7 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
         public async Task<IEnumerable<Order>> GetAllAsync()
         {
             return await _context.Orders
+                .AsNoTracking()
                 .Include(u => u.User)
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
@@ -63,6 +64,7 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
         public async Task<Order?> GetOrderAsync(int orderId, int userId)
         {
             return await _context.Orders
+                .AsNoTracking()
                 .Include(o=>o.OrderDetails)
                 .ThenInclude(od=>od.Product)
                 .FirstOrDefaultAsync(o=>o.OrderId == orderId && o.UserId == userId);
@@ -71,6 +73,7 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
         public async Task<List<Order>> GetOrdersByUserAsync(int userId)
         {
             return await _context.Orders
+                .AsNoTracking()
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
                 .Where(o=> o.UserId == userId)

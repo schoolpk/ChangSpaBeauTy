@@ -1,4 +1,5 @@
-﻿using ChangSpaBeauty.Application.DTOs.Order;
+﻿using ChangSpaBeauty.Application.DTOs;
+using ChangSpaBeauty.Application.DTOs.Order;
 using ChangSpaBeauty.Application.Interfaces;
 using ChangSpaBeauty.Domain.Entities;
 using ChangSpaBeauty.Domain.Interfaces;
@@ -15,12 +16,20 @@ namespace ChangSpaBeauty.Application.Services
         private readonly IShoppingCartRepository _cartRepo;
         private readonly IOrderRepository _orderRepo;
         private readonly IProductRepository _productRepo;
+        private readonly IUserRepository _userRepo;
+        private readonly INotificationRepository _notificationRepo;
 
-        public OrderService(IShoppingCartRepository cartRepo, IOrderRepository orderRepo, IProductRepository productRepo)
+        public OrderService(IShoppingCartRepository cartRepo,
+            IOrderRepository orderRepo,
+            IProductRepository productRepo,
+            IUserRepository userRepo,
+            INotificationRepository notificationRepo)
         {
             _cartRepo = cartRepo;
             _orderRepo = orderRepo;
             _productRepo = productRepo;
+            _userRepo = userRepo;
+            _notificationRepo = notificationRepo;
         }
 
         public async Task CancelOrderAsync(int orderId)
@@ -72,20 +81,47 @@ namespace ChangSpaBeauty.Application.Services
                 }).ToList()
             };
         }
-        
+
         public async Task<(bool success, string message)> CancelOrderAsync(int orderId, int userId)
         {
-            var order = await _orderRepo.GetOrderAsync(orderId,userId);
-            if(order == null)
+            try
             {
-                return (false, "Không có đơn hàng nào");
+                var order = await _orderRepo.GetOrderAsync(orderId, userId);
+                if (order == null)
+                    return (false, "Không có đơn hàng nào");
+
+                if (order.Status != "pending")
+                    return (false, "Không thể hủy đơn hàng khi đã được xác nhận");
+
+                await _orderRepo.UpdateOrderAsync(orderId, "cancelled");
+
+                Console.WriteLine($"[DEBUG] Order {orderId} cancelled");
+
+                var adminUser = await _userRepo.GetAdminAsync();
+                Console.WriteLine($"[DEBUG] Admin: {adminUser?.Id} - {adminUser?.Name}");
+
+                if (adminUser != null)
+                {
+                    var customer = await _userRepo.GetByIdAsync(userId);
+                    await _notificationRepo.AddAsync(new Notification
+                    {
+                        UserId = adminUser.Id,
+                        Message = $"❌ Khách hàng {customer?.Name ?? "N/A"} vừa hủy đơn #{orderId} ({order.TotalPrice.ToString("N0")} ₫)",
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    });
+                    Console.WriteLine($"[DEBUG] Notification saved!");
+                }
+
+                return (true, "Đã hủy đơn hàng thành công");
             }
-            if(order.Status != "pending")
+            catch (Exception ex)
             {
-                return (false, "Không thể hủy đơn hàng khi đã được xác nhận");
+                // In toàn bộ lỗi ra Output
+                Console.WriteLine($"[ERROR] CancelOrderAsync: {ex.Message}");
+                Console.WriteLine($"[ERROR] StackTrace: {ex.StackTrace}");
+                return (false, $"Lỗi: {ex.Message}");
             }
-            await _orderRepo.UpdateOrderAsync(orderId, "cancelled");
-            return (true, "Đã hủy đơn hàng thành công");
         }
 
         public async Task<List<OrderDto>> GetUserOrderAsync(int userId)
