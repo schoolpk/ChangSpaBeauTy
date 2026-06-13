@@ -1,4 +1,5 @@
 ﻿using ChangSpaBeauty.Application.Interfaces;
+using ChangSpaBeauty.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -6,11 +7,11 @@ using System.Security.Claims;
 namespace ChangSpaBeauty.Web.Controllers;
 
 [Authorize]
-public class CartController : Controller
+public class CartController : BaseController
 {
     private readonly IShoppingCartService _cartService;
 
-    public CartController(IShoppingCartService cartService)
+    public CartController(IShoppingCartService cartService, INotificationRepository notiRepo):base(cartService,notiRepo)
     {
         _cartService = cartService;
     }

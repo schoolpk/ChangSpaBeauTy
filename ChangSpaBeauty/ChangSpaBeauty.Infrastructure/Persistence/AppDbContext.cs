@@ -1,3 +1,4 @@
+using ChangSpaBeauty.Application.DTOs;
 using ChangSpaBeauty.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -13,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderDetail> OrderDetails { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -130,6 +132,22 @@ public class AppDbContext : DbContext
             entity.Property(u => u.Phone).HasColumnName("phone");
             //entity.Property(u => u.Create_At).HasColumnName("create_at");
 
+        });
+
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.ToTable("Notification");
+            entity.HasKey(n => n.Id);
+
+            entity.Property(n=>n.Id).HasColumnName("id");
+            entity.Property(n=>n.UserId).HasColumnName("user_id");
+            entity.Property(n=>n.Message).HasColumnName("message");
+            entity.Property(n=>n.IsRead).HasColumnName("is_read");
+            entity.Property(n=>n.CreatedAt).HasColumnName("created_at");
+
+            entity.HasOne(n => n.User)
+                    .WithMany()
+                    .HasForeignKey(n => n.UserId);
         });
     }
 }

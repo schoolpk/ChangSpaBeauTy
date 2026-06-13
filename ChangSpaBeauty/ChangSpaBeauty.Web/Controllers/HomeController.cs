@@ -1,5 +1,6 @@
 using ChangSpaBeauty.Application.Interfaces;
 using ChangSpaBeauty.Application.Services;
+using ChangSpaBeauty.Domain.Interfaces;
 using ChangSpaBeauty.Web.ViewModels;
 using ChangSpaBeauty.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +11,8 @@ public class HomeController : BaseController
 {
     private readonly ProductService _productService;
 
-    public HomeController(IShoppingCartService cartService,ProductService productService)
-        : base(cartService)
+    public HomeController(IShoppingCartService cartService,ProductService productService,INotificationRepository notiRepo)
+        : base(cartService, notiRepo)
     {
         _productService = productService;
     }
