@@ -46,6 +46,8 @@ namespace ChangSpaBeauty.Application.Services
             await _orderRepo.DeleteOrderAsync(orderId);
         }
 
+        
+
         public async Task<OrderDto?> GetOrderAsync(int orderId, int userId)
         {
             var order = await _orderRepo.GetOrderAsync(orderId, userId);
@@ -69,6 +71,42 @@ namespace ChangSpaBeauty.Application.Services
                     UnitPrice = od.UnitPrice
                 }).ToList()
             };
+        }
+        
+        public async Task<(bool success, string message)> CancelOrderAsync(int orderId, int userId)
+        {
+            var order = await _orderRepo.GetOrderAsync(orderId,userId);
+            if(order == null)
+            {
+                return (false, "Không có đơn hàng nào");
+            }
+            if(order.Status != "pending")
+            {
+                return (false, "Không thể hủy đơn hàng khi đã được xác nhận");
+            }
+            await _orderRepo.UpdateOrderAsync(orderId, "cancelled");
+            return (true, "Đã hủy đơn hàng thành công");
+        }
+
+        public async Task<List<OrderDto>> GetUserOrderAsync(int userId)
+        {
+            var orders = await _orderRepo.GetOrdersByUserAsync(userId);
+            return orders.Select(o => new OrderDto
+            {
+                OrderId = o.OrderId,
+                TotalPrice = o.TotalPrice,
+                Status = o.Status,
+                Address = o.Address,
+                Phone = o.Phone,
+                CreatedAt = o.CreatedAt,
+                Items = o.OrderDetails.Select(od => new OrderDetailDto
+                {
+                    ProductName = od.Product?.Name ?? "",
+                    ProductImage = od.Product?.Image ?? "",
+                    Quantity = od.Quantity,
+                    UnitPrice = od.UnitPrice
+                }).ToList()
+            }).ToList();
         }
 
         public async Task<int> PlaceOrderAsync(int userId, OrderDto dto)

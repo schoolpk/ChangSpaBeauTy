@@ -1,0 +1,116 @@
+﻿@model List<ChangSpaBeauty.Application.DTOs.Order.OrderDto>
+@{
+    ViewData["Title"] = "Đơn hàng của tôi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/myorder.css">
+}
+
+<div class="orders-wrap">
+    <h1 class="orders-title">📦 Đơn hàng của tôi</h1>
+
+    @if (TempData["Success"] != null)
+    {
+        <div style="background:#d1e7dd;color:#0f5132;padding:.8rem 1.2rem;
+                    border-radius:10px;margin-bottom:1rem;font-weight:600">
+            ✅ @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div style="background:#f8d7da;color:#842029;padding:.8rem 1.2rem;
+                    border-radius:10px;margin-bottom:1rem;font-weight:600">
+            ❌ @TempData["Error"]
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="empty-orders">
+            <div class="icon">📭</div>
+            <p>Bạn chưa có đơn hàng nào</p>
+            <a asp-controller="Products" asp-action="Index"
+               style="color:var(--pink-dark);font-weight:600">Mua sắm ngay →</a>
+        </div>
+    }
+    else
+    {
+        @foreach (var order in Model)
+        {
+            <div class="order-card">
+                @* Header *@
+                <div class="order-header">
+                    <div>
+                        <span class="order-id">Đơn hàng #@order.OrderId</span>
+                        <span class="order-date" style="margin-left:.8rem">
+                            @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                        </span>
+                    </div>
+                    <span class="badge-status status-@order.Status">
+                        @(order.Status switch {
+                            "pending"   => "⏳ Chờ xác nhận",
+                            "confirmed" => "✅ Đã xác nhận",
+                            "shipping"  => "🚚 Đang giao",
+                            "done"      => "✔️ Hoàn thành",
+                            "cancelled" => "❌ Đã hủy",
+                            _           => order.Status
+                        })
+                    </span>
+                </div>
+
+                @* Items *@
+                <div class="order-body">
+                    @foreach (var item in order.Items)
+                    {
+                        <div class="order-item">
+                            <img src="~/images/products/@item.ProductImage"
+                                 alt="@item.ProductName"
+                                 onerror="this.src='/images/placeholder.png'" />
+                            <div class="order-item-info">
+                                <div class="order-item-name">@item.ProductName</div>
+                                <div class="order-item-meta">
+                                    @item.UnitPrice.ToString("N0") ₫ × @item.Quantity
+                                </div>
+                            </div>
+                            <div class="order-item-price">
+                                @item.Subtotal.ToString("N0") ₫
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @* Footer *@
+                <div class="order-footer">
+                    <div>
+                        <div style="font-size:.85rem;color:#666">
+                            📍 @order.Address · 📞 @order.Phone
+                        </div>
+                        <div class="order-total" style="margin-top:.3rem">
+                            Tổng: @order.TotalPrice.ToString("N0") ₫
+                        </div>
+                    </div>
+
+                    @* Nút hủy — chỉ hiện khi pending *@
+                    @if (order.Status == "pending")
+                    {
+                        <form asp-controller="Order" asp-action="CancelOrder"
+                              method="post"
+                              onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn hàng #@order.OrderId?')">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="orderId" value="@order.OrderId" />
+                            <button type="submit" class="btn-cancel">
+                                🗑️ Hủy đơn hàng
+                            </button>
+                        </form>
+                    }
+                    else if (order.Status == "confirmed" || order.Status == "shipping")
+                    {
+                        <span class="cancel-locked">🔒 Không thể hủy</span>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>

@@ -47,7 +47,31 @@ namespace ChangSpaBeauty.Web.Controllers
             var orderId = await _orderService.PlaceOrderAsync(GetUserId(), dto);
             return RedirectToAction("Success", new {id = orderId});
         }
-        
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelOrder(int orderId)
+        {
+            var (success, message) = await _orderService.CancelOrderAsync(GetUserId(), orderId);
+            if(success)
+            {
+                TempData["Success"] = message;
+            }
+            else
+            {
+                TempData["Error"] = message;
+            }
+            return RedirectToAction("MyOrders");
+        }
+
+
+        public async Task<IActionResult> MyOrders()
+        {
+            var orders = await _orderService.GetUserOrderAsync(GetUserId());
+            return View(orders);
+        }
+
+
         public async Task<IActionResult> Success(int id)
         {
             var order = await _orderService.GetOrderAsync(id, GetUserId());
