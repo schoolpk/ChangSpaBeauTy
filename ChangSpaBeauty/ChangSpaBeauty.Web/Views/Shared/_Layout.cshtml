@@ -1,3 +1,5 @@
+@using System.Linq
+@using ChangSpaBeauty.Domain.Entities
 @using System.Security.Claims
 <!DOCTYPE html>
 <html lang="vi">
@@ -66,7 +68,7 @@
                         <div class="notif-dropdown" id="notif-dropdown">
                             <div class="notif-header">
                                 Thông báo
-                                @if (notifications.Any())
+                                @if (notifications.Count > 0)
                                 {
                                     <form asp-controller="Notification" asp-action="ClearAll" method="post" style="margin:0">
                                         @Html.AntiForgeryToken()
@@ -74,7 +76,7 @@
                                     </form>
                                 }
                             </div>
-                            @if (notifications.Any())
+                            @if (notifications.Count > 0)
                             {
                                 @foreach (var n in notifications)
                                 {
