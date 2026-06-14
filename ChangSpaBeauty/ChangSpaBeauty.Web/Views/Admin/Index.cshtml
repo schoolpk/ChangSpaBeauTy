@@ -56,6 +56,7 @@
         <button class="tab" onclick="switchTab('products', this)">📦 Sản phẩm</button>
         <button class="tab" onclick="switchTab('categories', this)">🗂️ Danh mục</button>
         <button class="tab" onclick="switchTab('orders', this)">🛒 Đơn hàng</button>
+        <button class="tab" onclick="switchTab('cancelled', this)">❌ Đơn hủy (@ViewBag.TotalCancelled)</button>
     </div>
 
     @* ===== PANEL: NGƯỜI DÙNG ===== *@
@@ -299,67 +300,70 @@
                     @if (ViewBag.Orders != null)
                     {
                         @foreach (var ord in ViewBag.Orders)
-                        {
-                            <tr>
-                                <td>#@ord.OrderId</td>
-                                <td>
-                                    <div style="font-weight:600">@ord.User?.Name</div>
-                                    <div style="font-size:.82rem;color:#888">@ord.Address</div>
-                                    <div style="font-size:.82rem;color:#888">📞 @ord.Phone</div>
-                                </td>
-                                <td>@ord.OrderDetails?.Count </td>
-                                <td>
-                                @{
-                                    var details = ord.OrderDetails as IEnumerable<ChangSpaBeauty.Domain.Entities.OrderDetail>;
-                                    var totalQty = details?.Sum(od => od.Quantity) ?? 0;
-                                }
-                                @totalQty 
-                                </td>
-                                <td style="font-weight:700;color:var(--pink-dark)">
-                                    @(((decimal)ord.TotalPrice).ToString("N0")) ₫
-                                </td>
-                                <td>
-                                    <span class="badge-status status-@ord.Status">
-                                        @(ord.Status switch {
-                                            "pending"   => "⏳ Chờ xác nhận",
-                                            "confirmed" => "✅ Đã xác nhận",
-                                            "shipping"  => "🚚 Đang giao",
-                                            "done"      => "✔️ Hoàn thành",
-                                            "cancelled" => "❌ Đã hủy",
-                                            _           => ord.Status
-                                        })
-                                    </span>
-                                </td>
-                                <td>@ord.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td>
-                                    @* Dropdown đổi trạng thái *@
-                                    <form asp-controller="Admin" asp-action="UpdateOrderStatus"
-                                          method="post" style="display:flex;gap:.4rem;align-items:center">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="orderId" value="@ord.OrderId" />
-                                        @{
-                                            string ordStatus = ord.Status?.ToString() ?? "pending";
-                                            var statusOptions = new[]
-                                            {
-                                                // ("pending",   "⏳ Chờ xác nhận"),
-                                                ("confirmed", "✅ Xác nhận"),
-                                                ("shipping",  "🚚 Giao hàng"),
-                                                ("done",      "✔️ Hoàn thành"),
-                                                ("cancelled", "❌ Hủy")
-                                            };
-                                            var selectHtml = "<select name='status' class='status-select'>";
-                                            foreach (var (val, label) in statusOptions)
-                                            {
-                                                var sel = ordStatus == val ? " selected" : "";
-                                                selectHtml += $"<option value='{val}'{sel}>{label}</option>";
+                        { 
+                            @if(ord.Status !="cancelled")
+                            {
+                                <tr>
+                                    <td>#@ord.OrderId</td>
+                                    <td>
+                                        <div style="font-weight:600">@ord.User?.Name</div>
+                                        <div style="font-size:.82rem;color:#888">@ord.Address</div>
+                                        <div style="font-size:.82rem;color:#888">📞 @ord.Phone</div>
+                                    </td>
+                                    <td>@ord.OrderDetails?.Count </td>
+                                    <td>
+                                    @{
+                                        var details = ord.OrderDetails as IEnumerable<ChangSpaBeauty.Domain.Entities.OrderDetail>;
+                                        var totalQty = details?.Sum(od => od.Quantity) ?? 0;
+                                    }
+                                    @totalQty 
+                                    </td>
+                                    <td style="font-weight:700;color:var(--pink-dark)">
+                                        @(((decimal)ord.TotalPrice).ToString("N0")) ₫
+                                    </td>
+                                    <td>
+                                        <span class="badge-status status-@ord.Status">
+                                            @(ord.Status switch {
+                                                "pending"   => "⏳ Chờ xác nhận",
+                                                "confirmed" => "✅ Đã xác nhận",
+                                                "shipping"  => "🚚 Đang giao",
+                                                "done"      => "✔️ Hoàn thành",
+                                                "cancelled" => "❌ Đã hủy",
+                                                _           => ord.Status
+                                            })
+                                        </span>
+                                    </td>
+                                    <td>@ord.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @* Dropdown đổi trạng thái *@
+                                        <form asp-controller="Admin" asp-action="UpdateOrderStatus"
+                                              method="post" style="display:flex;gap:.4rem;align-items:center">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="orderId" value="@ord.OrderId" />
+                                            @{
+                                                string ordStatus = ord.Status?.ToString() ?? "pending";
+                                                var statusOptions = new[]
+                                                {
+                                                    ("pending",   "⏳ Chờ xác nhận"),
+                                                    ("confirmed", "✅ Xác nhận"),
+                                                    ("shipping",  "🚚 Giao hàng"),
+                                                    ("done",      "✔️ Hoàn thành"),
+                                                    ("cancelled", "❌ Hủy")
+                                                };
+                                                var selectHtml = "<select name='status' class='status-select'>";
+                                                foreach (var (val, label) in statusOptions)
+                                                {
+                                                    var sel = ordStatus == val ? " selected" : "";
+                                                    selectHtml += $"<option value='{val}'{sel}>{label}</option>";
+                                                }
+                                                selectHtml += "</select>";
                                             }
-                                            selectHtml += "</select>";
-                                        }
-                                        @Html.Raw(selectHtml)
-                                        <button type="submit" class="btn-status-save">Lưu</button>
-                                    </form>
-                                </td>
-                            </tr>
+                                            @Html.Raw(selectHtml)
+                                            <button type="submit" class="btn-status-save">Lưu</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
                         }
                     }
                     else
@@ -372,7 +376,72 @@
             </table>
         </div>
     </div>
-
+    @* ===== PANEL: ĐƠN HỦY ===== *@
+    <div id="panel-cancelled" class="admin-panel">
+        <div class="admin-card">
+            <div class="admin-toolbar">
+                <div class="admin-search-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input type="text" placeholder="Tìm kiếm đơn hủy..."
+                           oninput="filterTable('tbl-cancelled', this.value)" />
+                </div>
+            </div>
+            <table class="admin-table" id="tbl-cancelled">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Đơn hàng</th>
+                        <th>SP</th>
+                        <th>Số lượng</th>
+                        <th>Tổng tiền</th>
+                        <th>Ngày đặt</th>
+                        <th>Ngày hủy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.CancelledOrders != null)
+                    {
+                        @foreach (var ord in ViewBag.CancelledOrders)
+                        {
+                            <tr>
+                                <td>#@ord.OrderId</td>
+                                <td>
+                                    <div style="font-weight:600">@ord.User?.Name</div>
+                                    <div style="font-size:.82rem;color:#888">@ord.Address</div>
+                                    <div style="font-size:.82rem;color:#888">📞 @ord.Phone</div>
+                                </td>
+                                <td>@ord.OrderDetails?.Count</td>
+                                <td>
+                                    @{
+                                        var cancelDetails = ord.OrderDetails as IEnumerable<ChangSpaBeauty.Domain.Entities.OrderDetail>;
+                                        var cancelQty = cancelDetails?.Sum(od => od.Quantity) ?? 0;
+                                    }
+                                    @cancelQty
+                                </td>
+                                <td style="font-weight:700;color:#dc3545">
+                                    @(((decimal)ord.TotalPrice).ToString("N0")) ₫
+                                </td>
+                                <td>@ord.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    <span class="badge-status status-cancelled">❌ Đã hủy</span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="empty-state">Không có đơn hàng bị hủy</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>@* end admin-wrap *@
 
 @section Scripts {
