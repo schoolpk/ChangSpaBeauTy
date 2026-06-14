@@ -65,11 +65,15 @@ public class AdminController : Controller
         // Order
         var orders = await _orderRepository.GetAllAsync();
         var orderList = orders.ToList();
-        ViewBag.Orders = orderList;
-        ViewBag.TotalOrders = orderList.Count;
+        ViewBag.Orders = orderList.Where(o => o.Status != "cancelled").ToList();
+        ViewBag.TotalOrders = orderList.Where(o => o.Status != "cancelled").Count();
+        ViewBag.CancelledOrders = orderList.Where(o => o.Status == "cancelled").ToList();
+        ViewBag.TotalCancelled = orderList.Where(o => o.Status == "cancelled").Count();  
         ViewBag.TotalProductsSold = orderList
-                            .SelectMany(o => o.OrderDetails)
-                            .Sum(od => od.Quantity);
+            .Where(o => o.Status != "cancelled")
+            .SelectMany(o => o.OrderDetails)
+            .Sum(od => od.Quantity);
+
 
         return View();
 
@@ -292,11 +296,34 @@ public class AdminController : Controller
             return RedirectToAction(nameof(Index));
         }
 
+        if(status == "cancelled")
+        {
+            var order = await _orderRepository.GetOrderWithDetailAsync(orderId);
+            if(order != null && order.Status != "cancelled")
+            {
+                foreach(var detail in order.OrderDetails)
+                {
+                    var product = await _productService.GetProductByIdAsync(detail.ProductId);
+                    if(product != null)
+                    {
+                        product.Sold -= detail.Quantity;
+                        product.Stock += detail.Quantity;
+                        if(product.Sold < 0)
+                        {
+                            product.Sold = 0;
+                        }
+                        await _productService.UpdateProductStockAsync(product);
+                    }
+                }
+            }
+
+        }
+
         await _orderRepository.UpdateOrderAsync(orderId, status);
 
         // ✅ Gửi notification đến customer
-        var order = await _orderRepository.GetByIdWithUserAsync(orderId);
-        if (order != null)
+        var orderInfo = await _orderRepository.GetByIdWithUserAsync(orderId);
+        if (orderInfo != null)
         {
             var message = status switch
             {
@@ -309,7 +336,7 @@ public class AdminController : Controller
 
             await _notiRepo.AddAsync(new Notification
             {
-                UserId = order.UserId,   // ← gửi cho customer
+                UserId = orderInfo.UserId,   // ← gửi cho customer
                 Message = message,
                 IsRead = false,
                 CreatedAt = DateTime.Now
