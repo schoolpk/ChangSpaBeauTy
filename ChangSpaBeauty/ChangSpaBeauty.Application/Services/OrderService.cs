@@ -6,6 +6,7 @@ using ChangSpaBeauty.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -63,14 +64,36 @@ namespace ChangSpaBeauty.Application.Services
             {
                 var order = await _orderRepo.GetOrderAsync(orderId, userId);
                 if (order == null)
+                {
                     return (false, "Không có đơn hàng nào");
+                }
 
                 if (order.Status == "shipping" || order.Status == "done")
+                {
                     return (false, "Không thể hủy đơn hàng khi đang giao hoặc đã hoàn thành");
+                }
+                
+                if(order.Status == "cancelled")
+                {
+                    return (false, "Đơn hàng đã bị hủy trước đó");
+                }
 
                 await _orderRepo.UpdateOrderAsync(orderId, "cancelled");
 
-                Console.WriteLine($"[DEBUG] Order {orderId} cancelled");
+                foreach(var detail in order.OrderDetails)
+                {
+                    var product = await _productRepo.GetByIdAsync(detail.ProductId);
+                    if (product != null)
+                    {
+                        product.Sold -= detail.Quantity;
+                        product.Stock += detail.Quantity;
+                        if(product.Sold < 0)
+                        {
+                            product.Sold = 0;
+                        }
+                        _productRepo.UpdateAsync(product);
+                    }
+                }
 
                 var adminUser = await _userRepo.GetAdminAsync();
                 Console.WriteLine($"[DEBUG] Admin: {adminUser?.Id} - {adminUser?.Name}");
@@ -87,6 +110,8 @@ namespace ChangSpaBeauty.Application.Services
                     });
                     Console.WriteLine($"[DEBUG] Notification saved!");
                 }
+
+
 
                 return (true, "Đã hủy đơn hàng thành công");
             }
