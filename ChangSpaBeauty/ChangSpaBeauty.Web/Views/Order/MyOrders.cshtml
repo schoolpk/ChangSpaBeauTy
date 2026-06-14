@@ -93,7 +93,7 @@
                     </div>
 
                     @* Nút hủy — chỉ hiện khi pending *@
-                    @if (order.Status == "pending")
+                    @if (order.Status == "pending" || order.Status == "confirmed")
                     {
                         <form asp-controller="Order" asp-action="CancelOrder"
                               method="post"
@@ -105,7 +105,7 @@
                             </button>
                         </form>
                     }
-                    else if (order.Status == "confirmed" || order.Status == "shipping")
+                    else if (order.Status == "done" || order.Status == "shipping")
                     {
                         <span class="cancel-locked">🔒 Không thể hủy</span>
                     }

@@ -53,7 +53,7 @@ namespace ChangSpaBeauty.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CancelOrder(int orderId)
         {
-            var (success, message) = await _orderService.CancelOrderAsync(GetUserId(), orderId);
+            var (success, message) = await _orderService.CancelOrderAsync(orderId, GetUserId());
             if(success)
             {
                 TempData["Success"] = message;
