@@ -56,6 +56,10 @@ public class ProductService
             Trademark = p.Category?.Trademark,
         });
     }
+    public async Task<Product?> GetProductByIdAsync(int productId)
+    {
+        return await _unitOfWork.Products.GetByIdAsync(productId);
+    }
 
     public async Task<IEnumerable<ProductDto>> GetPopularProductsAsync()
     {
@@ -67,9 +71,16 @@ public class ProductService
             Price = p.Price,
             Sold = p.Sold,
             CategoryName = p.Category?.Name ?? "",
-            Image = p.Image,
+            Image = p.Image
         });
     }
+
+    public async Task UpdateProductStockAsync(Product product)
+    {
+        _unitOfWork.Products.UpdateAsync(product);
+        await _unitOfWork.SaveChangesAsync();
+    }
+  
 
     public async Task UpdateProductAsync(ProductDto productDto)
     {
