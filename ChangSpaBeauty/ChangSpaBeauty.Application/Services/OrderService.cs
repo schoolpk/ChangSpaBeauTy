@@ -32,31 +32,6 @@ namespace ChangSpaBeauty.Application.Services
             _notificationRepo = notificationRepo;
         }
 
-        public async Task CancelOrderAsync(int orderId)
-        {
-            var order = await _orderRepo.GetOrderWithDetailAsync(orderId);
-            if(order == null)
-            {
-                return;
-            }
-            foreach(var detail in order.OrderDetails)
-            {
-                if(detail.Product != null)
-                {
-                    detail.Product.Sold -= detail.Quantity;
-                    detail.Product.Stock += detail.Quantity;
-                    if(detail.Product.Sold < 0)
-                    {
-                        detail.Product.Sold = 0;
-                    }
-                    _productRepo.UpdateAsync(detail.Product);
-                }
-            }
-            await _orderRepo.DeleteOrderAsync(orderId);
-        }
-
-        
-
         public async Task<OrderDto?> GetOrderAsync(int orderId, int userId)
         {
             var order = await _orderRepo.GetOrderAsync(orderId, userId);
@@ -90,8 +65,8 @@ namespace ChangSpaBeauty.Application.Services
                 if (order == null)
                     return (false, "Không có đơn hàng nào");
 
-                if (order.Status != "pending")
-                    return (false, "Không thể hủy đơn hàng khi đã được xác nhận");
+                if (order.Status == "shipping" || order.Status == "done")
+                    return (false, "Không thể hủy đơn hàng khi đang giao hoặc đã hoàn thành");
 
                 await _orderRepo.UpdateOrderAsync(orderId, "cancelled");
 
