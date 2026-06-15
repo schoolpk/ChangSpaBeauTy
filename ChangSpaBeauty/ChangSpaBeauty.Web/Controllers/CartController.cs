@@ -2,6 +2,7 @@
 using ChangSpaBeauty.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Specialized;
 using System.Security.Claims;
 
 namespace ChangSpaBeauty.Web.Controllers;
@@ -74,9 +75,23 @@ public class CartController : BaseController
     [HttpPost]
     public async Task<IActionResult> AddToCartAjax(int productId, int quantity = 1)
     {
-        var userId = GetUserId();
-        await _cartService.AddToCartAsync(userId, productId, quantity);
-        var count = await _cartService.GetCartItemCountAsync(GetUserId());
-        return Json(new { success = true, cartCount = count });
+        try
+        {
+            var userId = GetUserId();
+            await _cartService.AddToCartAsync(userId, productId, quantity);
+            var count = await _cartService.GetCartItemCountAsync(userId);
+            return Json(new
+            {
+                success = true,
+                cartCount = count
+            });
+        }catch(InvalidOperationException ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = ex.Message
+            });
+        }
     }
 }

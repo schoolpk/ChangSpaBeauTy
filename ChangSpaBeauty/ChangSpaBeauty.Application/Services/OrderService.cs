@@ -152,6 +152,22 @@ namespace ChangSpaBeauty.Application.Services
             {
                 throw new InvalidOperationException("Không có sản phẩm");
             }
+
+            foreach(var item in cart.CartItems)
+            {
+                var product = await _productRepo.GetByIdAsync(item.ProductId);
+                if(product == null)
+                {
+                    throw new InvalidOperationException("Sản phẩm không tồn tại");
+                }
+                if(item.Quantity > product.Stock)
+                {
+                    throw new InvalidOperationException(
+                        $"Sản phẩm \"{product.Name}\" chỉ còn {product.Stock} trong kho +" +
+                        $"bạn đang đặt {item.Quantity}");
+                }
+            }
+
             var order = new Order
             {
                 UserId = userId,

@@ -102,19 +102,16 @@
                     <button class="btn-cart" onclick="addToCart(@Model.ProductId)" type="button">
                         🛒 Thêm vào giỏ
                     </button>
-                    <a asp-controller="Cart" asp-action="Index" class="btn-buy"
-                       onclick="addToCart(@Model.ProductId); return true;">
+                    <button class="btn-buy" onclick="buyNow(@Model.ProductId)">
                         ⚡ Mua ngay
-                    </a>
+                    </button>
+
                 </div>
             }
             else
             {
-                <div class="action-row">
-                    <button class="btn-cart" disabled
-                            style="opacity:0.5; cursor:not-allowed;">
-                        Hết hàng
-                    </button>
+                <div style="color:#dc3545;font-weight:700;padding:1rem 0">
+                    ❌ Sản phẩm đã hết hàng
                 </div>
             }
 
