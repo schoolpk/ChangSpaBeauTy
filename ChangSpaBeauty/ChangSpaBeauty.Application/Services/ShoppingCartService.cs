@@ -8,19 +8,41 @@ namespace ChangSpaBeauty.Application.Services;
 public class ShoppingCartService : IShoppingCartService
 {
     private readonly IShoppingCartRepository _shoppingCartRepo;
+    private readonly IProductRepository _productRepo;
 
-    public ShoppingCartService(IShoppingCartRepository shoppingCartRepo)
+    public ShoppingCartService(IShoppingCartRepository shoppingCartRepo, IProductRepository productRepo)
     {
         _shoppingCartRepo = shoppingCartRepo;
+        _productRepo = productRepo;
     }
 
     public async Task AddToCartAsync(int userId, int productId, int quantity = 1)
     {
+        var product = await _productRepo.GetByIdAsync(productId);
+        if(product == null)
+        {
+            throw new InvalidOperationException("Sản phẩm không tồn tại");
+        }
+        if(product.Stock <= 0)
+        {
+            throw new InvalidOperationException($"Sản phẩm \"{product.Name}\" đã hết hàng");
+        }
+
         var cart = await _shoppingCartRepo.GetShoppingCartByUserAsync(userId);
         if (cart == null)
             cart = await _shoppingCartRepo.CreateCartAsync(userId);
 
         var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == productId);
+
+        int curentQty = existingItem?.Quantity ?? 0;
+        int newQty = curentQty + quantity;
+        if(newQty > product.Stock)
+        {
+            throw new InvalidOperationException(
+                $"Sản phẩm \"{product.Name}\" chỉ còn {product.Stock} trong kho" +
+                $"(Bạn có {curentQty} trong giỏ");
+        }
+
         if (existingItem != null)
         {
             existingItem.Quantity += quantity;
@@ -54,6 +76,7 @@ public class ShoppingCartService : IShoppingCartService
                 ProductName = ci.Product?.Name ?? string.Empty,
                 ProductImage = ci.Product?.Image ?? string.Empty,
                 Price = ci.Product?.Price ?? 0,
+                Stock = ci.Product?.Stock ?? 0,
                 Quantity = ci.Quantity
             }).ToList()
         };
@@ -66,6 +89,12 @@ public class ShoppingCartService : IShoppingCartService
 
         var item = cart.CartItems.FirstOrDefault(ci => ci.Id == cartItemId);
         if (item == null) return;
+
+        int stock = item.Product?.Stock ?? 0;
+        if (quantity > stock)
+        {
+            quantity = stock;
+        }
 
         if (quantity <= 0)
             await _shoppingCartRepo.DeleteCartItemAsync(item);
