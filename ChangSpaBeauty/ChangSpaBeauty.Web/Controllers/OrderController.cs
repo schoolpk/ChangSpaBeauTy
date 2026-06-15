@@ -41,12 +41,18 @@ namespace ChangSpaBeauty.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PlaceOrder(OrderDto dto)
         {
-            if(!ModelState.IsValid)
+            try
             {
+                var orderId = await _orderService.PlaceOrderAsync(GetUserId(), dto);
+                return RedirectToAction("Success", new
+                {
+                    id = orderId
+                });
+            }catch(InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
                 return RedirectToAction("Checkout");
             }
-            var orderId = await _orderService.PlaceOrderAsync(GetUserId(), dto);
-            return RedirectToAction("Success", new {id = orderId});
         }
 
         [HttpPost]
