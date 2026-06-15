@@ -48,7 +48,9 @@
                                     <div class="qty-control">
                                         <button type="button" class="qty-btn" onclick="changeQty(this, -1)">−</button>
                                         <input type="number" name="quantity" value="@item.Quantity"
-                                               min="1" max="99" class="qty-input"
+                                               min="1" max="@item.Stock"
+                                               data-stock="@item.Stock"
+                                               class="qty-input"
                                                onchange="this.form.submit()" />
                                         <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
                                     </div>
@@ -98,15 +100,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        function changeQty(btn, delta) {
-            const form = btn.closest('.qty-form');
-            const input = form.querySelector('.qty-input');
-            let val = parseInt(input.value) + delta;
-            if (val < 1) val = 1;
-            if (val > 99) val = 99;
-            input.value = val;
-            form.submit();
-        }
-    </script>
+    <script src="~/js/cart.js" asp-append-version="true"></script>
 }
