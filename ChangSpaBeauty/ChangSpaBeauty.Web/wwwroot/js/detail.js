@@ -64,3 +64,59 @@ function showToast(msg) {
     clearTimeout(t._timer);
     t._timer = setTimeout(() => t.classList.remove('show'), 2800);
 }
+// ── Mua ngay ────────────────────────────────────────────────────────
+function buyNow(productId) {
+    const qty = parseInt(document.getElementById('qty')?.value || 1);
+
+    const formData = new FormData();
+    formData.append('productId', productId);
+    formData.append('quantity', qty);
+
+    fetch('/Cart/AddToCartAjax', {
+        method: 'POST',
+        body: formData
+    })
+        .then(async res => {
+            if (res.status === 401) {
+                window.location.href = '/Account/Login';
+                return;
+            }
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success) {
+                    // ✅ Redirect thẳng sang Checkout
+                    window.location.href = '/Order/Checkout';
+                } else {
+                    showToast('❌ ' + data.message);
+                }
+            } else {
+                showToast('❌ Có lỗi xảy ra!');
+            }
+        })
+        .catch(() => showToast('❌ Không thể kết nối!'));
+}
+
+// --Stock error---------------------------------
+fetch('/Cart/AddToCartAjax', {
+    method: 'POST',
+    headers: { 'RequestVerificationToken': token },
+    body: formData
+})
+    .then(async res => {
+        if (res.status === 401) {
+            window.location.href = '/Account/Login';
+            return;
+        }
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+                showToast('✅ Đã thêm ' + qty + ' sản phẩm vào giỏ!');
+                updateCartBadge(data.cartCount);
+            } else {
+                showToast('❌ ' + data.message); // ✅ hiện lỗi stock
+            }
+        } else {
+            showToast('❌ Có lỗi xảy ra!');
+        }
+    })
+    .catch(() => showToast('❌ Không thể kết nối, thử lại nhé!'));

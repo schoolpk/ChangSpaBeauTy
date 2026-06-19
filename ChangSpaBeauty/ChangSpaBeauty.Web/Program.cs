@@ -5,7 +5,6 @@ using ChangSpaBeauty.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ChangSpaBeauty.Domain.Interfaces;
-using ChangSpaBeauty.Web.Models.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +33,8 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
 // Sesstion
 builder.Services.AddSession(options =>
 {
@@ -42,7 +43,6 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 }
 );
-builder.Services.AddScoped<NotificationService>();
 
 // Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

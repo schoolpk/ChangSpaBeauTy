@@ -5,35 +5,8 @@
     padding: 0 24px;
 }
 
-/* Breadcrumb */
-.breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--text-light);
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-}
 
-    .breadcrumb a {
-        color: var(--text-light);
-        text-decoration: none;
-        transition: color 0.15s;
-    }
 
-        .breadcrumb a:hover {
-            color: var(--pink-dark);
-        }
-
-    .breadcrumb .sep {
-        color: var(--pink-border);
-    }
-
-    .breadcrumb .current {
-        color: var(--pink-dark);
-        font-weight: 500;
-    }
 
 /* Main layout */
 .detail-grid {

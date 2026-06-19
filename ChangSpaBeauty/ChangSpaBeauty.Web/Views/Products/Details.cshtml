@@ -5,33 +5,11 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/changspa.css" />
-    <link rel="stylesheet" href="~/css/detail.css" />
-    
+    <link rel="stylesheet" href="~/css/detail.css" /> 
 }
 
 <div class="detail-wrap">
 
-    
-@* BREADCRUMB 
-*@
-    <nav class="breadcrumb">
-        <a asp-controller="Home" asp-action="Index">Trang chủ</a>
-        <span class="sep">›</span>
-        <a asp-controller="Products" asp-action="Index">Sản phẩm</a>
-        @if (!string.IsNullOrEmpty(Model.CategoryName))
-        {
-            <span class="sep">›</span>
-            <a asp-controller="Products" asp-action="Index"
-               asp-route-category="@Model.CategoryName.ToLower().Replace(" ", "-")">
-                @Model.CategoryName
-            </a>
-        }
-        <span class="sep">›</span>
-        <span class="current">@Model.Name</span>
-    </nav>
-
-    
 @* MAIN GRID 
 *@
     <div class="detail-grid">
@@ -124,19 +102,16 @@
                     <button class="btn-cart" onclick="addToCart(@Model.ProductId)" type="button">
                         🛒 Thêm vào giỏ
                     </button>
-                    <a asp-controller="Cart" asp-action="Index" class="btn-buy"
-                       onclick="addToCart(@Model.ProductId); return true;">
+                    <button class="btn-buy" onclick="buyNow(@Model.ProductId)">
                         ⚡ Mua ngay
-                    </a>
+                    </button>
+
                 </div>
             }
             else
             {
-                <div class="action-row">
-                    <button class="btn-cart" disabled
-                            style="opacity:0.5; cursor:not-allowed;">
-                        Hết hàng
-                    </button>
+                <div style="color:#dc3545;font-weight:700;padding:1rem 0">
+                    ❌ Sản phẩm đã hết hàng
                 </div>
             }
 

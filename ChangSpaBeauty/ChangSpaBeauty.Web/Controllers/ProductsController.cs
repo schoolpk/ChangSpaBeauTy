@@ -1,5 +1,6 @@
 ﻿using ChangSpaBeauty.Application.Interfaces;
 using ChangSpaBeauty.Application.Services;
+using ChangSpaBeauty.Domain.Interfaces;
 using ChangSpaBeauty.Web.ViewModels;
 using ChangSpaBeauty.Web.ViewModels.Category;
 using ChangSpaBeauty.Web.ViewModels.Product;
@@ -11,8 +12,8 @@ public class ProductsController : BaseController
 {
     private readonly ProductService _productService;
     private readonly IUnitOfWork _unitOfWork;
-    public ProductsController(ProductService productService, IShoppingCartService cartService, IUnitOfWork unitOfWork)
-        : base(cartService)
+    public ProductsController(ProductService productService, IShoppingCartService cartService, IUnitOfWork unitOfWork, INotificationRepository notiRepo)
+        : base(cartService, notiRepo)
     {
         _productService = productService;
         _unitOfWork = unitOfWork;

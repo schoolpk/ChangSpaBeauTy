@@ -1,16 +1,18 @@
 ﻿using ChangSpaBeauty.Application.Interfaces;
+using ChangSpaBeauty.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Specialized;
 using System.Security.Claims;
 
 namespace ChangSpaBeauty.Web.Controllers;
 
 [Authorize]
-public class CartController : Controller
+public class CartController : BaseController
 {
     private readonly IShoppingCartService _cartService;
 
-    public CartController(IShoppingCartService cartService)
+    public CartController(IShoppingCartService cartService, INotificationRepository notiRepo):base(cartService,notiRepo)
     {
         _cartService = cartService;
     }
@@ -73,9 +75,23 @@ public class CartController : Controller
     [HttpPost]
     public async Task<IActionResult> AddToCartAjax(int productId, int quantity = 1)
     {
-        var userId = GetUserId();
-        await _cartService.AddToCartAsync(userId, productId, quantity);
-        var count = await _cartService.GetCartItemCountAsync(GetUserId());
-        return Json(new { success = true, cartCount = count });
+        try
+        {
+            var userId = GetUserId();
+            await _cartService.AddToCartAsync(userId, productId, quantity);
+            var count = await _cartService.GetCartItemCountAsync(userId);
+            return Json(new
+            {
+                success = true,
+                cartCount = count
+            });
+        }catch(InvalidOperationException ex)
+        {
+            return Json(new
+            {
+                success = false,
+                message = ex.Message
+            });
+        }
     }
 }

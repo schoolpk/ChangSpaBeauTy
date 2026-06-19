@@ -17,6 +17,13 @@
     <div class="checkout-grid">
 
         @* FORM *@
+        @if (TempData["Error"] != null)
+        {
+            <div style="background:#f8d7da;color:#842029;padding:.8rem 1.2rem;
+                    border-radius:10px;margin-bottom:1rem;font-weight:600">
+                ❌ @TempData["Error"]
+                </div>
+        }
         <div class="form-card">
             <h2>📦 Thông tin giao hàng</h2>
 

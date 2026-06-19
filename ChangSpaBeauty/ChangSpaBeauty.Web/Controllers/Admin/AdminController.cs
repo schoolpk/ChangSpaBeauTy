@@ -6,7 +6,6 @@ using ChangSpaBeauty.Domain.Entities;
 using ChangSpaBeauty.Domain.Interfaces;
 using ChangSpaBeauty.Infrastructure.Repositories;
 using ChangSpaBeauty.Web.Models;
-using ChangSpaBeauty.Web.Models.Services;
 using ChangSpaBeauty.Web.ViewModels;
 using ChangSpaBeauty.Web.ViewModels.Product;
 using Microsoft.AspNetCore.Authorization;
@@ -26,23 +25,23 @@ public class AdminController : Controller
     private readonly IOrderService _orderService;
     private readonly IUserRepository _userRepository;
     private readonly IWebHostEnvironment _env;
-    private readonly NotificationService _notificationService;
+    private readonly INotificationRepository _notiRepo;
 
     public AdminController(CategoryService categoryService,
         ProductService productService,
         IUserRepository userRepository,
         IWebHostEnvironment env,
         IOrderRepository orderRepository,
-        NotificationService notificationService,
-        IOrderService orderService)
+        IOrderService orderService,
+        INotificationRepository notiRepo)
     {
         _categoryService = categoryService;
         _productService = productService;
         _userRepository = userRepository;
         _env = env;
         _orderRepository = orderRepository;
-        _notificationService = notificationService;
         _orderService = orderService;
+        _notiRepo = notiRepo;
     }
 
     public async Task<IActionResult> Index()
@@ -66,11 +65,15 @@ public class AdminController : Controller
         // Order
         var orders = await _orderRepository.GetAllAsync();
         var orderList = orders.ToList();
-        ViewBag.Orders = orderList;
-        ViewBag.TotalOrders = orderList.Count;
+        ViewBag.Orders = orderList.Where(o => o.Status != "cancelled").ToList();
+        ViewBag.TotalOrders = orderList.Where(o => o.Status != "cancelled").Count();
+        ViewBag.CancelledOrders = orderList.Where(o => o.Status == "cancelled").ToList();
+        ViewBag.TotalCancelled = orderList.Where(o => o.Status == "cancelled").Count();  
         ViewBag.TotalProductsSold = orderList
-                            .SelectMany(o => o.OrderDetails)
-                            .Sum(od => od.Quantity);
+            .Where(o => o.Status != "cancelled")
+            .SelectMany(o => o.OrderDetails)
+            .Sum(od => od.Quantity);
+
 
         return View();
 
@@ -281,7 +284,7 @@ public class AdminController : Controller
     }
 
 
-    // ORDER - UPDATE
+    // ORDER - STATUS
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateOrderStatus(int orderId, string status)
@@ -289,38 +292,58 @@ public class AdminController : Controller
         var allowed = new[] { "pending", "confirmed", "shipping", "done", "cancelled" };
         if (!allowed.Contains(status))
         {
-            TempData["Error"] = "Không hợp lệ";
+            TempData["Error"] = "Trạng thái không hợp lệ!";
             return RedirectToAction(nameof(Index));
         }
-        var order = await _orderRepository.GetByIdWithUserAsync(orderId);
-        if (order == null)
+
+        if(status == "cancelled")
         {
-            TempData["Error"] = "Không tìm thấy đơn hàng";
-            return RedirectToAction(nameof(Index));
+            var order = await _orderRepository.GetOrderWithDetailAsync(orderId);
+            if(order != null && order.Status != "cancelled")
+            {
+                foreach(var detail in order.OrderDetails)
+                {
+                    var product = await _productService.GetProductByIdAsync(detail.ProductId);
+                    if(product != null)
+                    {
+                        product.Sold -= detail.Quantity;
+                        product.Stock += detail.Quantity;
+                        if(product.Sold < 0)
+                        {
+                            product.Sold = 0;
+                        }
+                        await _productService.UpdateProductStockAsync(product);
+                    }
+                }
+            }
+
         }
-        if (status == "cancelled")
+
+        await _orderRepository.UpdateOrderAsync(orderId, status);
+
+        // ✅ Gửi notification đến customer
+        var orderInfo = await _orderRepository.GetByIdWithUserAsync(orderId);
+        if (orderInfo != null)
         {
-            await _orderService.CancelOrderAsync(orderId);
-            TempData["Success"] = "Đã hủy";
+            var message = status switch
+            {
+                "confirmed" => $"✅ Đơn hàng #{orderId} của bạn đã được xác nhận!",
+                "shipping" => $"🚚 Đơn hàng #{orderId} đang được giao đến bạn!",
+                "done" => $"🎉 Đơn hàng #{orderId} đã giao thành công. Cảm ơn bạn!",
+                "cancelled" => $"❌ Đơn hàng #{orderId} đã bị hủy. Liên hệ nếu cần hỗ trợ!",
+                _ => $"📦 Đơn hàng #{orderId} đã được cập nhật trạng thái."
+            };
+
+            await _notiRepo.AddAsync(new Notification
+            {
+                UserId = orderInfo.UserId,   // ← gửi cho customer
+                Message = message,
+                IsRead = false,
+                CreatedAt = DateTime.Now
+            });
         }
-        else
-        {
-            await _orderRepository.UpdateOrderAsync(orderId, status);
-            TempData["Success"] = "Đã cập nhật thành công";
-        }
-        var statusText = status switch
-        {
-            "confirmed" => "✅ Đã xác nhận",
-            "shipping" => "🚚 Đang giao hàng",
-            "done" => "🎉 Giao hàng thành công",
-            "cancelled" => "❌ Đã hủy",
-            _ => status
-        };
-        _notificationService.AddNotification(HttpContext.Session, order.UserId, new Notification {
-            OrderId = orderId,
-            OrderStatus = status,
-            Message = $"Đơn hàng #{orderId} của bạn: {statusText}"
-        });
+
+        TempData["Success"] = "Đã cập nhật trạng thái!";
         return RedirectToAction(nameof(Index));
     }
     private async Task LoadCategoriesAsync()
