@@ -1,5 +1,6 @@
 ﻿using ChangSpaBeauty.Application.DTOs.Order;
 using ChangSpaBeauty.Application.Interfaces;
+using ChangSpaBeauty.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -7,11 +8,11 @@ using System.Security.Claims;
 namespace ChangSpaBeauty.Web.Controllers
 {
     [Authorize]
-    public class OrderController : Controller
+    public class OrderController : BaseController
     {
         private readonly IOrderService _orderService;
         private readonly IShoppingCartService _cartService;
-        public OrderController(IOrderService orderService, IShoppingCartService cartService)
+        public OrderController(IOrderService orderService, IShoppingCartService cartService, INotificationRepository notiRepo):base(cartService,notiRepo) 
         {
             _orderService = orderService;
             _cartService = cartService;
@@ -40,19 +41,25 @@ namespace ChangSpaBeauty.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PlaceOrder(OrderDto dto)
         {
-            if(!ModelState.IsValid)
+            try
             {
+                var orderId = await _orderService.PlaceOrderAsync(GetUserId(), dto);
+                return RedirectToAction("Success", new
+                {
+                    id = orderId
+                });
+            }catch(InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
                 return RedirectToAction("Checkout");
             }
-            var orderId = await _orderService.PlaceOrderAsync(GetUserId(), dto);
-            return RedirectToAction("Success", new {id = orderId});
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CancelOrder(int orderId)
         {
-            var (success, message) = await _orderService.CancelOrderAsync(GetUserId(), orderId);
+            var (success, message) = await _orderService.CancelOrderAsync(orderId, GetUserId());
             if(success)
             {
                 TempData["Success"] = message;

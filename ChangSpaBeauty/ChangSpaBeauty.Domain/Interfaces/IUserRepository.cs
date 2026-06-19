@@ -12,6 +12,7 @@ namespace ChangSpaBeauty.Application.Interfaces
         
         Task<User?> GetByEmailAsync(string email);
         Task<User?> GetByIdAsync(int id);
+        Task<User?> GetAdminAsync();
         Task AddAsync(User user);
         Task DeteleAsync(int userId);
         Task SaveChangeAsync();

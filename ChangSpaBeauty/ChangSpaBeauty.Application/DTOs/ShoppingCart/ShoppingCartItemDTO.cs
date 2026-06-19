@@ -14,6 +14,7 @@ namespace ChangSpaBeauty.Application.DTOs.ShoppingCart
         public string ProductImage { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public int Quantity { get; set; } = 1;
+        public int Stock { get; set; }
         public decimal Total => Price * Quantity;
 
     }

@@ -65,6 +65,12 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
             return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
+        public async Task<User?> GetAdminAsync()
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.Role == "Admin");
+        }
+
         public async Task<IEnumerable<User>> GetAllAsync()
         {
             return await _context.Users

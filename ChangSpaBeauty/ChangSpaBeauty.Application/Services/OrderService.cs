@@ -1,10 +1,12 @@
-﻿using ChangSpaBeauty.Application.DTOs.Order;
+﻿using ChangSpaBeauty.Application.DTOs;
+using ChangSpaBeauty.Application.DTOs.Order;
 using ChangSpaBeauty.Application.Interfaces;
 using ChangSpaBeauty.Domain.Entities;
 using ChangSpaBeauty.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,38 +17,21 @@ namespace ChangSpaBeauty.Application.Services
         private readonly IShoppingCartRepository _cartRepo;
         private readonly IOrderRepository _orderRepo;
         private readonly IProductRepository _productRepo;
+        private readonly IUserRepository _userRepo;
+        private readonly INotificationRepository _notificationRepo;
 
-        public OrderService(IShoppingCartRepository cartRepo, IOrderRepository orderRepo, IProductRepository productRepo)
+        public OrderService(IShoppingCartRepository cartRepo,
+            IOrderRepository orderRepo,
+            IProductRepository productRepo,
+            IUserRepository userRepo,
+            INotificationRepository notificationRepo)
         {
             _cartRepo = cartRepo;
             _orderRepo = orderRepo;
             _productRepo = productRepo;
+            _userRepo = userRepo;
+            _notificationRepo = notificationRepo;
         }
-
-        public async Task CancelOrderAsync(int orderId)
-        {
-            var order = await _orderRepo.GetOrderWithDetailAsync(orderId);
-            if(order == null)
-            {
-                return;
-            }
-            foreach(var detail in order.OrderDetails)
-            {
-                if(detail.Product != null)
-                {
-                    detail.Product.Sold -= detail.Quantity;
-                    detail.Product.Stock += detail.Quantity;
-                    if(detail.Product.Sold < 0)
-                    {
-                        detail.Product.Sold = 0;
-                    }
-                    _productRepo.UpdateAsync(detail.Product);
-                }
-            }
-            await _orderRepo.DeleteOrderAsync(orderId);
-        }
-
-        
 
         public async Task<OrderDto?> GetOrderAsync(int orderId, int userId)
         {
@@ -72,20 +57,71 @@ namespace ChangSpaBeauty.Application.Services
                 }).ToList()
             };
         }
-        
+
         public async Task<(bool success, string message)> CancelOrderAsync(int orderId, int userId)
         {
-            var order = await _orderRepo.GetOrderAsync(orderId,userId);
-            if(order == null)
+            try
             {
-                return (false, "Không có đơn hàng nào");
+                var order = await _orderRepo.GetOrderAsync(orderId, userId);
+                if (order == null)
+                {
+                    return (false, "Không có đơn hàng nào");
+                }
+
+                if (order.Status == "shipping" || order.Status == "done")
+                {
+                    return (false, "Không thể hủy đơn hàng khi đang giao hoặc đã hoàn thành");
+                }
+                
+                if(order.Status == "cancelled")
+                {
+                    return (false, "Đơn hàng đã bị hủy trước đó");
+                }
+
+                await _orderRepo.UpdateOrderAsync(orderId, "cancelled");
+
+                foreach(var detail in order.OrderDetails)
+                {
+                    var product = await _productRepo.GetByIdAsync(detail.ProductId);
+                    if (product != null)
+                    {
+                        product.Sold -= detail.Quantity;
+                        product.Stock += detail.Quantity;
+                        if(product.Sold < 0)
+                        {
+                            product.Sold = 0;
+                        }
+                        _productRepo.UpdateAsync(product);
+                    }
+                }
+
+                var adminUser = await _userRepo.GetAdminAsync();
+                Console.WriteLine($"[DEBUG] Admin: {adminUser?.Id} - {adminUser?.Name}");
+
+                if (adminUser != null)
+                {
+                    var customer = await _userRepo.GetByIdAsync(userId);
+                    await _notificationRepo.AddAsync(new Notification
+                    {
+                        UserId = adminUser.Id,
+                        Message = $"❌ Khách hàng {customer?.Name ?? "N/A"} vừa hủy đơn #{orderId} ({order.TotalPrice.ToString("N0")} ₫)",
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    });
+                    Console.WriteLine($"[DEBUG] Notification saved!");
+                }
+
+
+
+                return (true, "Đã hủy đơn hàng thành công");
             }
-            if(order.Status != "pending")
+            catch (Exception ex)
             {
-                return (false, "Không thể hủy đơn hàng khi đã được xác nhận");
+                // In toàn bộ lỗi ra Output
+                Console.WriteLine($"[ERROR] CancelOrderAsync: {ex.Message}");
+                Console.WriteLine($"[ERROR] StackTrace: {ex.StackTrace}");
+                return (false, $"Lỗi: {ex.Message}");
             }
-            await _orderRepo.UpdateOrderAsync(orderId, "cancelled");
-            return (true, "Đã hủy đơn hàng thành công");
         }
 
         public async Task<List<OrderDto>> GetUserOrderAsync(int userId)
@@ -116,6 +152,22 @@ namespace ChangSpaBeauty.Application.Services
             {
                 throw new InvalidOperationException("Không có sản phẩm");
             }
+
+            foreach(var item in cart.CartItems)
+            {
+                var product = await _productRepo.GetByIdAsync(item.ProductId);
+                if(product == null)
+                {
+                    throw new InvalidOperationException("Sản phẩm không tồn tại");
+                }
+                if(item.Quantity > product.Stock)
+                {
+                    throw new InvalidOperationException(
+                        $"Sản phẩm \"{product.Name}\" chỉ còn {product.Stock} trong kho +" +
+                        $"bạn đang đặt {item.Quantity}");
+                }
+            }
+
             var order = new Order
             {
                 UserId = userId,
