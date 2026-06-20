@@ -367,4 +367,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Bỏ qua file cấu hình riêng
+appsettings.json
 >>>>>>> 4127a3e1d136397a2a6daea92a1edc9e8787917d
