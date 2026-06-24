@@ -96,14 +96,22 @@
                             <div class="product-sold">@p.CategoryName · Đã bán @p.Sold</div>
 
                             @* Kiểm tra đăng nhập bên trong từng sản phẩm *@
+                            
                             @if (User.Identity?.IsAuthenticated == true)
                             {
-                                <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="productId" value="@p.ProductId" />
-                                    <input type="hidden" name="quantity" value="1" />
-                                    <button type="submit" class="product-add">+ Thêm vào giỏ</button>
-                                </form>
+                                if (p.Stock <= 0)
+                                {
+                                    <button class="product-add" disabled>🚫 Hết hàng</button>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@p.ProductId" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="product-add">+ Thêm vào giỏ</button>
+                                    </form>
+                                }
                             }
                             else
                             {
