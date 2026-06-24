@@ -192,6 +192,14 @@
 
 <!-- ══ MAIN ═════════════════════════════════════════════ -->
 <main>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="toast toast-error">@TempData["ErrorMessage"]</div>
+        }
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="toast toast-success">@TempData["SuccessMessage"]</div>
+        }
     @RenderBody()
 </main>
 
