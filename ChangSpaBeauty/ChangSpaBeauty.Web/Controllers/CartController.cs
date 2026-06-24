@@ -47,7 +47,7 @@ public class CartController : BaseController
         {
             TempData["ErrorMessage"] = ex.Message;
         }
-        return RedirectToAction("Index");
+        return RedirectToAction("Index","Products");
         
     }
 
