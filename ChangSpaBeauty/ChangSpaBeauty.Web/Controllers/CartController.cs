@@ -38,9 +38,17 @@ public class CartController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
     {
-        await _cartService.AddToCartAsync(GetUserId(), productId, quantity);
-        TempData["SuccessMessage"] = "Đã thêm sản phẩm vào giỏ hàng!";
+        try
+        {
+            await _cartService.AddToCartAsync(GetUserId(), productId, quantity);
+            TempData["SuccessMessage"] = "Đã thêm sản phẩm vào giỏ hàng!";
+        }
+        catch (InvalidOperationException ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+        }
         return RedirectToAction("Index");
+        
     }
 
     // ==================== CẬP NHẬT SỐ LƯỢNG ====================
