@@ -15,8 +15,8 @@
                 @foreach (var cat in Model.Categories)
                 {
                     <a asp-controller="Products" asp-action="Index"
-                       asp-route-category="@cat.Slug"
-                       class="sidebar-item @(Model.SelectedCategory == cat.Slug ? "active" : "")">
+                       asp-route-category="@cat.CategoryId"
+                       class="sidebar-item @(Model.SelectedCategory == cat.CategoryId.ToString() ? "active" : "")">
                         @cat.Name <span class="count">@cat.Total</span>
                     </a>
                 }
@@ -40,7 +40,10 @@
         <main class="main-content">
             <div class="section-header">
                 <div class="section-title">
-                    @(string.IsNullOrEmpty(Model.SelectedCategory) ? "Tất cả sản phẩm" : Model.SelectedCategory)
+                    @{
+                        var selectedCat = Model.Categories.FirstOrDefault(c => c.CategoryId.ToString() == Model.SelectedCategory);
+                    }
+                    @(selectedCat != null ? selectedCat.Name : "Tất cả sản phẩm")
                 </div>
             </div>
 
