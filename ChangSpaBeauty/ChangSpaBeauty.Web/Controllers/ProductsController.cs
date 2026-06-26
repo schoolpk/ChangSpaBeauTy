@@ -77,16 +77,15 @@ public class ProductsController : BaseController
 
         // Sidebar categories
         var matchedCategoryIds = products.Select(p => p.CategoryId).Distinct().ToHashSet();
+        // Sidebar — luôn hiện TẤT CẢ categories, không filter bỏ
         var categorySidebar = allCategories.Select(c => new CategorySidebar
         {
             CategoryId = c.CategoryId,
             Name = c.Name,
             Total = c.Total,
-            Slug = c.CategoryId.ToString()  // dùng Id làm slug
+            Slug = c.CategoryId.ToString()
         })
-        .Where(c => keyword != null || matchedCategoryIds.Contains(c.CategoryId))
-        .ToList();
-
+        .ToList(); // ← bỏ .Where() đi, giữ nguyên tất cả
         var trademarks = allCategories
             .Where(c => !string.IsNullOrEmpty(c.Trademark))
             .Select(c => c.Trademark!)
