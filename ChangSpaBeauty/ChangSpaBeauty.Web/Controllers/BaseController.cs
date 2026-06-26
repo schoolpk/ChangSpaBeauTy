@@ -30,6 +30,9 @@ namespace ChangSpaBeauty.Web.Controllers
                 ViewBag.Notifications = await notifRepo.GetByUserAsync(userId);
                 ViewBag.UnreadCount = await notifRepo.GetUnreadCountAsync(userId);
             }
+            var unitOfWork = HttpContext.RequestServices.GetRequiredService<IUnitOfWork>();
+            var categories = await unitOfWork.Categories.GetAllAsync();
+            ViewBag.NavCategories = categories;
             await next();
         }
     }

@@ -66,11 +66,7 @@
                 @if (User.IsInRole("Customer"))
                 {
                     <a asp-controller="Order" asp-action="MyOrders" class="btn btn-ghost">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14,2 14,8 20,8"/>
-                        </svg>
-                        Đơn hàng
+                        🛒 Đơn hàng của tôi
                     </a>
                 }
 
@@ -176,19 +172,27 @@
 </header>
 
 <!-- ══ NAV ═════════════════════════════════════════════ -->
-<nav id="site-nav">
-    <div class="nav-inner">
-        <a asp-controller="Home" asp-action="Index"
-           class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
-            Trang chủ
-        </a>
-        <a asp-controller="Products" asp-action="Index" asp-route-category="duong-da"    class="nav-item">Dưỡng da</a>
-        <a asp-controller="Products" asp-action="Index" asp-route-category="trang-diem"  class="nav-item">Trang điểm</a>
-        <a asp-controller="Products" asp-action="Index" asp-route-category="cham-soc-co-the" class="nav-item">Chăm sóc cơ thể</a>
-        <a asp-controller="Products" asp-action="Index" asp-route-category="nuoc-hoa"    class="nav-item">Nước hoa</a>
+    <nav id="site-nav">
+        <div class="nav-inner">
+            <a asp-controller="Home" asp-action="Index"
+               class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
+                Trang chủ
+            </a>
 
-    </div>
-</nav>
+            @{
+                var navCategories = ViewBag.NavCategories as IEnumerable<ChangSpaBeauty.Domain.Entities.Category>
+                ?? Enumerable.Empty<ChangSpaBeauty.Domain.Entities.Category>();
+            }
+            @foreach (var cat in navCategories)
+            {
+                <a asp-controller="Products" asp-action="Index"
+                   asp-route-category="@cat.CategoryId"
+                   class="nav-item">
+                    @cat.Name
+                </a>
+            }
+        </div>
+    </nav>
 
 <!-- ══ MAIN ═════════════════════════════════════════════ -->
 <main>
