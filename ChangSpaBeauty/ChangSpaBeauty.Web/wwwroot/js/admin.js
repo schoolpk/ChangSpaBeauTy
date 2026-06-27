@@ -11,3 +11,19 @@ function filterTable(tableId, query) {
         row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
     });
 }
+// Filter rows trong bảng orders theo status
+function filterOrders(status, btn) {
+    // Highlight tab active
+    document.querySelectorAll('.order-filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Show/hide rows
+    const rows = document.querySelectorAll('#tbl-orders tbody tr[data-status]');
+    rows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}

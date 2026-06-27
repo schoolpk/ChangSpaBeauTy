@@ -44,7 +44,8 @@ public class AdminController : Controller
         _notiRepo = notiRepo;
     }
 
-    public async Task<IActionResult> Index()
+    // Chỉ sửa action Index — thêm param status
+    public async Task<IActionResult> Index(string? status)
     {
         // User
         var users = await _userRepository.GetAllAsync();
@@ -52,31 +53,40 @@ public class AdminController : Controller
         ViewBag.Users = userList;
         ViewBag.TotalUsers = userList.Count;
         ViewBag.NewUsersThisMounth = 0;
+
         // Product
         var products = await _productService.GetAllProductsAsync();
         var productList = products.ToList();
         ViewBag.Products = productList;
         ViewBag.TotalProducts = productList.Count;
+
         // Category
         var categories = await _categoryService.GetAllAsync();
         var categoryList = categories.ToList();
         ViewBag.Categories = categories;
         ViewBag.TotalCategories = categoryList.Count;
+
         // Order
         var orders = await _orderRepository.GetAllAsync();
         var orderList = orders.ToList();
-        ViewBag.Orders = orderList.Where(o => o.Status != "cancelled").ToList();
-        ViewBag.TotalOrders = orderList.Where(o => o.Status != "cancelled").Count();
-        ViewBag.CancelledOrders = orderList.Where(o => o.Status == "cancelled").ToList();
-        ViewBag.TotalCancelled = orderList.Where(o => o.Status == "cancelled").Count();  
+
+        // Stats (luôn tính trên toàn bộ)
+        ViewBag.TotalOrders = orderList.Count(o => o.Status != "cancelled");
+        ViewBag.TotalCancelled = orderList.Count(o => o.Status == "cancelled");
         ViewBag.TotalProductsSold = orderList
             .Where(o => o.Status != "cancelled")
             .SelectMany(o => o.OrderDetails)
             .Sum(od => od.Quantity);
 
+        // Filter theo status nếu có
+        var filtered = string.IsNullOrEmpty(status)
+            ? orderList
+            : orderList.Where(o => o.Status == status).ToList();
+
+        ViewBag.Orders = filtered;
+        ViewBag.SelectedStatus = status ?? "all";
 
         return View();
-
     }
 
     // USER - DELETE
@@ -222,6 +232,7 @@ public class AdminController : Controller
             Description = product.Description
         };
         ViewBag.ProductId = id;
+        ViewBag.CurrentImage = product.Image;
         return View(model);
     }
     [HttpPost]

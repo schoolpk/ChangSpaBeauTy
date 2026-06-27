@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Đơn hàng của tôi";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var selectedStatus = ViewBag.SelectedStatus as string ?? "all";
 }
 
 @section Styles {
@@ -27,12 +28,49 @@
         <div class="mo-alert mo-alert-error">❌ @TempData["Error"]</div>
     }
 
+    @* ── TABS LỌC THEO TRẠNG THÁI ── *@
+    <div class="mo-tabs">
+        <a asp-action="MyOrders" asp-route-status=""
+           class="mo-tab @(selectedStatus == "all" ? "active" : "")">
+            Tất cả
+        </a>
+        <a asp-action="MyOrders" asp-route-status="pending"
+           class="mo-tab @(selectedStatus == "pending" ? "active" : "")">
+            ⏳ Chờ xác nhận
+        </a>
+        <a asp-action="MyOrders" asp-route-status="confirmed"
+           class="mo-tab @(selectedStatus == "confirmed" ? "active" : "")">
+            ✅ Đã xác nhận
+        </a>
+        <a asp-action="MyOrders" asp-route-status="shipping"
+           class="mo-tab @(selectedStatus == "shipping" ? "active" : "")">
+            🚚 Đang giao
+        </a>
+        <a asp-action="MyOrders" asp-route-status="done"
+           class="mo-tab @(selectedStatus == "done" ? "active" : "")">
+            ✔️ Hoàn thành
+        </a>
+        <a asp-action="MyOrders" asp-route-status="cancelled"
+           class="mo-tab @(selectedStatus == "cancelled" ? "active" : "")">
+            ❌ Đã hủy
+        </a>
+    </div>
+
     @if (!Model.Any())
     {
         <div class="mo-empty">
             <div class="mo-empty-icon">📭</div>
-            <h3>Chưa có đơn hàng nào</h3>
-            <p>Hãy khám phá các sản phẩm và đặt hàng ngay!</p>
+            <h3>Không có đơn hàng nào</h3>
+            <p>
+                @if (selectedStatus != "all")
+                {
+                    <span>Không có đơn hàng nào ở trạng thái này.</span>
+                }
+                else
+                {
+                    <span>Hãy khám phá các sản phẩm và đặt hàng ngay!</span>
+                }
+            </p>
             <a asp-controller="Products" asp-action="Index" class="mo-btn-shop-big">
                 Mua sắm ngay →
             </a>
@@ -102,9 +140,7 @@
                                         @item.UnitPrice.ToString("N0") ₫ × @item.Quantity
                                     </div>
                                 </div>
-                                <div class="mo-item-sub">
-                                    @item.Subtotal.ToString("N0") ₫
-                                </div>
+                                <div class="mo-item-sub">@item.Subtotal.ToString("N0") ₫</div>
                             </div>
                         }
                         @if (order.Items.Count > 2)
