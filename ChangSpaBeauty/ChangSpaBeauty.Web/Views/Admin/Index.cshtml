@@ -56,7 +56,6 @@
         <button class="tab" onclick="switchTab('products', this)">📦 Sản phẩm</button>
         <button class="tab" onclick="switchTab('categories', this)">🗂️ Danh mục</button>
         <button class="tab" onclick="switchTab('orders', this)">🛒 Đơn hàng</button>
-        <button class="tab" onclick="switchTab('cancelled', this)">❌ Đơn hủy (@ViewBag.TotalCancelled)</button>
     </div>
 
     @* ===== PANEL: NGƯỜI DÙNG ===== *@
@@ -276,19 +275,41 @@
                 <div class="admin-search-wrap">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
                     </svg>
                     <input type="text" placeholder="Tìm kiếm đơn hàng..."
                            oninput="filterTable('tbl-orders', this.value)" />
                 </div>
             </div>
+
+            @* ── FILTER TABS THEO TRẠNG THÁI ── *@
+            <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem;">
+                <button class="order-filter-tab active" onclick="filterOrders('all', this)">
+                    Tất cả
+                </button>
+                <button class="order-filter-tab" onclick="filterOrders('pending', this)">
+                    ⏳ Chờ xác nhận
+                </button>
+                <button class="order-filter-tab" onclick="filterOrders('confirmed', this)">
+                    ✅ Đã xác nhận
+                </button>
+                <button class="order-filter-tab" onclick="filterOrders('shipping', this)">
+                    🚚 Đang giao
+                </button>
+                <button class="order-filter-tab" onclick="filterOrders('done', this)">
+                    ✔️ Hoàn thành
+                </button>
+                <button class="order-filter-tab" onclick="filterOrders('cancelled', this)">
+                    ❌ Đã hủy
+                </button>
+            </div>
+
             <table class="admin-table" id="tbl-orders">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Đơn hàng</th>
-                        <th> SP</th>
+                        <th>SP</th>
                         <th>Số lượng SP</th>
                         <th>Tổng tiền</th>
                         <th>Trạng thái</th>
@@ -300,134 +321,65 @@
                     @if (ViewBag.Orders != null)
                     {
                         @foreach (var ord in ViewBag.Orders)
-                        { 
-                            @if(ord.Status !="cancelled")
-                            {
-                                <tr>
-                                    <td>#@ord.OrderId</td>
-                                    <td>
-                                        <div style="font-weight:600">@ord.User?.Name</div>
-                                        <div style="font-size:.82rem;color:#888">@ord.Address</div>
-                                        <div style="font-size:.82rem;color:#888">📞 @ord.Phone</div>
-                                    </td>
-                                    <td>@ord.OrderDetails?.Count </td>
-                                    <td>
-                                    @{
-                                        var details = ord.OrderDetails as IEnumerable<ChangSpaBeauty.Domain.Entities.OrderDetail>;
-                                        var totalQty = details?.Sum(od => od.Quantity) ?? 0;
-                                    }
-                                    @totalQty 
-                                    </td>
-                                    <td style="font-weight:700;color:var(--pink-dark)">
-                                        @(((decimal)ord.TotalPrice).ToString("N0")) ₫
-                                    </td>
-                                    <td>
-                                        <span class="badge-status status-@ord.Status">
-                                            @(ord.Status switch {
-                                                "pending"   => "⏳ Chờ xác nhận",
-                                                "confirmed" => "✅ Đã xác nhận",
-                                                "shipping"  => "🚚 Đang giao",
-                                                "done"      => "✔️ Hoàn thành",
-                                                "cancelled" => "❌ Đã hủy",
-                                                _           => ord.Status
-                                            })
-                                        </span>
-                                    </td>
-                                    <td>@ord.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td>
-                                        @* Dropdown đổi trạng thái *@
-                                        <form asp-controller="Admin" asp-action="UpdateOrderStatus"
-                                              method="post" style="display:flex;gap:.4rem;align-items:center">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="orderId" value="@ord.OrderId" />
-                                            @{
-                                                string ordStatus = ord.Status?.ToString() ?? "pending";
-                                                var statusOptions = new[]
-                                                {
-                                                    ("pending",   "⏳ Chờ xác nhận"),
-                                                    ("confirmed", "✅ Xác nhận"),
-                                                    ("shipping",  "🚚 Giao hàng"),
-                                                    ("done",      "✔️ Hoàn thành"),
-                                                    ("cancelled", "❌ Hủy")
-                                                };
-                                                var selectHtml = "<select name='status' class='status-select'>";
-                                                foreach (var (val, label) in statusOptions)
-                                                {
-                                                    var sel = ordStatus == val ? " selected" : "";
-                                                    selectHtml += $"<option value='{val}'{sel}>{label}</option>";
-                                                }
-                                                selectHtml += "</select>";
-                                            }
-                                            @Html.Raw(selectHtml)
-                                            <button type="submit" class="btn-status-save">Lưu</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="4" class="empty-state">Không có dữ liệu đơn hàng</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-    @* ===== PANEL: ĐƠN HỦY ===== *@
-    <div id="panel-cancelled" class="admin-panel">
-        <div class="admin-card">
-            <div class="admin-toolbar">
-                <div class="admin-search-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                    <input type="text" placeholder="Tìm kiếm đơn hủy..."
-                           oninput="filterTable('tbl-cancelled', this.value)" />
-                </div>
-            </div>
-            <table class="admin-table" id="tbl-cancelled">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Đơn hàng</th>
-                        <th>SP</th>
-                        <th>Số lượng</th>
-                        <th>Tổng tiền</th>
-                        <th>Ngày đặt</th>
-                        <th>Ngày hủy</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (ViewBag.CancelledOrders != null)
-                    {
-                        @foreach (var ord in ViewBag.CancelledOrders)
                         {
-                            <tr>
+                            <tr data-status="@ord.Status">
                                 <td>#@ord.OrderId</td>
                                 <td>
                                     <div style="font-weight:600">@ord.User?.Name</div>
+                                    <div style="font-size:.82rem;color:#888">@ord.User?.Email</div>
                                     <div style="font-size:.82rem;color:#888">@ord.Address</div>
                                     <div style="font-size:.82rem;color:#888">📞 @ord.Phone</div>
                                 </td>
                                 <td>@ord.OrderDetails?.Count</td>
                                 <td>
                                     @{
-                                        var cancelDetails = ord.OrderDetails as IEnumerable<ChangSpaBeauty.Domain.Entities.OrderDetail>;
-                                        var cancelQty = cancelDetails?.Sum(od => od.Quantity) ?? 0;
+                                        var details = ord.OrderDetails as IEnumerable<ChangSpaBeauty.Domain.Entities.OrderDetail>;
+                                        var totalQty = details?.Sum(od => od.Quantity) ?? 0;
                                     }
-                                    @cancelQty
+                                    @totalQty
                                 </td>
-                                <td style="font-weight:700;color:#dc3545">
+                                <td style="font-weight:700;color:var(--pink-dark)">
                                     @(((decimal)ord.TotalPrice).ToString("N0")) ₫
+                                </td>
+                                <td>
+                                    <span class="badge-status status-@ord.Status">
+                                        @(ord.Status switch {
+                                            "pending"   => "⏳ Chờ xác nhận",
+                                            "confirmed" => "✅ Đã xác nhận",
+                                            "shipping"  => "🚚 Đang giao",
+                                            "done"      => "✔️ Hoàn thành",
+                                            "cancelled" => "❌ Đã hủy",
+                                            _           => ord.Status
+                                        })
+                                    </span>
                                 </td>
                                 <td>@ord.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
                                 <td>
-                                    <span class="badge-status status-cancelled">❌ Đã hủy</span>
+                                    <form asp-controller="Admin" asp-action="UpdateOrderStatus"
+                                          method="post" style="display:flex;gap:.4rem;align-items:center">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderId" value="@ord.OrderId" />
+                                        @{
+                                            string ordStatus = ord.Status?.ToString() ?? "pending";
+                                            var statusOptions = new[]
+                                            {
+                                                ("pending",   "⏳ Chờ xác nhận"),
+                                                ("confirmed", "✅ Xác nhận"),
+                                                ("shipping",  "🚚 Giao hàng"),
+                                                ("done",      "✔️ Hoàn thành"),
+                                                ("cancelled", "❌ Hủy")
+                                            };
+                                            var selectHtml = "<select name='status' class='status-select'>";
+                                            foreach (var (val, label) in statusOptions)
+                                            {
+                                                var sel = ordStatus == val ? " selected" : "";
+                                                selectHtml += $"<option value='{val}'{sel}>{label}</option>";
+                                            }
+                                            selectHtml += "</select>";
+                                        }
+                                        @Html.Raw(selectHtml)
+                                        <button type="submit" class="btn-status-save">Lưu</button>
+                                    </form>
                                 </td>
                             </tr>
                         }
@@ -435,7 +387,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="7" class="empty-state">Không có đơn hàng bị hủy</td>
+                            <td colspan="8" class="empty-state">Không có dữ liệu đơn hàng</td>
                         </tr>
                     }
                 </tbody>
