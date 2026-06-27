@@ -1,16 +1,21 @@
-﻿.auth-container {
+﻿/* Đồng bộ tông màu với changspa.md — dùng chung các biến (--pink-dark, --pink-light,
+   --pink-pale, --mint, --text-dark, --text-mid, --gradient-pink, --shadow-md,
+   --radius-sm/md/pill, var(--transition), @keyframes jellyPress) đã khai báo ở :root
+   trong changspa.md. File này cần được load SAU changspa.md. */
+
+.auth-container {
     min-height: 80vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #FFF5F8 0%, #FFB6C1 100%);
+    background: linear-gradient(135deg, var(--pink-pale) 0%, var(--pink-light) 100%);
     padding: 40px 20px;
 }
 
 .auth-card {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(214, 51, 108, 0.15);
+    background: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
     padding: 48px 40px;
     width: 100%;
     max-width: 460px;
@@ -22,14 +27,14 @@
 }
 
     .auth-header h2 {
-        color: #D6336C;
+        color: var(--pink-dark);
         font-size: 28px;
         font-weight: 700;
         margin-bottom: 8px;
     }
 
     .auth-header p {
-        color: #888;
+        color: var(--text-mid);
         font-size: 14px;
     }
 
@@ -40,7 +45,7 @@
     .form-group label {
         display: block;
         font-weight: 600;
-        color: #555;
+        color: var(--text-mid);
         margin-bottom: 6px;
         font-size: 14px;
     }
@@ -48,17 +53,19 @@
 .form-control {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid #FFB6C1;
-    border-radius: 10px;
+    border: 2px solid var(--pink-light);
+    border-radius: var(--radius-sm);
     font-size: 15px;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    font-family: var(--font-body);
+    color: var(--text-dark);
+    transition: border-color var(--transition), box-shadow var(--transition);
     box-sizing: border-box;
     outline: none;
 }
 
     .form-control:focus {
-        border-color: #D6336C;
-        box-shadow: 0 0 0 3px rgba(214, 51, 108, 0.1);
+        border-color: var(--pink-dark);
+        box-shadow: 0 0 0 3px rgba(255, 77, 136, 0.12);
     }
 
 .input-password {
@@ -76,7 +83,7 @@
     right: 12px;
     background: none;
     border: none;
-    color: #D6336C;
+    color: var(--pink-dark);
     cursor: pointer;
     font-size: 16px;
     padding: 0;
@@ -91,13 +98,13 @@
 .form-check-input {
     width: 18px;
     height: 18px;
-    accent-color: #D6336C;
+    accent-color: var(--pink-dark);
     cursor: pointer;
 }
 
 .form-check-label {
     font-size: 14px;
-    color: #666;
+    color: var(--text-mid);
     cursor: pointer;
     margin-bottom: 0 !important;
 }
@@ -105,36 +112,37 @@
 .btn-auth {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #D6336C, #FF4081);
-    color: #fff;
+    background: var(--gradient-pink);
+    color: var(--white);
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-pill);
     font-size: 16px;
     font-weight: 700;
+    font-family: var(--font-body);
     cursor: pointer;
-    transition: opacity 0.3s, transform 0.1s;
+    transition: filter var(--transition), transform var(--transition);
     margin-top: 8px;
     letter-spacing: 0.5px;
 }
 
     .btn-auth:hover {
-        opacity: 0.9;
+        filter: brightness(1.06);
         transform: translateY(-1px);
     }
 
     .btn-auth:active {
-        transform: translateY(0);
+        animation: jellyPress 0.4s ease;
     }
 
 .auth-footer {
     text-align: center;
     margin-top: 24px;
-    color: #888;
+    color: var(--text-mid);
     font-size: 14px;
 }
 
     .auth-footer a {
-        color: #D6336C;
+        color: var(--pink-dark);
         font-weight: 600;
         text-decoration: none;
     }
@@ -145,25 +153,25 @@
 
 .alert {
     padding: 12px 16px;
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
     margin-bottom: 16px;
     font-size: 14px;
 }
 
 .alert-danger {
-    background: #fff0f3;
-    color: #c0392b;
-    border: 1px solid #f5c6cb;
+    background: #FDE8EF;
+    color: var(--pink-dark);
+    border: 1px solid var(--pink-light);
 }
 
 .alert-success {
-    background: #f0fff4;
-    color: #27ae60;
-    border: 1px solid #c3e6cb;
+    background: var(--mint);
+    color: #1F7A52;
+    border: 1px solid #A8E0C4;
 }
 
 .text-danger {
-    color: #e74c3c;
+    color: var(--pink-dark);
     font-size: 12px;
     margin-top: 4px;
     display: block;
