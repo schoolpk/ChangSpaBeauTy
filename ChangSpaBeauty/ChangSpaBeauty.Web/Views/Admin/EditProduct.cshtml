@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Chỉnh sửa sản phẩm";
     int proId = (int)ViewBag.ProductId;
+
     string? currentImage = ViewBag.CurrentImage as string;
 }
 @section Styles {
@@ -19,6 +20,7 @@
     </div>
 
     <div class="admin-title">✏️ Chỉnh sửa sản phẩm</div>
+
     <div class="edit-badge">ID: #@proId</div>
 
     <div class="admin-card">
@@ -43,6 +45,7 @@
                 </label>
                 <input asp-for="Price" class="form-control" id="priceInput"
                        placeholder="Giá sản phẩm" />
+
                 <span asp-validation-for="Price" class="text-danger"></span>
 
                 <label class="form-label" asp-for="CategoryId">
@@ -109,7 +112,6 @@
         </form>
     </div>
 </div>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

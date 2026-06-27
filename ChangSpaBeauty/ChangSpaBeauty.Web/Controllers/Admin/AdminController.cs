@@ -44,8 +44,10 @@ public class AdminController : Controller
         _notiRepo = notiRepo;
     }
 
+
     // Chỉ sửa action Index — thêm param status
     public async Task<IActionResult> Index(string? status)
+
     {
         // User
         var users = await _userRepository.GetAllAsync();
@@ -54,17 +56,18 @@ public class AdminController : Controller
         ViewBag.TotalUsers = userList.Count;
         ViewBag.NewUsersThisMounth = 0;
 
-        // Product
         var products = await _productService.GetAllProductsAsync();
         var productList = products.ToList();
         ViewBag.Products = productList;
         ViewBag.TotalProducts = productList.Count;
 
-        // Category
+
+
         var categories = await _categoryService.GetAllAsync();
         var categoryList = categories.ToList();
         ViewBag.Categories = categories;
         ViewBag.TotalCategories = categoryList.Count;
+
 
         // Order
         var orders = await _orderRepository.GetAllAsync();
@@ -77,6 +80,7 @@ public class AdminController : Controller
             .Where(o => o.Status != "cancelled")
             .SelectMany(o => o.OrderDetails)
             .Sum(od => od.Quantity);
+
 
         // Filter theo status nếu có
         var filtered = string.IsNullOrEmpty(status)

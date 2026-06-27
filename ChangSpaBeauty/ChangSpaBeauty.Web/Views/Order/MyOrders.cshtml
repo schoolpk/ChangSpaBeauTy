@@ -4,6 +4,7 @@
     ViewData["Title"] = "Đơn hàng của tôi";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var selectedStatus = ViewBag.SelectedStatus as string ?? "all";
+
 }
 
 @section Styles {
@@ -27,6 +28,7 @@
     {
         <div class="mo-alert mo-alert-error">❌ @TempData["Error"]</div>
     }
+
 
     @* ── TABS LỌC THEO TRẠNG THÁI ── *@
     <div class="mo-tabs">
@@ -60,6 +62,7 @@
     {
         <div class="mo-empty">
             <div class="mo-empty-icon">📭</div>
+
             <h3>Không có đơn hàng nào</h3>
             <p>
                 @if (selectedStatus != "all")
@@ -140,6 +143,7 @@
                                         @item.UnitPrice.ToString("N0") ₫ × @item.Quantity
                                     </div>
                                 </div>
+
                                 <div class="mo-item-sub">@item.Subtotal.ToString("N0") ₫</div>
                             </div>
                         }

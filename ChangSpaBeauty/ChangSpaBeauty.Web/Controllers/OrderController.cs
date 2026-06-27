@@ -21,11 +21,14 @@ namespace ChangSpaBeauty.Web.Controllers
             _cartService = cartService;
         }
 
+
         private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
 
         public async Task<IActionResult> Checkout()
         {
             var cart = await _cartService.GetCartAsync(GetUserId());
+
             if (!cart.Items.Any())
                 return RedirectToAction("Index", "Cart");
 
@@ -34,6 +37,7 @@ namespace ChangSpaBeauty.Web.Controllers
                 Address = User.FindFirstValue(ClaimTypes.StreetAddress) ?? "",
                 Phone = ""
             };
+
             ViewBag.Cart = cart;
             return View(dto);
         }
@@ -59,6 +63,7 @@ namespace ChangSpaBeauty.Web.Controllers
         public async Task<IActionResult> CancelOrder(int orderId)
         {
             var (success, message) = await _orderService.CancelOrderAsync(orderId, GetUserId());
+
             if (success) TempData["Success"] = message;
             else TempData["Error"] = message;
             return RedirectToAction("MyOrders");

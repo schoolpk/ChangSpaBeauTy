@@ -10,6 +10,7 @@ function filterTable(tableId, query) {
     document.querySelectorAll('#' + tableId + ' tbody tr').forEach(function (row) {
         row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
     });
+
 }
 // Filter rows trong bảng orders theo status
 function filterOrders(status, btn) {
@@ -26,4 +27,5 @@ function filterOrders(status, btn) {
             row.style.display = 'none';
         }
     });
+
 }
