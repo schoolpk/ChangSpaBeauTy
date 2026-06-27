@@ -1245,6 +1245,11 @@ select:focus-visible {
 .product-info {
     padding: 12px 14px 15px;
 }
+    .product-info form,
+    .product-info a.product-add {
+        display: flex;
+        justify-content: flex-end; /* ← đẩy nút sang phải */
+    }
 
 .product-name {
     font-size: 12.5px;
@@ -1271,7 +1276,10 @@ select:focus-visible {
 }
 
 .product-add {
-    width: 100%;
+    width: auto;
+    text-align: center;
+    padding-right: 16px;
+    display: inline-block;
     background: var(--pink-pale);
     border: 2px solid var(--pink-border);
     color: var(--pink-dark);
@@ -1282,6 +1290,12 @@ select:focus-visible {
     font-weight: 800;
     cursor: pointer;
     transition: all var(--transition);
+}
+.product-trademark {
+    font-size: .75rem;
+    color: var(--pink-dark);
+    margin-top: 2px;
+    font-weight: 500;
 }
 
     .product-add:hover {
