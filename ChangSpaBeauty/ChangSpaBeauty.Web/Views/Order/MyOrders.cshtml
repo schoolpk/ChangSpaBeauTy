@@ -1,116 +1,145 @@
-﻿@model List<ChangSpaBeauty.Application.DTOs.Order.OrderDto>
+﻿
+@model List<ChangSpaBeauty.Application.DTOs.Order.OrderDto>
 @{
     ViewData["Title"] = "Đơn hàng của tôi";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/myorder.css">
+    <link rel="stylesheet" href="~/css/myorders.css" asp-append-version="true">
 }
 
-<div class="orders-wrap">
-    <h1 class="orders-title">📦 Đơn hàng của tôi</h1>
+<div class="mo-wrap">
+    <div class="mo-header">
+        <div>
+            <h1 class="mo-title">📦 Đơn hàng của tôi</h1>
+            <p class="mo-subtitle">Theo dõi và quản lý đơn hàng của bạn</p>
+        </div>
+        <a asp-controller="Products" asp-action="Index" class="mo-btn-shop">🛍️ Mua thêm</a>
+    </div>
 
     @if (TempData["Success"] != null)
     {
-        <div style="background:#d1e7dd;color:#0f5132;padding:.8rem 1.2rem;
-                    border-radius:10px;margin-bottom:1rem;font-weight:600">
-            ✅ @TempData["Success"]
-        </div>
+        <div class="mo-alert mo-alert-success">✅ @TempData["Success"]</div>
     }
     @if (TempData["Error"] != null)
     {
-        <div style="background:#f8d7da;color:#842029;padding:.8rem 1.2rem;
-                    border-radius:10px;margin-bottom:1rem;font-weight:600">
-            ❌ @TempData["Error"]
-        </div>
+        <div class="mo-alert mo-alert-error">❌ @TempData["Error"]</div>
     }
 
     @if (!Model.Any())
     {
-        <div class="empty-orders">
-            <div class="icon">📭</div>
-            <p>Bạn chưa có đơn hàng nào</p>
-            <a asp-controller="Products" asp-action="Index"
-               style="color:var(--pink-dark);font-weight:600">Mua sắm ngay →</a>
+        <div class="mo-empty">
+            <div class="mo-empty-icon">📭</div>
+            <h3>Chưa có đơn hàng nào</h3>
+            <p>Hãy khám phá các sản phẩm và đặt hàng ngay!</p>
+            <a asp-controller="Products" asp-action="Index" class="mo-btn-shop-big">
+                Mua sắm ngay →
+            </a>
         </div>
     }
     else
     {
-        @foreach (var order in Model)
-        {
-            <div class="order-card">
-                @* Header *@
-                <div class="order-header">
-                    <div>
-                        <span class="order-id">Đơn hàng #@order.OrderId</span>
-                        <span class="order-date" style="margin-left:.8rem">
-                            @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+        <div class="mo-list">
+            @foreach (var order in Model)
+            {
+                <div class="mo-card">
+                    @* Header *@
+                    <div class="mo-card-header">
+                        <div class="mo-card-header-left">
+                            <span class="mo-order-id">Đơn hàng #@order.OrderId</span>
+                            <span class="mo-order-date">
+                                @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            </span>
+                        </div>
+                        <span class="mo-badge status-@order.Status">
+                            @(order.Status switch {
+                                "pending"   => "⏳ Chờ xác nhận",
+                                "confirmed" => "✅ Đã xác nhận",
+                                "shipping"  => "🚚 Đang giao",
+                                "done"      => "✔️ Hoàn thành",
+                                "cancelled" => "❌ Đã hủy",
+                                _           => order.Status
+                            })
                         </span>
                     </div>
-                    <span class="badge-status status-@order.Status">
-                        @(order.Status switch {
-                            "pending"   => "⏳ Chờ xác nhận",
-                            "confirmed" => "✅ Đã xác nhận",
-                            "shipping"  => "🚚 Đang giao",
-                            "done"      => "✔️ Hoàn thành",
-                            "cancelled" => "❌ Đã hủy",
-                            _           => order.Status
-                        })
-                    </span>
-                </div>
 
-                @* Items *@
-                <div class="order-body">
-                    @foreach (var item in order.Items)
+                    @* Progress bar *@
+                    @if (order.Status != "cancelled")
                     {
-                        <div class="order-item">
-                            <img src="~/images/products/@item.ProductImage"
-                                 alt="@item.ProductName"
-                                 onerror="this.src='/images/placeholder.png'" />
-                            <div class="order-item-info">
-                                <div class="order-item-name">@item.ProductName</div>
-                                <div class="order-item-meta">
-                                    @item.UnitPrice.ToString("N0") ₫ × @item.Quantity
+                        var steps = new[] { "pending", "confirmed", "shipping", "done" };
+                        var labels = new[] { "Chờ xác nhận", "Đã xác nhận", "Đang giao", "Hoàn thành" };
+                        var icons  = new[] { "⏳", "✅", "🚚", "✔️" };
+                        var currentIdx = Array.IndexOf(steps, order.Status);
+
+                        <div class="mo-progress">
+                            @for (int i = 0; i < steps.Length; i++)
+                            {
+                                var done = i <= currentIdx ? "done" : "";
+                                <div class="mo-progress-step @done">
+                                    <div class="mo-progress-dot">@icons[i]</div>
+                                    <span>@labels[i]</span>
+                                </div>
+                                @if (i < steps.Length - 1)
+                                {
+                                    <div class="mo-progress-line @done"></div>
+                                }
+                            }
+                        </div>
+                    }
+
+                    @* Items *@
+                    <div class="mo-items">
+                        @foreach (var item in order.Items.Take(2))
+                        {
+                            <div class="mo-item">
+                                <img src="~/images/products/@item.ProductImage"
+                                     alt="@item.ProductName"
+                                     onerror="this.src='/images/placeholder.png'" />
+                                <div class="mo-item-info">
+                                    <div class="mo-item-name">@item.ProductName</div>
+                                    <div class="mo-item-meta">
+                                        @item.UnitPrice.ToString("N0") ₫ × @item.Quantity
+                                    </div>
+                                </div>
+                                <div class="mo-item-sub">
+                                    @item.Subtotal.ToString("N0") ₫
                                 </div>
                             </div>
-                            <div class="order-item-price">
-                                @item.Subtotal.ToString("N0") ₫
-                            </div>
-                        </div>
-                    }
-                </div>
-
-                @* Footer *@
-                <div class="order-footer">
-                    <div>
-                        <div style="font-size:.85rem;color:#666">
-                            📍 @order.Address · 📞 @order.Phone
-                        </div>
-                        <div class="order-total" style="margin-top:.3rem">
-                            Tổng: @order.TotalPrice.ToString("N0") ₫
-                        </div>
+                        }
+                        @if (order.Items.Count > 2)
+                        {
+                            <div class="mo-more-items">+@(order.Items.Count - 2) sản phẩm khác</div>
+                        }
                     </div>
 
-                    @* Nút hủy — chỉ hiện khi pending *@
-                    @if (order.Status == "pending" || order.Status == "confirmed")
-                    {
-                        <form asp-controller="Order" asp-action="CancelOrder"
-                              method="post"
-                              onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn hàng #@order.OrderId?')">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="orderId" value="@order.OrderId" />
-                            <button type="submit" class="btn-cancel">
-                                🗑️ Hủy đơn hàng
-                            </button>
-                        </form>
-                    }
-                    else if (order.Status == "done" || order.Status == "shipping")
-                    {
-                        <span class="cancel-locked">🔒 Không thể hủy</span>
-                    }
+                    @* Footer *@
+                    <div class="mo-card-footer">
+                        <div class="mo-footer-left">
+                            <div class="mo-address">📍 @order.Address</div>
+                            <div class="mo-phone">📞 @order.Phone</div>
+                        </div>
+                        <div class="mo-footer-right">
+                            <div class="mo-total-label">Tổng tiền</div>
+                            <div class="mo-total">@order.TotalPrice.ToString("N0") ₫</div>
+
+                            @if (order.Status == "pending" || order.Status == "confirmed")
+                            {
+                                <form asp-controller="Order" asp-action="CancelOrder" method="post"
+                                      onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn hàng #@order.OrderId?')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="orderId" value="@order.OrderId" />
+                                    <button type="submit" class="mo-btn-cancel">🗑️ Hủy đơn hàng</button>
+                                </form>
+                            }
+                            else if (order.Status == "done" || order.Status == "shipping")
+                            {
+                                <span class="mo-cancel-locked">🔒 Không thể hủy</span>
+                            }
+                        </div>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     }
 </div>
