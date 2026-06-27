@@ -28,8 +28,7 @@
                 {
                     <a asp-controller="Products" asp-action="Index"
                        asp-route-trademark="@tm"
-                       asp-route-category="@Model.SelectedCategory"
-                       class="sidebar-item @(Model.SelectedCategory == tm ? "active" : "")">
+                       class="sidebar-item @(Model.SelectedTrademark == tm ? "active" : "")">
                         @tm
                     </a>
                 }
@@ -97,6 +96,11 @@
                             <div class="product-name">@p.Name</div>
                             <div class="product-price">@p.Price.ToString("N0")đ</div>
                             <div class="product-sold">@p.CategoryName · Đã bán @p.Sold</div>
+                            @if (!string.IsNullOrEmpty(p.Trademark))
+                            {
+                                <div class="product-trademark">🏷️ @p.Trademark</div>
+                            }
+                            
 
                             @* Kiểm tra đăng nhập bên trong từng sản phẩm *@
                             
