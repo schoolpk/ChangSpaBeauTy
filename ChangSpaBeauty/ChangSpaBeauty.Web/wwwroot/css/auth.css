@@ -1,7 +1,9 @@
 ﻿/* Đồng bộ tông màu với changspa.md — dùng chung các biến (--pink-dark, --pink-light,
-   --pink-pale, --mint, --text-dark, --text-mid, --gradient-pink, --shadow-md,
-   --radius-sm/md/pill, var(--transition), @keyframes jellyPress) đã khai báo ở :root
-   trong changspa.md. File này cần được load SAU changspa.md. */
+   --pink-pale, --pink-mid, --mint, --peach, --lavender, --text-dark, --text-mid,
+   --gradient-pink, --gradient-soft, --gradient-candy, --shadow-sm/md,
+   --radius-sm/md/pill, var(--transition), @keyframes jellyPress / pageFadeIn /
+   candyShift / kbFloat) đã khai báo ở :root trong changspa.md.
+   File này cần được load SAU changspa.md. */
 
 .auth-container {
     min-height: 80vh;
@@ -10,7 +12,37 @@
     justify-content: center;
     background: linear-gradient(135deg, var(--pink-pale) 0%, var(--pink-light) 100%);
     padding: 40px 20px;
+    position: relative;
+    overflow: hidden;
 }
+
+    /* Vầng pastel mờ trang trí phía sau thẻ — mint + lavender cho cảm giác "macaron" */
+    .auth-container::before,
+    .auth-container::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(50px);
+        opacity: .55;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .auth-container::before {
+        width: 260px;
+        height: 260px;
+        background: var(--mint);
+        top: -60px;
+        left: -60px;
+    }
+
+    .auth-container::after {
+        width: 300px;
+        height: 300px;
+        background: var(--lavender);
+        bottom: -80px;
+        right: -60px;
+    }
 
 .auth-card {
     background: var(--white);
@@ -19,6 +51,60 @@
     padding: 48px 40px;
     width: 100%;
     max-width: 460px;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    animation: pageFadeIn .5s ease both;
+}
+
+    /* Viền gradient candy chạy ở mép trên thẻ */
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: var(--gradient-candy);
+        background-size: 200% 100%;
+        animation: candyShift 6s linear infinite;
+    }
+
+    /* Sticker lấp lánh trang trí, đặt trực tiếp trong markup (.kb-sparkle đã định nghĩa ở changspa.md) */
+    .auth-card .kb-sparkle {
+        z-index: 2;
+    }
+
+/* LOGO BUBBLE */
+.auth-logo {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: var(--gradient-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--pink-dark);
+    box-shadow: var(--shadow-sm);
+    animation: authLogoPop .6s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+@keyframes authLogoPop {
+    0% {
+        transform: scale(.4);
+        opacity: 0;
+    }
+
+    60% {
+        transform: scale(1.08);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .auth-header {
@@ -68,10 +154,35 @@
         box-shadow: 0 0 0 3px rgba(255, 77, 136, 0.12);
     }
 
+    .form-control::placeholder {
+        color: var(--text-light);
+    }
+
+/* INPUT VỚI ICON BÊN TRÁI (envelope, lock, user, phone, map-marker...) */
+.input-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+    .input-icon-wrap .form-icon {
+        position: absolute;
+        left: 16px;
+        color: var(--pink-mid);
+        font-size: 14px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .input-icon-wrap .form-control {
+        padding-left: 42px;
+    }
+
 .input-password {
     position: relative;
     display: flex;
     align-items: center;
+    flex: 1;
 }
 
     .input-password .form-control {
@@ -87,6 +198,34 @@
     cursor: pointer;
     font-size: 16px;
     padding: 0;
+}
+
+/* THANH ĐO ĐỘ MẠNH MẬT KHẨU */
+.pwd-strength {
+    margin-top: 10px;
+}
+
+.pwd-strength-bar {
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--pink-border);
+    overflow: hidden;
+}
+
+.pwd-strength-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: var(--radius-pill);
+    background: var(--pink-border);
+    transition: width .3s ease, background .3s ease;
+}
+
+.pwd-strength-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-mid);
+    margin-top: 4px;
+    display: block;
 }
 
 .form-check {
@@ -120,6 +259,10 @@
     font-weight: 700;
     font-family: var(--font-body);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     transition: filter var(--transition), transform var(--transition);
     margin-top: 8px;
     letter-spacing: 0.5px;
@@ -175,4 +318,11 @@
     font-size: 12px;
     margin-top: 4px;
     display: block;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 36px 24px;
+    }
 }
