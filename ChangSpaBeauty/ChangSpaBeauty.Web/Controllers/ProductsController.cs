@@ -29,32 +29,16 @@ public class ProductsController : BaseController
         { "nuoc-hoa",         "Nước hoa" },
         { "combo",            "Combo tiết kiệm" },
     };
-
-    // ProductsController.cs
     public async Task<IActionResult> Index(int? category, string? keyword, string? trademark, string sort = "popular")
     {
         var allCategories = await _unitOfWork.Categories.GetAllAsync();
         var products = await _productService.GetAllProductsAsync();
 
-        // Filter theo CategoryId
+        // Filter theo CategoryId khi click sidebar/nav
         if (category.HasValue)
             products = products.Where(p => p.CategoryId == category.Value);
 
-        // Tự động map keyword → category nếu khớp tên
-        if (!string.IsNullOrEmpty(keyword) && !category.HasValue)
-        {
-            var matchedCat = allCategories.FirstOrDefault(c =>
-                c.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase)
-                || keyword.Contains(c.Name, StringComparison.OrdinalIgnoreCase));
-
-            if (matchedCat != null)
-            {
-                category = matchedCat.CategoryId;
-                products = products.Where(p => p.CategoryId == category.Value);
-                keyword = null;
-            }
-        }
-
+        // Search keyword — tìm theo tên sản phẩm, tên category, trademark
         if (!string.IsNullOrEmpty(keyword))
         {
             products = products.Where(p =>
@@ -75,17 +59,15 @@ public class ProductsController : BaseController
             _ => products.OrderByDescending(p => p.Sold),
         };
 
-        // Sidebar categories
-        var matchedCategoryIds = products.Select(p => p.CategoryId).Distinct().ToHashSet();
-        // Sidebar — luôn hiện TẤT CẢ categories, không filter bỏ
+        // Sidebar — luôn hiện tất cả categories
         var categorySidebar = allCategories.Select(c => new CategorySidebar
         {
             CategoryId = c.CategoryId,
             Name = c.Name,
             Total = c.Total,
             Slug = c.CategoryId.ToString()
-        })
-        .ToList(); // ← bỏ .Where() đi, giữ nguyên tất cả
+        }).ToList();
+
         var trademarks = allCategories
             .Where(c => !string.IsNullOrEmpty(c.Trademark))
             .Select(c => c.Trademark!)
