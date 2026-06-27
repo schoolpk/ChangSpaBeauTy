@@ -1245,11 +1245,11 @@ select:focus-visible {
 .product-info {
     padding: 12px 14px 15px;
 }
-    .product-info form,
+    /*.product-info form,
     .product-info a.product-add {
         display: flex;
-        justify-content: flex-end; /* ← đẩy nút sang phải */
-    }
+        justify-content: flex-end;*/ /* ← đẩy nút sang phải */
+    /*}*/
 
 .product-name {
     font-size: 12.5px;
@@ -1276,21 +1276,11 @@ select:focus-visible {
 }
 
 .product-add {
-<<<<<<< HEAD
-<<<<<<< Updated upstream
+
     width: 100%;
-=======
-    width: auto;
-    text-align: right;
-    padding-right: 16px;
-    display: inline-block;
->>>>>>> Stashed changes
-=======
-    width: auto;
     text-align: center;
     padding-right: 16px;
     display: inline-block;
->>>>>>> 55cdd85ad8ad3e437e7b43cfed03baf201aba6aa
     background: var(--pink-pale);
     border: 2px solid var(--pink-border);
     color: var(--pink-dark);
