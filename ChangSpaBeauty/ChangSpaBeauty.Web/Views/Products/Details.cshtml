@@ -1,4 +1,4 @@
-﻿@model ChangSpaBeauty.Application.DTOs.ProductDto
+@model ChangSpaBeauty.Application.DTOs.ProductDto
 @{
     ViewData["Title"] = Model.Name;
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -24,7 +24,7 @@
             }
             @if (!string.IsNullOrEmpty(Model.Image))
             {
-                <img src="~/images/products/@Model.Image" alt="@Model.Name" />
+                <img src="~/images/products/@Model.Image" alt="@Model.Name" loading="lazy" />
             }
             else
             {
@@ -91,9 +91,9 @@
                 <div class="qty-row">
                     <span class="qty-label">Số lượng</span>
                     <div class="qty-control">
-                        <button class="qty-btn" onclick="changeQty(-1)" type="button">−</button>
-                        <input class="qty-input" id="qty" type="number" value="1" min="1" max="@Model.Stock" readonly />
-                        <button class="qty-btn" onclick="changeQty(1)" type="button">+</button>
+                        <button class="qty-btn" onclick="changeQty(-1)" type="button" aria-label="Giảm số lượng">−</button>
+                        <input class="qty-input" id="qty" type="number" value="1" min="1" max="@Model.Stock" readonly aria-label="Số lượng" />
+                        <button class="qty-btn" onclick="changeQty(1)" type="button" aria-label="Tăng số lượng">+</button>
                     </div>
                     <span class="stock-label">/ @Model.Stock có sẵn</span>
                 </div>

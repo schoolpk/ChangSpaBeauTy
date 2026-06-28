@@ -44,7 +44,10 @@ public class AdminController : Controller
         _notiRepo = notiRepo;
     }
 
-    public async Task<IActionResult> Index()
+
+    // Chỉ sửa action Index — thêm param status
+    public async Task<IActionResult> Index(string? status)
+
     {
         // User
         var users = await _userRepository.GetAllAsync();
@@ -52,31 +55,42 @@ public class AdminController : Controller
         ViewBag.Users = userList;
         ViewBag.TotalUsers = userList.Count;
         ViewBag.NewUsersThisMounth = 0;
-        // Product
+
         var products = await _productService.GetAllProductsAsync();
         var productList = products.ToList();
         ViewBag.Products = productList;
         ViewBag.TotalProducts = productList.Count;
-        // Category
+
+
+
         var categories = await _categoryService.GetAllAsync();
         var categoryList = categories.ToList();
         ViewBag.Categories = categories;
         ViewBag.TotalCategories = categoryList.Count;
+
+
         // Order
         var orders = await _orderRepository.GetAllAsync();
         var orderList = orders.ToList();
-        ViewBag.Orders = orderList.Where(o => o.Status != "cancelled").ToList();
-        ViewBag.TotalOrders = orderList.Where(o => o.Status != "cancelled").Count();
-        ViewBag.CancelledOrders = orderList.Where(o => o.Status == "cancelled").ToList();
-        ViewBag.TotalCancelled = orderList.Where(o => o.Status == "cancelled").Count();  
+
+        // Stats (luôn tính trên toàn bộ)
+        ViewBag.TotalOrders = orderList.Count(o => o.Status != "cancelled");
+        ViewBag.TotalCancelled = orderList.Count(o => o.Status == "cancelled");
         ViewBag.TotalProductsSold = orderList
             .Where(o => o.Status != "cancelled")
             .SelectMany(o => o.OrderDetails)
             .Sum(od => od.Quantity);
 
 
-        return View();
+        // Filter theo status nếu có
+        var filtered = string.IsNullOrEmpty(status)
+            ? orderList
+            : orderList.Where(o => o.Status == status).ToList();
 
+        ViewBag.Orders = filtered;
+        ViewBag.SelectedStatus = status ?? "all";
+
+        return View();
     }
 
     // USER - DELETE
@@ -122,7 +136,7 @@ public class AdminController : Controller
     {
         var category = await _categoryService.GetByIdAsync(id);
         if (category == null) return NotFound();
-        var model = new CategoryCreateViewModel { Name = category.Name};
+        var model = new CategoryCreateViewModel { Name = category.Name, TradeMark = category.Trademark ?? "" };
         ViewBag.CategoryId = id;
         return View(model);
     }
@@ -132,7 +146,7 @@ public class AdminController : Controller
     public async Task<IActionResult> EditCategory(int id, CategoryCreateViewModel model)
     {
         if (!ModelState.IsValid) { ViewBag.CategoryId = id; return View(model); }
-        var (success, message) = await _categoryService.UpdateAsync(id, model.Name);
+        var (success, message) = await _categoryService.UpdateAsync(id, model.Name, model.TradeMark);
         if (!success) { ModelState.AddModelError(nameof(model.Name), message); ViewBag.CategoryId = id; return View(model); }
         TempData["Success"] = message;
         return RedirectToAction(nameof(Index));
@@ -208,11 +222,13 @@ public class AdminController : Controller
     {
         var products = await _productService.GetAllProductsAsync();
         var product = products.FirstOrDefault(p => p.ProductId == id);
-        if(product == null)
-        {
-            return NotFound();
-        }
+        if (product == null) return NotFound();
+
         await LoadCategoriesAsync();
+        ViewBag.ProductId = id;
+        ViewBag.CurrentImage = product.Image;
+        ViewBag.CurrentStock = product.Stock;
+
         var model = new ProductCreateViewModel
         {
             Name = product.Name,
@@ -221,7 +237,6 @@ public class AdminController : Controller
             Stock = product.Stock,
             Description = product.Description
         };
-        ViewBag.ProductId = id;
         return View(model);
     }
     [HttpPost]
@@ -257,6 +272,8 @@ public class AdminController : Controller
             Name = model.Name,
             Price = model.Price,
             CategoryId = model.CategoryId,
+            Stock = model.Stock,       
+            Description = model.Description,
             Image = saveFileName
         };
         await _productService.UpdateProductAsync(productDto);

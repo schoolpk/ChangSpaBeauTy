@@ -1,4 +1,4 @@
-﻿@model ChangSpaBeauty.Application.DTOs.ShoppingCart.ShoppingCartDTO
+@model ChangSpaBeauty.Application.DTOs.ShoppingCart.ShoppingCartDTO
 @{
     ViewData["Title"] = "Giỏ hàng";
 }
@@ -30,10 +30,17 @@
             <div class="cart-layout">
                 <!-- DANH SÁCH SẢN PHẨM -->
                 <div class="cart-items">
+                    <div class="cart-items-header">
+                        <h3>Sản phẩm trong giỏ</h3>
+                        <span class="cart-items-count">@Model.Items.Count() sản phẩm</span>
+                    </div>
+
                     @foreach (var item in Model.Items)
                     {
                         <div class="cart-item">
-                            <img src="~/images/products/@item.ProductImage" alt="@item.ProductName" class="cart-item-img" />
+                            <div class="cart-item-img-wrap">
+                                <img src="~/images/products/@item.ProductImage" alt="@item.ProductName" class="cart-item-img" loading="lazy" />
+                            </div>
 
                             <div class="cart-item-info">
                                 <h4>@item.ProductName</h4>
@@ -46,13 +53,14 @@
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="cartItemId" value="@item.CartItemId" />
                                     <div class="qty-control">
-                                        <button type="button" class="qty-btn" onclick="changeQty(this, -1)">−</button>
+                                        <button type="button" class="qty-btn" onclick="changeQty(this, -1)" aria-label="Giảm số lượng">−</button>
                                         <input type="number" name="quantity" value="@item.Quantity"
                                                min="1" max="@item.Stock"
                                                data-stock="@item.Stock"
                                                class="qty-input"
+                                               aria-label="Số lượng"
                                                onchange="this.form.submit()" />
-                                        <button type="button" class="qty-btn" onclick="changeQty(this, 1)">+</button>
+                                        <button type="button" class="qty-btn" onclick="changeQty(this, 1)" aria-label="Tăng số lượng">+</button>
                                     </div>
                                 </form>
 
@@ -62,7 +70,7 @@
                                 <form asp-action="DeleteCartItem" method="post">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="cartItemId" value="@item.CartItemId" />
-                                    <button type="submit" class="btn-remove" title="Xóa">✕</button>
+                                    <button type="submit" class="btn-remove" title="Xóa" aria-label="Xóa sản phẩm">✕</button>
                                 </form>
                             </div>
                         </div>

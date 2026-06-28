@@ -1,4 +1,5 @@
-﻿using ChangSpaBeauty.Application.DTOs.Order;
+﻿
+using ChangSpaBeauty.Application.DTOs.Order;
 using ChangSpaBeauty.Application.Interfaces;
 using ChangSpaBeauty.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -12,20 +13,24 @@ namespace ChangSpaBeauty.Web.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IShoppingCartService _cartService;
-        public OrderController(IOrderService orderService, IShoppingCartService cartService, INotificationRepository notiRepo):base(cartService,notiRepo) 
+
+        public OrderController(IOrderService orderService, IShoppingCartService cartService, INotificationRepository notiRepo)
+            : base(cartService, notiRepo)
         {
             _orderService = orderService;
             _cartService = cartService;
         }
-        private int GetUserId()=> int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+
+        private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
 
         public async Task<IActionResult> Checkout()
         {
             var cart = await _cartService.GetCartAsync(GetUserId());
-            if(!cart.Items.Any())
-            {
+
+            if (!cart.Items.Any())
                 return RedirectToAction("Index", "Cart");
-            }
 
             var dto = new CheckoutDto
             {
@@ -44,11 +49,9 @@ namespace ChangSpaBeauty.Web.Controllers
             try
             {
                 var orderId = await _orderService.PlaceOrderAsync(GetUserId(), dto);
-                return RedirectToAction("Success", new
-                {
-                    id = orderId
-                });
-            }catch(InvalidOperationException ex)
+                return RedirectToAction("Success", new { id = orderId });
+            }
+            catch (InvalidOperationException ex)
             {
                 TempData["Error"] = ex.Message;
                 return RedirectToAction("Checkout");
@@ -60,32 +63,28 @@ namespace ChangSpaBeauty.Web.Controllers
         public async Task<IActionResult> CancelOrder(int orderId)
         {
             var (success, message) = await _orderService.CancelOrderAsync(orderId, GetUserId());
-            if(success)
-            {
-                TempData["Success"] = message;
-            }
-            else
-            {
-                TempData["Error"] = message;
-            }
+
+            if (success) TempData["Success"] = message;
+            else TempData["Error"] = message;
             return RedirectToAction("MyOrders");
         }
 
-
-        public async Task<IActionResult> MyOrders()
+        // ← thêm param status để filter
+        public async Task<IActionResult> MyOrders(string? status)
         {
             var orders = await _orderService.GetUserOrderAsync(GetUserId());
+
+            if (!string.IsNullOrEmpty(status))
+                orders = orders.Where(o => o.Status == status).ToList();
+
+            ViewBag.SelectedStatus = status ?? "all";
             return View(orders);
         }
-
 
         public async Task<IActionResult> Success(int id)
         {
             var order = await _orderService.GetOrderAsync(id, GetUserId());
-            if(order == null)
-            {
-                return NotFound();
-            }
+            if (order == null) return NotFound();
             return View(order);
         }
     }

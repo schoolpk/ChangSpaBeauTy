@@ -430,3 +430,31 @@
     color: #842029;
 }
 
+
+/* Order filter tabs */
+.order-filter-tab {
+    padding: .4rem 1.1rem;
+    border: 1.5px solid #FFB6C1;
+    border-radius: 50px;
+    font-size: .78rem;
+    font-weight: 700;
+    background: #FFF5F8;
+    color: #D6336C;
+    cursor: pointer;
+    transition: all .18s;
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+}
+
+    .order-filter-tab:hover {
+        border-color: #D6336C;
+        background: #FFE0EC;
+    }
+
+    .order-filter-tab.active {
+        background: #D6336C;
+        border-color: #D6336C;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(214,51,108,.3);
+    }
+
