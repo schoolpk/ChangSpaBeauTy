@@ -1,4 +1,4 @@
-﻿@model ChangSpaBeauty.Web.ViewModels.CategoryCreateViewModel
+@model ChangSpaBeauty.Web.ViewModels.CategoryCreateViewModel
 @{
     ViewData["Title"] = "Chỉnh sửa danh mục";
     int catId = (int)(ViewBag.CategoryId ?? 0);
@@ -68,11 +68,9 @@
     </div>
 </div>
 
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/edit.js" asp-append-version="true"></script>
 }
-

@@ -1,31 +1,44 @@
-﻿/* ══════════════════════════════════════════════════════════
-   Admin – Create form (Category / Product)
-   Đồng bộ theme "K-Beauty Candy" với site chính:
-   dùng chung token màu, font Nunito, bo tròn, hiệu ứng jelly.
-   Giữ nguyên toàn bộ tên class — không cần sửa file .cshtml.
-   ══════════════════════════════════════════════════════════ */
+/* ==========================================================
+   ChangSpaBeauty — Admin · Trang "Thêm mới"
+   Bảng màu & type dùng chung với edit.css để toàn bộ khu vực
+   quản trị có một ngôn ngữ thị giác thống nhất.
+   ========================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 
 .create-page {
+    --rose: #D6336C;
+    --rose-deep: #A61B53;
+    --rose-light: #FF6FA0;
+    --rose-50: #FFF5F8;
+    --rose-100: #FFE0EC;
+    --rose-border: #F5C6D8;
+    --ink: #2B2730;
+    --ink-soft: #837C89;
+    --card-bg: #FFFDFC;
+
     max-width: 800px;
     margin: 40px auto;
     padding: 0 20px 60px;
-    font-family: var(--font-body);
-    animation: pageFadeIn 0.45s ease both;
+    font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+    color: var(--ink);
 }
 
+/* ---------- Header ---------- */
 .create-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
 }
 
     .create-header a {
-        color: var(--pink-dark);
+        color: var(--rose);
         text-decoration: none;
         font-size: 14px;
-        font-weight: 700;
-        transition: color var(--transition);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
     }
 
         .create-header a:hover {
@@ -34,35 +47,46 @@
         }
 
     .create-header h1 {
-        font-family: var(--font-display);
-        font-size: 24px;
+        font-size: 25px;
         font-weight: 800;
-        color: var(--text-dark);
+        letter-spacing: -0.2px;
+        color: var(--ink);
         margin: 0;
     }
 
+/* ---------- Card ---------- */
 .create-card {
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--pink-border);
-    padding: 36px;
+    position: relative;
+    background: var(--card-bg);
+    border-radius: 18px;
+    box-shadow: 0 10px 32px rgba(214, 51, 108, 0.10), 0 1px 3px rgba(214, 51, 108, 0.06);
+    padding: 38px 36px 32px;
+    overflow: hidden;
 }
 
+    /* dải ruy băng gradient ở mép trên — chi tiết nhận diện chung với edit.css */
+    .create-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--rose-deep), var(--rose), var(--rose-light));
+    }
+
+/* ---------- Sections ---------- */
 .form-section {
-    margin-bottom: 28px;
+    margin-bottom: 26px;
 }
 
 .form-section-title {
-    font-family: var(--font-display);
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--pink-dark);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--rose-deep);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
     margin-bottom: 16px;
     padding-bottom: 8px;
-    border-bottom: 1px solid var(--pink-border);
+    border-bottom: 1px solid var(--rose-100);
 }
 
 .form-row {
@@ -84,33 +108,38 @@
 
 label {
     font-size: 13px;
-    font-weight: 700;
-    color: var(--text-dark);
+    font-weight: 600;
+    color: #4A4550;
 }
 
     label span.required {
-        color: var(--pink-dark);
+        color: var(--rose);
         margin-left: 2px;
     }
 
+/* ---------- Inputs ---------- */
 .form-control {
-    padding: 10px 14px;
-    border: 1.5px solid var(--pink-border);
-    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    border: 1.5px solid var(--rose-border);
+    border-radius: 10px;
+    font-family: inherit;
     font-size: 14px;
-    font-family: var(--font-body);
-    color: var(--text-dark);
-    background: var(--pink-pale);
-    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    color: var(--ink);
+    background: var(--rose-50);
+    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
     outline: none;
     width: 100%;
     box-sizing: border-box;
 }
 
+    .form-control::placeholder {
+        color: #C8A6B6;
+    }
+
     .form-control:focus {
-        border-color: var(--pink-dark);
-        box-shadow: 0 0 0 4px rgba(255,77,136,0.14);
-        background: var(--white);
+        border-color: var(--rose);
+        box-shadow: 0 0 0 3px rgba(214, 51, 108, 0.12);
+        background: #fff;
     }
 
     .form-control::placeholder {
@@ -119,29 +148,30 @@ label {
 
 textarea.form-control {
     resize: vertical;
-    min-height: 100px;
+    min-height: 110px;
+    line-height: 1.5;
 }
 
 select.form-control {
     cursor: pointer;
 }
 
-/* Image Upload Area */
+/* ---------- Image upload ---------- */
 .img-upload-area {
-    border: 2px dashed var(--pink-border);
-    border-radius: var(--radius-md);
-    background: var(--pink-pale);
-    padding: 32px 20px;
+    border: 2px dashed var(--rose-border);
+    border-radius: 14px;
+    background: var(--rose-50);
+    padding: 34px 20px;
     text-align: center;
     cursor: pointer;
-    transition: all var(--transition);
+    transition: border-color 0.2s, background 0.2s;
     position: relative;
 }
 
     .img-upload-area:hover,
     .img-upload-area.dragover {
-        border-color: var(--pink-dark);
-        background: var(--pink-light);
+        border-color: var(--rose);
+        background: #FFEAF1;
     }
 
     .img-upload-area input[type="file"] {
@@ -154,18 +184,17 @@ select.form-control {
     }
 
 .img-upload-icon {
-    font-size: 40px;
-    margin-bottom: 10px;
+    font-size: 38px;
+    margin-bottom: 8px;
 }
 
 .img-upload-text {
     font-size: 14px;
-    color: var(--text-mid);
-    font-weight: 600;
+    color: var(--ink-soft);
 }
 
     .img-upload-text strong {
-        color: var(--pink-dark);
+        color: var(--rose);
     }
 
 .img-preview-wrap {
@@ -178,95 +207,84 @@ select.form-control {
         width: 100%;
         max-height: 220px;
         object-fit: contain;
-        border-radius: var(--radius-sm);
-        border: 1.5px solid var(--pink-border);
+        border-radius: 12px;
+        border: 1.5px solid var(--rose-border);
+        background: #fff;
     }
 
 .img-remove-btn {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    background: var(--gradient-pink);
+    top: 8px;
+    right: 8px;
+    background: var(--rose);
     color: #fff;
     border: none;
     border-radius: 50%;
     width: 26px;
     height: 26px;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
-    box-shadow: var(--shadow-sm);
-    transition: transform var(--transition);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
 }
 
     .img-remove-btn:hover {
-        transform: scale(1.1) rotate(8deg);
+        background: var(--rose-deep);
     }
 
 .img-hint {
     font-size: 12px;
-    color: var(--text-light);
+    color: #B9A3AE;
     margin-top: 6px;
 }
 
-/* Validation */
-.text-danger {
-    color: #E0457A;
-    font-size: 12px;
-    margin-top: 3px;
-    font-weight: 600;
-}
-
+/* ---------- Validation ---------- */
+.text-danger,
 .field-validation-error {
-    color: #E0457A;
+    color: var(--rose);
     font-size: 12px;
-    font-weight: 600;
+    margin-top: 2px;
 }
 
 .input-validation-error {
-    border-color: #E0457A !important;
-    background: var(--pink-pale) !important;
+    border-color: var(--rose) !important;
+    background: #FFF2F4 !important;
 }
 
-/* Buttons */
+/* ---------- Buttons ---------- */
 .btn-row {
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid var(--pink-border);
+    margin-top: 30px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rose-100);
 }
 
 .btn-cancel {
     padding: 11px 28px;
-    border: 1.5px solid var(--pink-dark);
-    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--rose);
+    border-radius: 10px;
     background: transparent;
-    color: var(--pink-dark);
+    color: var(--rose);
     font-size: 14px;
     font-weight: 700;
     font-family: var(--font-body);
     cursor: pointer;
     text-decoration: none;
-    transition: all var(--transition);
+    transition: background 0.2s, color 0.2s;
 }
 
     .btn-cancel:hover {
-        background: var(--pink-pale);
-        transform: translateY(-1px);
-    }
-
-    .btn-cancel:active {
-        animation: jellyPress 0.4s ease;
+        background: var(--rose-50);
     }
 
 .btn-submit {
-    padding: 11px 36px;
-    background: var(--gradient-pink);
+    padding: 11px 34px;
+    background: linear-gradient(135deg, var(--rose-deep), var(--rose) 55%, var(--rose-light));
     border: none;
     border-radius: var(--radius-pill);
     color: #fff;
@@ -274,7 +292,8 @@ select.form-control {
     font-weight: 800;
     font-family: var(--font-body);
     cursor: pointer;
-    transition: filter var(--transition), transform var(--transition);
+    box-shadow: 0 6px 16px rgba(214, 51, 108, 0.28);
+    transition: opacity 0.2s, transform 0.12s, box-shadow 0.2s;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -282,8 +301,9 @@ select.form-control {
 }
 
     .btn-submit:hover {
-        filter: brightness(1.07);
+        opacity: 0.94;
         transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(214, 51, 108, 0.34);
     }
 
     .btn-submit:active {
@@ -297,26 +317,35 @@ select.form-control {
         animation: none;
     }
 
+    .btn-submit:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .btn-submit:focus-visible,
+    .btn-cancel:focus-visible {
+        outline: 2px solid var(--rose-deep);
+        outline-offset: 2px;
+    }
+
     .btn-submit .spinner {
         display: none;
         width: 16px;
         height: 16px;
-        border: 2px solid rgba(255,255,255,0.4);
+        border: 2px solid rgba(255,255,255,0.45);
         border-top-color: #fff;
         border-radius: 50%;
         animation: spin 0.7s linear infinite;
     }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
 }
 
-/* Alert */
+/* ---------- Alerts ---------- */
 .alert {
     padding: 12px 16px;
-    border-radius: var(--radius-sm);
+    border-radius: 12px;
     margin-bottom: 20px;
     font-size: 14px;
     font-weight: 600;
@@ -337,14 +366,14 @@ select.form-control {
     color: #1B5E3A;
 }
 
+/* ---------- Responsive ---------- */
 @media (max-width: 600px) {
     .form-row {
         grid-template-columns: 1fr;
     }
 
     .create-card {
-        padding: 20px;
-        border-radius: var(--radius-md);
+        padding: 24px 18px;
     }
 
     .btn-row {
@@ -354,5 +383,14 @@ select.form-control {
     .btn-cancel, .btn-submit {
         width: 100%;
         justify-content: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-submit, .btn-cancel, .img-upload-area, .form-control {
+        transition: none;
+    }
+    .btn-submit .spinner {
+        animation: none;
     }
 }

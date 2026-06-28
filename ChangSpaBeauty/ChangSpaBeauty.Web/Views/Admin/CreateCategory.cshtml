@@ -1,6 +1,6 @@
-﻿@model ChangSpaBeauty.Web.ViewModels.CategoryCreateViewModel
+@model ChangSpaBeauty.Web.ViewModels.CategoryCreateViewModel
 @{
-    ViewData["Title"] = "Chỉnh sửa danh mục";
+    ViewData["Title"] = "Thêm danh mục mới";
     Layout = "_Layout";
 }
 @section Styles {
@@ -12,17 +12,16 @@
         <span style="color:#ccc">|</span>
         <h1>✨ Thêm danh mục mới</h1>
     </div>
-    @if(!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
     {
         <div class="alert alert-danger">
             ⚠️ Vui lòng kiểm tra lại thông tin bên dưới.
         </div>
     }
- 
 
     <div class="create-card">
         <form asp-controller="Admin" asp-action="CreateCategory" method="post"
-                enctype="multipart/form-data" id="createForm" novalidate>
+              enctype="multipart/form-data" id="createForm" novalidate>
             @Html.AntiForgeryToken()
 
             <div class="form-section">
@@ -46,7 +45,7 @@
                 <a asp-controller="Admin" asp-action="Index" class="btn-cancel">Hủy</a>
                 <button type="submit" class="btn-submit" id="submitBtn">
                     <span class="spinner" id="spinner"></span>
-                    💾 Lưu sản phẩm
+                    💾 Lưu danh mục
                 </button>
             </div>
         </form>
@@ -58,5 +57,3 @@
     }
     <script src="~/js/createt.js" asp-append-version="true"></script>
 }
-
-  
