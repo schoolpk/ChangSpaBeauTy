@@ -64,13 +64,14 @@ public class ProductsController : BaseController
         {
             CategoryId = c.CategoryId,
             Name = c.Name,
-            Total = c.Total,
+            Total = c.Products?.Count() ?? 0,
             Slug = c.CategoryId.ToString()
         }).ToList();
 
         var trademarks = allCategories
             .Where(c => !string.IsNullOrEmpty(c.Trademark))
-            .Select(c => c.Trademark!)
+            .SelectMany(c => c.Trademark!.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            .Select(t => t.Trim())
             .Distinct()
             .ToList();
 

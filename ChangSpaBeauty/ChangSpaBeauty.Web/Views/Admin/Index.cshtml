@@ -228,6 +228,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Tên danh mục</th>
+                        <th>Thương hiệu</th>
                         <th>Số sản phẩm</th>
                         <th>Thao tác</th>
                     </tr>
@@ -240,6 +241,24 @@
                             <tr>
                                 <td class="id-cell">#@cat.CategoryId</td>
                                 <td><span class="cat-chip">🏷️ @cat.Name</span></td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(cat.Trademark))
+                                    {
+                                        @foreach (var tm in cat.Trademark.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                        {
+                                            <span style="display:inline-block;background:#FFF0F5;color:#D6336C;
+                                                         border:1px solid #FFB6C1;border-radius:20px;
+                                                         padding:2px 10px;font-size:.75rem;font-weight:600;
+                                                         margin:2px;">
+                                                💄 @tm.Trim()
+                                            </span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span style="color:#ccc;font-size:.8rem;">—</span>
+                                    }
+                                </td>
                                 <td>
                                     <span class="badge-count">@(cat.Products?.Count ?? 0)</span>
                                 </td>
