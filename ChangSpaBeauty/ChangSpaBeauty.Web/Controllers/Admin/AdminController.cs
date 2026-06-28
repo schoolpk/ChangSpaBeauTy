@@ -222,11 +222,13 @@ public class AdminController : Controller
     {
         var products = await _productService.GetAllProductsAsync();
         var product = products.FirstOrDefault(p => p.ProductId == id);
-        if(product == null)
-        {
-            return NotFound();
-        }
+        if (product == null) return NotFound();
+
         await LoadCategoriesAsync();
+        ViewBag.ProductId = id;
+        ViewBag.CurrentImage = product.Image;
+        ViewBag.CurrentStock = product.Stock;
+
         var model = new ProductCreateViewModel
         {
             Name = product.Name,
@@ -235,8 +237,6 @@ public class AdminController : Controller
             Stock = product.Stock,
             Description = product.Description
         };
-        ViewBag.ProductId = id;
-        ViewBag.CurrentImage = product.Image;
         return View(model);
     }
     [HttpPost]
@@ -272,6 +272,8 @@ public class AdminController : Controller
             Name = model.Name,
             Price = model.Price,
             CategoryId = model.CategoryId,
+            Stock = model.Stock,       
+            Description = model.Description,
             Image = saveFileName
         };
         await _productService.UpdateProductAsync(productDto);
