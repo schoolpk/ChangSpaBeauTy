@@ -1,8 +1,16 @@
-﻿.create-page {
+﻿/* ══════════════════════════════════════════════════════════
+   Admin – Create form (Category / Product)
+   Đồng bộ theme "K-Beauty Candy" với site chính:
+   dùng chung token màu, font Nunito, bo tròn, hiệu ứng jelly.
+   Giữ nguyên toàn bộ tên class — không cần sửa file .cshtml.
+   ══════════════════════════════════════════════════════════ */
+
+.create-page {
     max-width: 800px;
     margin: 40px auto;
     padding: 0 20px 60px;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: var(--font-body);
+    animation: pageFadeIn 0.45s ease both;
 }
 
 .create-header {
@@ -13,26 +21,31 @@
 }
 
     .create-header a {
-        color: #D6336C;
+        color: var(--pink-dark);
         text-decoration: none;
         font-size: 14px;
+        font-weight: 700;
+        transition: color var(--transition);
     }
 
         .create-header a:hover {
+            color: var(--text-dark);
             text-decoration: underline;
         }
 
     .create-header h1 {
+        font-family: var(--font-display);
         font-size: 24px;
-        font-weight: 700;
-        color: #2d2d2d;
+        font-weight: 800;
+        color: var(--text-dark);
         margin: 0;
     }
 
 .create-card {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 2px 20px rgba(214,51,108,0.08);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--pink-border);
     padding: 36px;
 }
 
@@ -41,14 +54,15 @@
 }
 
 .form-section-title {
+    font-family: var(--font-display);
     font-size: 13px;
-    font-weight: 600;
-    color: #D6336C;
+    font-weight: 800;
+    color: var(--pink-dark);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 16px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #FFE0EC;
+    border-bottom: 1px solid var(--pink-border);
 }
 
 .form-row {
@@ -70,32 +84,37 @@
 
 label {
     font-size: 13px;
-    font-weight: 600;
-    color: #444;
+    font-weight: 700;
+    color: var(--text-dark);
 }
 
     label span.required {
-        color: #D6336C;
+        color: var(--pink-dark);
         margin-left: 2px;
     }
 
 .form-control {
     padding: 10px 14px;
-    border: 1.5px solid #F5C6D8;
-    border-radius: 10px;
+    border: 1.5px solid var(--pink-border);
+    border-radius: var(--radius-sm);
     font-size: 14px;
-    color: #333;
-    background: #FFFAFC;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: var(--font-body);
+    color: var(--text-dark);
+    background: var(--pink-pale);
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
     outline: none;
     width: 100%;
     box-sizing: border-box;
 }
 
     .form-control:focus {
-        border-color: #D6336C;
-        box-shadow: 0 0 0 3px rgba(214,51,108,0.1);
-        background: #fff;
+        border-color: var(--pink-dark);
+        box-shadow: 0 0 0 4px rgba(255,77,136,0.14);
+        background: var(--white);
+    }
+
+    .form-control::placeholder {
+        color: var(--text-light);
     }
 
 textarea.form-control {
@@ -109,20 +128,20 @@ select.form-control {
 
 /* Image Upload Area */
 .img-upload-area {
-    border: 2px dashed #F5C6D8;
-    border-radius: 12px;
-    background: #FFF5F8;
+    border: 2px dashed var(--pink-border);
+    border-radius: var(--radius-md);
+    background: var(--pink-pale);
     padding: 32px 20px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition);
     position: relative;
 }
 
     .img-upload-area:hover,
     .img-upload-area.dragover {
-        border-color: #D6336C;
-        background: #FFF0F5;
+        border-color: var(--pink-dark);
+        background: var(--pink-light);
     }
 
     .img-upload-area input[type="file"] {
@@ -141,11 +160,12 @@ select.form-control {
 
 .img-upload-text {
     font-size: 14px;
-    color: #888;
+    color: var(--text-mid);
+    font-weight: 600;
 }
 
     .img-upload-text strong {
-        color: #D6336C;
+        color: var(--pink-dark);
     }
 
 .img-preview-wrap {
@@ -158,15 +178,15 @@ select.form-control {
         width: 100%;
         max-height: 220px;
         object-fit: contain;
-        border-radius: 10px;
-        border: 1.5px solid #F5C6D8;
+        border-radius: var(--radius-sm);
+        border: 1.5px solid var(--pink-border);
     }
 
 .img-remove-btn {
     position: absolute;
     top: 6px;
     right: 6px;
-    background: #D6336C;
+    background: var(--gradient-pink);
     color: #fff;
     border: none;
     border-radius: 50%;
@@ -178,29 +198,37 @@ select.form-control {
     align-items: center;
     justify-content: center;
     line-height: 1;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition);
 }
+
+    .img-remove-btn:hover {
+        transform: scale(1.1) rotate(8deg);
+    }
 
 .img-hint {
     font-size: 12px;
-    color: #aaa;
+    color: var(--text-light);
     margin-top: 6px;
 }
 
 /* Validation */
 .text-danger {
-    color: #D6336C;
+    color: #E0457A;
     font-size: 12px;
     margin-top: 3px;
+    font-weight: 600;
 }
 
 .field-validation-error {
-    color: #D6336C;
+    color: #E0457A;
     font-size: 12px;
+    font-weight: 600;
 }
 
 .input-validation-error {
-    border-color: #D6336C !important;
-    background: #FFF5F5 !important;
+    border-color: #E0457A !important;
+    background: var(--pink-pale) !important;
 }
 
 /* Buttons */
@@ -210,48 +238,63 @@ select.form-control {
     justify-content: flex-end;
     margin-top: 32px;
     padding-top: 24px;
-    border-top: 1px solid #FFE0EC;
+    border-top: 1px solid var(--pink-border);
 }
 
 .btn-cancel {
     padding: 11px 28px;
-    border: 1.5px solid #D6336C;
-    border-radius: 10px;
+    border: 1.5px solid var(--pink-dark);
+    border-radius: var(--radius-pill);
     background: transparent;
-    color: #D6336C;
+    color: var(--pink-dark);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
+    font-family: var(--font-body);
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all var(--transition);
 }
 
     .btn-cancel:hover {
-        background: #FFF0F5;
+        background: var(--pink-pale);
+        transform: translateY(-1px);
+    }
+
+    .btn-cancel:active {
+        animation: jellyPress 0.4s ease;
     }
 
 .btn-submit {
     padding: 11px 36px;
-    background: linear-gradient(135deg, #D6336C, #FF4081);
+    background: var(--gradient-pink);
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-pill);
     color: #fff;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 800;
+    font-family: var(--font-body);
     cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
+    transition: filter var(--transition), transform var(--transition);
     display: flex;
     align-items: center;
     gap: 8px;
+    box-shadow: var(--shadow-sm);
 }
 
     .btn-submit:hover {
-        opacity: 0.9;
+        filter: brightness(1.07);
         transform: translateY(-1px);
     }
 
     .btn-submit:active {
-        transform: translateY(0);
+        animation: jellyPress 0.4s ease;
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+        animation: none;
     }
 
     .btn-submit .spinner {
@@ -264,7 +307,7 @@ select.form-control {
         animation: spin 0.7s linear infinite;
     }
 
-@@keyframes spin {
+@keyframes spin {
     to {
         transform: rotate(360deg);
     }
@@ -273,9 +316,10 @@ select.form-control {
 /* Alert */
 .alert {
     padding: 12px 16px;
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
     margin-bottom: 20px;
     font-size: 14px;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -288,18 +332,19 @@ select.form-control {
 }
 
 .alert-success {
-    background: #F0FFF4;
-    border: 1px solid #C8E6C9;
-    color: #2E7D32;
+    background: var(--mint);
+    border: 1px solid #A8E6C5;
+    color: #1B5E3A;
 }
 
-@@media (max-width: 600px) {
+@media (max-width: 600px) {
     .form-row {
         grid-template-columns: 1fr;
     }
 
     .create-card {
         padding: 20px;
+        border-radius: var(--radius-md);
     }
 
     .btn-row {
