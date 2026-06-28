@@ -136,7 +136,7 @@ public class AdminController : Controller
     {
         var category = await _categoryService.GetByIdAsync(id);
         if (category == null) return NotFound();
-        var model = new CategoryCreateViewModel { Name = category.Name};
+        var model = new CategoryCreateViewModel { Name = category.Name, TradeMark = category.Trademark ?? "" };
         ViewBag.CategoryId = id;
         return View(model);
     }
@@ -146,7 +146,7 @@ public class AdminController : Controller
     public async Task<IActionResult> EditCategory(int id, CategoryCreateViewModel model)
     {
         if (!ModelState.IsValid) { ViewBag.CategoryId = id; return View(model); }
-        var (success, message) = await _categoryService.UpdateAsync(id, model.Name);
+        var (success, message) = await _categoryService.UpdateAsync(id, model.Name, model.TradeMark);
         if (!success) { ModelState.AddModelError(nameof(model.Name), message); ViewBag.CategoryId = id; return View(model); }
         TempData["Success"] = message;
         return RedirectToAction(nameof(Index));

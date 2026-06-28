@@ -34,7 +34,7 @@ public class CategoryService
         return (true, "Thêm danh mục thành công.");
     }
 
-    public async Task<(bool Success, string Message)> UpdateAsync(int id, string name)
+    public async Task<(bool Success, string Message)> UpdateAsync(int id, string name, string trademark)
     {
         var category = await _categoryRepo.GetByIdAsync(id);
         if (category == null)
@@ -44,6 +44,7 @@ public class CategoryService
             return (false, $"Tên \"{name}\" đã được dùng bởi danh mục khác.");
 
         category.Name = name.Trim();
+        category.Trademark = trademark?.Trim() ?? "";
         _categoryRepo.UpdateAsync(category);
         await _categoryRepo.SaveChangeAsync();
         return (true, "Cập nhật danh mục thành công.");

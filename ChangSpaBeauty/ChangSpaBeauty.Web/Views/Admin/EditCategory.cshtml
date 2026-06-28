@@ -37,6 +37,26 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
+            <div class="form-group">
+                <label class="form-label" asp-for="TradeMark">
+                    Thương hiệu
+                    <span style="font-size:.75rem;color:#aaa;font-weight:400;">
+                        (nhiều thương hiệu cách nhau bằng dấu phẩy)
+                    </span>
+                </label>
+                <input asp-for="TradeMark" class="form-control"
+                       placeholder="VD: LOREAL, MAC, Dove, Neutrogena"
+                       maxlength="500" />
+                <div style="font-size:.75rem;color:#aaa;margin-top:.3rem;">
+                    💡 Nhập nhiều thương hiệu cách nhau bằng dấu <strong>,</strong>
+                </div>
+
+                @* Preview tags realtime *@
+                <div id="tm-preview" style="margin-top:.6rem;display:flex;flex-wrap:wrap;gap:4px;"></div>
+
+                <span asp-validation-for="TradeMark" class="text-danger"></span>
+            </div>
+
             <div class="btn-row">
                 <a asp-action="Index" class="btn-cancel">Hủy bỏ</a>
                 <button type="submit" class="btn-save" id="saveBtn">
