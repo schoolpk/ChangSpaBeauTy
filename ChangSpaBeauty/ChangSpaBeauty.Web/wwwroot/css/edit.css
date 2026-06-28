@@ -1,51 +1,107 @@
-﻿.admin-page {
+/* ==========================================================
+   ChangSpaBeauty — Admin · Trang "Chỉnh sửa"
+   Dựa trên file edit.css gốc — giữ nguyên toàn bộ class/giá trị
+   đã có, chỉ bổ sung token + những phần còn thiếu (form-row,
+   upload ảnh, responsive) để đồng bộ với create.css.
+   ========================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+
+.admin-page {
+    --rose: #D6336C;
+    --rose-deep: #A61B53;
+    --rose-light: #FF6FA0;
+    --rose-50: #FFF0F5;
+    --rose-100: #FFE4EE;
+    --rose-border: #F5C6D8;
+    --danger: #e53935;
+    --ink: #2d2d2d;
+    --ink-soft: #aaa;
+
     max-width: 620px;
     margin: 36px auto 80px;
     padding: 0 20px;
-    font-family: 'Segoe UI',sans-serif;
+    font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+    color: var(--ink);
 }
 
+/* ---------- Breadcrumb ---------- */
 .admin-breadcrumb {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: #aaa;
+    color: var(--ink-soft);
     margin-bottom: 20px;
 }
 
     .admin-breadcrumb a {
-        color: #D6336C;
+        color: var(--rose);
         text-decoration: none;
+        font-weight: 600;
     }
 
         .admin-breadcrumb a:hover {
             text-decoration: underline;
         }
 
+/* ---------- Title ---------- */
 .admin-title {
     font-size: 22px;
-    font-weight: 700;
-    color: #2d2d2d;
-    margin-bottom: 28px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    color: var(--ink);
+    margin-bottom: 14px;
 }
 
+.edit-badge {
+    display: inline-block;
+    background: var(--rose-50);
+    color: var(--rose);
+    border: 1px solid #FFB6C1;
+    font-family: 'SF Mono', 'Consolas', ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+
+/* ---------- Card ---------- */
 .admin-card {
+    position: relative;
     background: #fff;
     border-radius: 16px;
-    box-shadow: 0 2px 20px rgba(214,51,108,.08);
+    box-shadow: 0 10px 32px rgba(214, 51, 108, 0.10), 0 1px 3px rgba(214, 51, 108, 0.06);
     padding: 36px;
+    overflow: hidden;
 }
+
+    /* dải ruy băng gradient — chi tiết nhận diện chung với create.css */
+    .admin-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, var(--rose-deep), var(--rose), var(--rose-light));
+    }
 
 .card-section-title {
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: .6px;
-    color: #D6336C;
+    letter-spacing: 0.6px;
+    color: var(--rose);
     padding-bottom: 10px;
-    border-bottom: 1px solid #FFE4EE;
+    border-bottom: 1px solid var(--rose-100);
     margin-bottom: 20px;
+}
+
+/* ---------- Form ---------- */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
 }
 
 .form-group {
@@ -62,41 +118,51 @@
 }
 
     .form-label .req {
-        color: #D6336C;
+        color: var(--rose);
         margin-left: 2px;
     }
 
 .form-control {
     padding: 10px 14px;
-    border: 1.5px solid #F5C6D8;
+    border: 1.5px solid var(--rose-border);
     border-radius: 10px;
+    font-family: inherit;
     font-size: 14px;
     color: #333;
     background: #FFFAFC;
     outline: none;
     width: 100%;
     box-sizing: border-box;
-    transition: border-color .2s, box-shadow .2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+    .form-control::placeholder {
+        color: #C8A6B6;
+    }
+
     .form-control:focus {
-        border-color: #D6336C;
-        box-shadow: 0 0 0 3px rgba(214,51,108,.1);
+        border-color: var(--rose);
+        box-shadow: 0 0 0 3px rgba(214, 51, 108, 0.1);
         background: #fff;
     }
 
     .form-control.input-validation-error {
-        border-color: #e53935 !important;
+        border-color: var(--danger) !important;
         background: #FFF5F5 !important;
     }
 
 textarea.form-control {
     resize: vertical;
     min-height: 100px;
+    line-height: 1.5;
+}
+
+select.form-control {
+    cursor: pointer;
 }
 
 .field-validation-error, .text-danger {
-    color: #e53935;
+    color: var(--danger);
     font-size: 12px;
     margin-top: 2px;
 }
@@ -108,81 +174,190 @@ textarea.form-control {
     margin-top: 4px;
 }
 
-.edit-badge {
-    display: inline-block;
-    background: #FFF0F5;
-    color: #D6336C;
-    border: 1px solid #FFB6C1;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 20px;
+/* ---------- Upload ảnh (dùng cho Edit Product) ---------- */
+.img-upload-area {
+    border: 2px dashed var(--rose-border);
+    border-radius: 14px;
+    background: #FFF5F8;
+    padding: 32px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
 }
 
+    .img-upload-area:hover,
+    .img-upload-area.dragover {
+        border-color: var(--rose);
+        background: #FFEAF1;
+    }
+
+    .img-upload-area input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+
+.img-upload-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+}
+
+.img-upload-text {
+    font-size: 14px;
+    color: var(--ink-soft);
+}
+
+    .img-upload-text strong {
+        color: var(--rose);
+    }
+
+.img-preview-wrap {
+    display: none;
+    position: relative;
+    margin-top: 12px;
+}
+
+    .img-preview-wrap img {
+        width: 100%;
+        max-height: 220px;
+        object-fit: contain;
+        border-radius: 12px;
+        border: 1.5px solid var(--rose-border);
+        background: #fff;
+    }
+
+.img-remove-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--rose);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+}
+
+    .img-remove-btn:hover {
+        background: var(--rose-deep);
+    }
+
+.img-hint {
+    font-size: 12px;
+    color: #B9A3AE;
+    margin-top: 6px;
+}
+
+/* ---------- Buttons ---------- */
 .btn-row {
     display: flex;
     gap: 12px;
     justify-content: flex-end;
     margin-top: 28px;
     padding-top: 22px;
-    border-top: 1px solid #FFE4EE;
+    border-top: 1px solid var(--rose-100);
 }
 
 .btn-cancel {
     padding: 11px 28px;
-    border: 1.5px solid #D6336C;
+    border: 1.5px solid var(--rose);
     border-radius: 10px;
     background: transparent;
-    color: #D6336C;
+    color: var(--rose);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
-    transition: background .2s;
+    transition: background 0.2s;
 }
 
     .btn-cancel:hover {
-        background: #FFF0F5;
+        background: var(--rose-50);
     }
 
 .btn-save {
     padding: 11px 36px;
-    background: linear-gradient(135deg,#D6336C,#FF4081);
+    background: linear-gradient(135deg, var(--rose-deep), var(--rose) 55%, var(--rose-light));
     border: none;
     border-radius: 10px;
     color: #fff;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
+    box-shadow: 0 6px 16px rgba(214, 51, 108, 0.28);
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: opacity .2s, transform .1s;
+    transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
 }
 
     .btn-save:hover {
-        opacity: .9;
+        opacity: 0.9;
         transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(214, 51, 108, 0.34);
     }
 
     .btn-save:disabled {
-        opacity: .7;
+        opacity: 0.7;
         cursor: not-allowed;
+    }
+
+    .btn-save:focus-visible,
+    .btn-cancel:focus-visible {
+        outline: 2px solid var(--rose-deep);
+        outline-offset: 2px;
     }
 
 .spinner {
     display: none;
     width: 15px;
     height: 15px;
-    border: 2px solid rgba(255,255,255,.4);
+    border: 2px solid rgba(255,255,255,0.4);
     border-top-color: #fff;
     border-radius: 50%;
-    animation: sp .7s linear infinite;
+    animation: sp 0.7s linear infinite;
 }
 
 @keyframes sp {
-    to {
-        transform: rotate(360deg);
+    to { transform: rotate(360deg); }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-card {
+        padding: 22px 18px;
+    }
+
+    .btn-row {
+        flex-direction: column-reverse;
+    }
+
+    .btn-cancel, .btn-save {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-save, .btn-cancel, .img-upload-area, .form-control {
+        transition: none;
+    }
+    .spinner {
+        animation: none;
     }
 }

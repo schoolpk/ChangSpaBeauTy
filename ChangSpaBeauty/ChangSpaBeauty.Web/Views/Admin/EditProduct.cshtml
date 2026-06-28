@@ -1,4 +1,4 @@
-﻿@model ChangSpaBeauty.Web.ViewModels.Product.ProductCreateViewModel
+@model ChangSpaBeauty.Web.ViewModels.Product.ProductCreateViewModel
 @{
     ViewData["Title"] = "Chỉnh sửa sản phẩm";
     int proId = (int)ViewBag.ProductId;
@@ -24,7 +24,8 @@
     <div class="admin-card">
         <div class="card-section-title">📋 Thông tin sản phẩm</div>
 
-        <form asp-action="EditProduct" asp-route-id="@proId" method="post" id="editForm" novalidate>
+        <form asp-action="EditProduct" asp-route-id="@proId" method="post"
+              enctype="multipart/form-data" id="editForm" novalidate>
             @Html.AntiForgeryToken()
 
             <div class="form-group">
@@ -35,15 +36,29 @@
                        placeholder="Tên sản phẩm" maxlength="100" />
                 <div class="char-count"><span id="nameCount">0</span>/100</div>
                 <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
 
-                <label class="form-label" asp-for="Price">
-                    Giá <span class="req">*</span>
-                </label>
-                <input asp-for="Price" class="form-control" id="priceInput"
-                       placeholder="Giá sản phẩm" maxlength="100" />
-                <div class="char-count"><span id="nameCount">0</span>/100</div>
-                <span asp-validation-for="Price" class="text-danger"></span>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" asp-for="Price">
+                        Giá (đ) <span class="req">*</span>
+                    </label>
+                    <input asp-for="Price" class="form-control" type="number" min="0" step="1000"
+                           placeholder="VD: 285000" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
 
+                <div class="form-group">
+                    <label class="form-label" asp-for="Stock">
+                        Số lượng tồn kho
+                    </label>
+                    <input asp-for="Stock" class="form-control" type="number" min="0"
+                           placeholder="VD: 100" />
+                    <span asp-validation-for="Stock" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label class="form-label" asp-for="CategoryId">
                     Danh mục <span class="req">*</span>
                 </label>
@@ -52,11 +67,37 @@
                     <option value="">-- Chọn danh mục --</option>
                 </select>
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
 
-                <input asp-for="Description" class="form-control" id="priceInput"
-                       placeholder="Mô tả" maxlength="100" />
-                <div class="char-count"><span id="nameCount">0</span>/100</div>
+            <div class="form-group">
+                <label class="form-label" asp-for="Description">
+                    Mô tả sản phẩm
+                </label>
+                <textarea asp-for="Description" class="form-control"
+                          placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Ảnh sản phẩm</label>
+
+                <div class="img-upload-area" id="uploadArea">
+                    <input type="file" asp-for="ImageFile" accept="image/*" id="imageInput" />
+                    <div id="uploadPlaceholder">
+                        <div class="img-upload-icon">🖼️</div>
+                        <div class="img-upload-text">
+                            Kéo thả ảnh mới vào đây hoặc <strong>click để chọn file</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="img-preview-wrap" id="previewWrap">
+                    <img id="imgPreview" src="#" alt="Preview" />
+                    <button type="button" class="img-remove-btn" onclick="removeImage()" title="Xóa ảnh">✕</button>
+                </div>
+
+                <div class="img-hint">Bỏ trống nếu muốn giữ ảnh hiện tại. Hỗ trợ JPG, PNG, WebP. Tối đa 5MB.</div>
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
 
             <div class="btn-row">

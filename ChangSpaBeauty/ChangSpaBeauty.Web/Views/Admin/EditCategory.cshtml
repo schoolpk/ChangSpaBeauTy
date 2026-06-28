@@ -1,4 +1,4 @@
-﻿@model ChangSpaBeauty.Web.ViewModels.CategoryCreateViewModel
+@model ChangSpaBeauty.Web.ViewModels.CategoryCreateViewModel
 @{
     ViewData["Title"] = "Chỉnh sửa danh mục";
     int catId = (int)(ViewBag.CategoryId ?? 0);
@@ -37,6 +37,15 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
+            <div class="form-group">
+                <label class="form-label" asp-for="TradeMark">
+                    Tên thương hiệu <span class="req">*</span>
+                </label>
+                <input asp-for="TradeMark" class="form-control"
+                       placeholder="VD: L'Oréal, Cocoon..." maxlength="100" />
+                <span asp-validation-for="TradeMark" class="text-danger"></span>
+            </div>
+
             <div class="btn-row">
                 <a asp-action="Index" class="btn-cancel">Hủy bỏ</a>
                 <button type="submit" class="btn-save" id="saveBtn">
@@ -48,11 +57,9 @@
     </div>
 </div>
 
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/edit.js" asp-append-version="true"></script>
 }
-
