@@ -155,6 +155,8 @@
                         <th>Tên sản phẩm</th>
                         <th>Giá</th>
                         <th>Danh mục</th>
+                        <th>Đã bán</th>
+                        <th>Tồn kho</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
@@ -170,7 +172,10 @@
                                         <div class="img-thumb">
                                             @if (!string.IsNullOrEmpty(pro.Image))
                                             {
-                                                <img src="@pro.Image" alt="@pro.Name" />
+                                                <img src="~/images/products/@pro.Image"
+                                                 alt="@pro.Name"
+                                                 onerror="this.src='/images/placeholder.png'"
+                                                 style="width:100%;height:100%;object-fit:cover;" />
                                             }
                                             else
                                             {
@@ -182,6 +187,17 @@
                                 </td>
                                 <td class="price">@pro.Price.ToString("N0") ₫</td>
                                 <td><span class="badge badge-cat">@pro.CategoryName</span></td>
+                                <td>@pro.Sold</td>
+                                <td>
+                                    @if (pro.Stock <= 0)
+                                    {
+                                        <span style="color:#dc3545;font-weight:600;">Hết hàng</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:#2e7d32;font-weight:600;">@pro.Stock</span>
+                                    }
+                                </td>
                                 <td>
                                     <div class="action-group">
                                         <a asp-action="EditProduct"
