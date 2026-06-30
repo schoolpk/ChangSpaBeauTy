@@ -99,5 +99,11 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
             order.Status = status;
             await _context.SaveChangesAsync();
         }
+
+        public async Task UpdateOrderDetailsAsync(Order order)
+        {
+            _context.Orders.Update(order);
+            await  _context.SaveChangesAsync();
+        }
     }
 }

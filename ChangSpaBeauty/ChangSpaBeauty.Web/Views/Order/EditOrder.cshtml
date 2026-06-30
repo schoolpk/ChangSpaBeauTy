@@ -1,0 +1,78 @@
+﻿@model ChangSpaBeauty.Application.DTOs.Order.OrderDto
+@{
+    ViewData["Title"] = "Sửa đơn hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/checkout.css" asp-append-version="true" />
+}
+
+<div class="co-wrap">
+    <h1 style="font-size:1.4rem;font-weight:700;margin-bottom:1.5rem;">
+        ✏️ Sửa đơn hàng #@Model.OrderId
+    </h1>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="co-alert co-alert-error">
+            <span class="co-alert-icon">❌</span> @TempData["Error"]
+        </div>
+    }
+
+    <form asp-controller="Order" asp-action="EditOrder" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="OrderId" value="@Model.OrderId" />
+
+        <div class="co-form-card">
+            <div class="co-card-title"><span class="co-card-icon">📦</span> Thông tin giao hàng</div>
+
+            <div class="co-field">
+                <label class="co-label">Số điện thoại <span class="co-req">*</span></label>
+                <div class="co-input-wrap">
+                    <span class="co-input-icon">📞</span>
+                    <input name="Phone" type="tel" value="@Model.Phone" required />
+                </div>
+            </div>
+
+            <div class="co-field">
+                <label class="co-label">Địa chỉ giao hàng <span class="co-req">*</span></label>
+                <div class="co-textarea-wrap">
+                    <span class="co-textarea-icon">📍</span>
+                    <textarea name="Address" required>@Model.Address</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="co-summary-card" style="margin-top:1.2rem;">
+            <div class="co-card-title"><span class="co-card-icon">🛍️</span> Sản phẩm trong đơn</div>
+
+            <div class="co-item-list">
+                @for (int i = 0; i < Model.Items.Count; i++)
+                {
+                    var item = Model.Items[i];
+                    <div class="co-item">
+                        <div class="co-item-img-wrap">
+                            <img src="~/images/products/@item.ProductImage" alt="@item.ProductName"
+                                 onerror="this.src='/images/placeholder.png'" />
+                        </div>
+                        <div class="co-item-info">
+                            <div class="co-item-name">@item.ProductName</div>
+                            <div class="co-item-unit">@item.UnitPrice.ToString("N0") ₫ / sản phẩm</div>
+                        </div>
+                        <input type="hidden" name="Items[@i].ProductId" value="@item.ProductId" />
+                        <input type="number" name="Items[@i].Quantity" value="@item.Quantity"
+                               min="0" style="width:70px;padding:.4rem;border:1.5px solid #e8e8e8;
+                                   border-radius:8px;text-align:center;" />
+                    </div>
+                }
+            </div>
+
+            <button type="submit" class="co-btn-order" style="margin-top:1.2rem;">
+                💾 Lưu thay đổi
+            </button>
+        </div>
+    </form>
+
+    <a asp-action="MyOrders" class="co-btn-back">← Quay lại đơn hàng của tôi</a>
+</div>

@@ -176,6 +176,18 @@
                             {
                                 <span class="mo-cancel-locked">🔒 Không thể hủy</span>
                             }
+
+                            @if(order.Status == "pending")
+                            {
+                                <a asp-action="EditOrder" asp-route-id="@order.OrderId" class="mo-btn-cancel"
+                                   style="submit">
+                                    ✏️ Sửa đơn hàng
+                                </a>
+                            }
+                            else if (order.Status == "done" || order.Status == "shipping")
+                            {
+                                <span class="mo-cancel-locked">🔒 Không thể sửa</span>
+                            }
                         </div>
                     </div>
                 </div>

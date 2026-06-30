@@ -390,7 +390,7 @@
                                 <td>
                                     @{
                                         string ordStatus = ord.Status?.ToString() ?? "pending";
-                                        var lockedStatuses = new[] { "cancelled", "done" };
+                                        var lockedStatuses = new[] { "cancelled", "done" , "shipping"};
                                         bool isLocked = lockedStatuses.Contains(ordStatus);
                                     }
 
