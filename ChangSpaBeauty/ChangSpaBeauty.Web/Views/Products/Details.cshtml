@@ -37,9 +37,9 @@
 *@
         <div class="detail-info">
 
-            @if (!string.IsNullOrEmpty(Model.CategoryName))
+            @if (!string.IsNullOrEmpty(Model.CategoryName) || !string.IsNullOrEmpty(Model.Trademark))
             {
-                <span class="detail-category">🏷️ @Model.CategoryName</span>
+                <span class="detail-category">🏷️ @Model.CategoryName - @Model.Trademark</span>
             }
 
             <h1 class="detail-name">@Model.Name</h1>
