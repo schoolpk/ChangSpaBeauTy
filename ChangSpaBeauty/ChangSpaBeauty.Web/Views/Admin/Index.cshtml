@@ -388,31 +388,45 @@
                                 </td>
                                 <td>@ord.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
                                 <td>
-                                    <form asp-controller="Admin" asp-action="UpdateOrderStatus"
-                                          method="post" style="display:flex;gap:.4rem;align-items:center">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="orderId" value="@ord.OrderId" />
-                                        @{
-                                            string ordStatus = ord.Status?.ToString() ?? "pending";
-                                            var statusOptions = new[]
-                                            {
-                                                ("pending",   "⏳ Chờ xác nhận"),
-                                                ("confirmed", "✅ Xác nhận"),
-                                                ("shipping",  "🚚 Giao hàng"),
-                                                ("done",      "✔️ Hoàn thành"),
-                                                ("cancelled", "❌ Hủy")
-                                            };
-                                            var selectHtml = "<select name='status' class='status-select'>";
-                                            foreach (var (val, label) in statusOptions)
-                                            {
-                                                var sel = ordStatus == val ? " selected" : "";
-                                                selectHtml += $"<option value='{val}'{sel}>{label}</option>";
+                                    @{
+                                        string ordStatus = ord.Status?.ToString() ?? "pending";
+                                        var lockedStatuses = new[] { "cancelled", "done" };
+                                        bool isLocked = lockedStatuses.Contains(ordStatus);
+                                    }
+
+                                    @if (isLocked)
+                                    {
+                                        <span style="font-size:.82rem;color:#999;font-weight:600;">
+                                            🔒 Không thể thay đổi
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <form asp-controller="Admin" asp-action="UpdateOrderStatus"
+                                              method="post" style="display:flex;gap:.4rem;align-items:center">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="orderId" value="@ord.OrderId" />
+                                            @{
+                                                var statusOptions = new[]
+                                                {
+                                                    ("pending",   "⏳ Chờ xác nhận"),
+                                                    ("confirmed", "✅ Xác nhận"),
+                                                    ("shipping",  "🚚 Giao hàng"),
+                                                    ("done",      "✔️ Hoàn thành"),
+                                                    ("cancelled", "❌ Hủy")
+                                                };
+                                                var selectHtml = "<select name='status' class='status-select'>";
+                                                foreach (var (val, label) in statusOptions)
+                                                {
+                                                    var sel = ordStatus == val ? " selected" : "";
+                                                    selectHtml += $"<option value='{val}'{sel}>{label}</option>";
+                                                }
+                                                selectHtml += "</select>";
                                             }
-                                            selectHtml += "</select>";
-                                        }
-                                        @Html.Raw(selectHtml)
-                                        <button type="submit" class="btn-status-save">Lưu</button>
-                                    </form>
+                                            @Html.Raw(selectHtml)
+                                            <button type="submit" class="btn-status-save">Lưu</button>
+                                        </form>
+                                    }
                                 </td>
                             </tr>
                         }
