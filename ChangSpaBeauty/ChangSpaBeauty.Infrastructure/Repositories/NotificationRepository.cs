@@ -23,6 +23,18 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteAllAsync(int userId)
+        {
+            var notification = await _context.Notifications
+                .Where(n => n.UserId == userId)
+                .ToListAsync();
+            if (notification.Any())
+            {
+                _context.Notifications.RemoveRange(notification);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<List<Notification>> GetByUserAsync(int userId)
         {
             return await _context.Notifications

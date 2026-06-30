@@ -24,8 +24,17 @@ namespace ChangSpaBeauty.Web.Controllers
         public async Task<IActionResult> ClearAll()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _notiRepo.MarkAllReadAsync(userId);
+            await _notiRepo.DeleteAllAsync(userId);
             return Redirect(Request.Headers["Referer"].ToString());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkRead()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _notiRepo.MarkAllReadAsync(userId);
+            return Ok();
         }
     }
 }

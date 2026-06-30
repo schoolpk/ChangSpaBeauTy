@@ -93,7 +93,9 @@
                             <span class="notif-badge">@(unreadCount > 9 ? "9+" : unreadCount.ToString())</span>
                         }
                     </button>
-
+                        <form id="markread-form" style="display:none">
+                            @Html.AntiForgeryToken()
+                        </form>
                     <div class="notif-dropdown" id="notif-dropdown" role="menu">
                         <div class="notif-header">
                             <span>

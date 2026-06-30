@@ -39,12 +39,34 @@ function scrollToTop() {
 /* ── NOTIFICATION DROPDOWN ──────────────────────────────── */
 function toggleNotif() {
     const dropdown = document.getElementById('notif-dropdown');
-    const bell     = document.getElementById('notifBtn');
-    if (!dropdown) return;
+    const wasOpen = dropdown.classList.contains('open');
+    dropdown.classList.toggle('open');
 
-    const isOpen = dropdown.classList.toggle('open');
-    if (bell) bell.classList.toggle('active', isOpen);
+    // Chỉ mark-read khi MỞ dropdown và đang có badge chưa đọc
+    if (!wasOpen) {
+        const badge = document.querySelector('.notif-badge');
+        if (badge) {
+            const token = document.querySelector('#markread-form input[name="__RequestVerificationToken"]')?.value;
+            fetch('/Notification/MarkRead', {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': token }
+            }).then(() => {
+                badge.style.display = 'none';
+                // Bỏ class "unread" và "active" trên các item để UI cập nhật ngay
+                document.querySelectorAll('.notif-item.unread').forEach(item => item.classList.remove('unread'));
+                document.querySelectorAll('.notif-dot.active').forEach(dot => dot.classList.remove('active'));
+            });
+        }
+    }
 }
+
+// Đóng dropdown khi click ngoài (giữ nguyên nếu đã có)
+document.addEventListener('click', function (e) {
+    const wrap = document.querySelector('.notif-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+        document.getElementById('notif-dropdown')?.classList.remove('open');
+    }
+});
 
 // Close when clicking outside
 document.addEventListener('click', function (e) {
@@ -121,15 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Highlight search box on focus — already handled by CSS :focus-within
     // Could add autocomplete suggestions here in the future
 })();
-/* ══════════════════════════════════════════════════════════
-   K-BEAUTY EFFECTS — hiệu ứng bổ sung cho giao diện mới
-   Dán đoạn này vào CUỐI file wwwroot/js/changspa.js hiện có.
-   Toàn bộ code nằm trong 1 IIFE riêng, dùng tên hàm/biến có
-   tiền tố "kb" để KHÔNG đụng tới toggleFav / addToCart /
-   setPage / switchTab / filterTable / toggleNotif đã có sẵn.
-   An toàn chạy trên mọi trang — tự bỏ qua nếu không có
-   phần tử tương ứng.
-   ══════════════════════════════════════════════════════════ */
+
 (function () {
     "use strict";
 
