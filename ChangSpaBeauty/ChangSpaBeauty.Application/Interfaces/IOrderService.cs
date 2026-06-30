@@ -13,5 +13,6 @@ namespace ChangSpaBeauty.Application.Interfaces
         Task<OrderDto?> GetOrderAsync(int orderId, int userId);
         Task<List<OrderDto>> GetUserOrderAsync(int userId);
         Task<(bool success, string message)> CancelOrderAsync(int orderId, int userId);
+        Task<(bool success, string message)> UpdateOrderAsync(int userId, UpdateOrderDto updateOrder);
     }
 }

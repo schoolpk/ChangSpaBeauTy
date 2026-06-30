@@ -50,6 +50,7 @@ namespace ChangSpaBeauty.Application.Services
                 CreatedAt = order.CreatedAt,
                 Items = order.OrderDetails.Select(od => new OrderDetailDto
                 {
+                    ProductId = od.ProductId,
                     ProductName = od.Product?.Name ?? "",
                     ProductImage = od.Product?.Image ?? "",
                     Quantity = od.Quantity,
@@ -137,6 +138,7 @@ namespace ChangSpaBeauty.Application.Services
                 CreatedAt = o.CreatedAt,
                 Items = o.OrderDetails.Select(od => new OrderDetailDto
                 {
+                    ProductId = od.ProductId,
                     ProductName = od.Product?.Name ?? "",
                     ProductImage = od.Product?.Image ?? "",
                     Quantity = od.Quantity,
@@ -198,6 +200,88 @@ namespace ChangSpaBeauty.Application.Services
             await _cartRepo.SaveChangeAsync();
 
             return order.OrderId;
+        }
+
+        public async Task<(bool success, string message)> UpdateOrderAsync(int userId, UpdateOrderDto dto)
+        {
+            try
+            {
+                // Lấy order kèm details, đảm bảo đúng user
+                var order = await _orderRepo.GetOrderAsync(dto.OrderId, userId);
+                if (order == null)
+                    return (false, "Không tìm thấy đơn hàng");
+
+                // Chỉ cho sửa khi pending
+                if (order.Status != "pending")
+                    return (false, "Chỉ có thể sửa đơn hàng khi đang chờ xác nhận");
+
+                if (!dto.Items.Any())
+                    return (false, "Đơn hàng phải có ít nhất 1 sản phẩm");
+
+                // Lấy lại order có tracking (vì GetOrderAsync dùng AsNoTracking)
+                var trackedOrder = await _orderRepo.GetOrderWithDetailAsync(dto.OrderId);
+                if (trackedOrder == null)
+                    return (false, "Không tìm thấy đơn hàng");
+
+                // Hoàn lại stock cũ trước khi áp dụng số lượng mới
+                foreach (var oldDetail in trackedOrder.OrderDetails)
+                {
+                    var product = await _productRepo.GetByIdAsync(oldDetail.ProductId);
+                    if (product != null)
+                    {
+                        product.Stock += oldDetail.Quantity;
+                        product.Sold -= oldDetail.Quantity;
+                        if (product.Sold < 0) product.Sold = 0;
+                        _productRepo.UpdateAsync(product);
+                    }
+                }
+
+                // Validate stock đủ cho số lượng mới
+                foreach (var item in dto.Items)
+                {
+                    var product = await _productRepo.GetByIdAsync(item.ProductId);
+                    if (product == null)
+                        return (false, "Sản phẩm không tồn tại");
+                    if (item.Quantity > product.Stock)
+                        return (false, $"Sản phẩm \"{product.Name}\" chỉ còn {product.Stock} trong kho");
+                }
+
+                // Xóa hết OrderDetails cũ, thêm lại theo số lượng mới
+                trackedOrder.OrderDetails.Clear();
+                decimal newTotal = 0;
+
+                foreach (var item in dto.Items)
+                {
+                    var product = await _productRepo.GetByIdAsync(item.ProductId);
+                    if (product == null) continue;
+
+                    trackedOrder.OrderDetails.Add(new OrderDetail
+                    {
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity,
+                        UnitPrice = product.Price
+                    });
+
+                    newTotal += product.Price * item.Quantity;
+
+                    // Trừ lại stock theo số lượng mới
+                    product.Stock -= item.Quantity;
+                    product.Sold += item.Quantity;
+                    _productRepo.UpdateAsync(product);
+                }
+
+                trackedOrder.Address = dto.Address;
+                trackedOrder.Phone = dto.Phone;
+                trackedOrder.TotalPrice = newTotal;
+
+                await _orderRepo.UpdateOrderDetailsAsync(trackedOrder);
+
+                return (true, "Cập nhật đơn hàng thành công");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Lỗi: {ex.Message}");
+            }
         }
     }
 }

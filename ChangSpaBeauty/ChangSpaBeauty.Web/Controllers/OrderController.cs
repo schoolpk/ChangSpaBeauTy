@@ -43,6 +43,52 @@ namespace ChangSpaBeauty.Web.Controllers
             return View(dto);
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> EditOrder(int id)
+        {
+            var order = await _orderService.GetOrderAsync(id, GetUserId());
+            if (order == null) return NotFound();
+
+            if (order.Status != "pending")
+            {
+                TempData["Error"] = "Chỉ có thể sửa đơn hàng khi đang chờ xác nhận";
+                return RedirectToAction("MyOrders");
+            }
+
+            return View(order);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditOrder(UpdateOrderDto dto)
+        {
+            var (success, message) = await _orderService.UpdateOrderAsync(GetUserId(), dto);
+
+            if (success)
+            {
+                TempData["Success"] = message;
+
+                // Thông báo cho admin
+                var admin = await _userRepository.GetAdminAsync();
+                if (admin != null)
+                {
+                    await _notiRepo.AddAsync(new Notification
+                    {
+                        UserId = admin.Id,
+                        Message = $"✏️ Khách hàng {User.Identity?.Name} đã chỉnh sửa đơn hàng #{dto.OrderId}",
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    });
+                }
+
+                return RedirectToAction("MyOrders");
+            }
+
+            TempData["Error"] = message;
+            return RedirectToAction("EditOrder", new { id = dto.OrderId });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PlaceOrder(OrderDto dto)

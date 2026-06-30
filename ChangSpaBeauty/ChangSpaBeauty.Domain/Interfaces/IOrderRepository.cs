@@ -17,6 +17,6 @@ namespace ChangSpaBeauty.Domain.Interfaces
         Task<Order?> GetOrderAsync(int orderId, int userId);
         Task DeleteOrderAsync(int orderId);
         Task<IEnumerable<Order>> GetAllAsync();
-        
+        Task UpdateOrderDetailsAsync(Order order);
     }
 }
