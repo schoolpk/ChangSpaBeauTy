@@ -55,11 +55,11 @@
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <!-- Greeting + hover dropdown -->
-                @{
-                    var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-                    var userRoleLabel = User.IsInRole("Admin") ? "Quản trị viên" : "Khách hàng";
-                    var userInitial = !string.IsNullOrEmpty(User.Identity.Name) ? User.Identity.Name.Trim().Substring(0, 1).ToUpper() : "?";
-                }
+                
+                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+                var userRoleLabel = User.IsInRole("Admin") ? "Quản trị viên" : "Khách hàng";
+                var userInitial = !string.IsNullOrEmpty(User.Identity.Name) ? User.Identity.Name.Trim().Substring(0, 1).ToUpper() : "?";
+                
                 <div class="user-menu-wrap" tabindex="0">
                     <span class="user-greeting">
                         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
