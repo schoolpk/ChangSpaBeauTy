@@ -1,0 +1,81 @@
+using ChangSpaBeauty.Application.Services;
+using ChangSpaBeauty.Application.Interfaces;
+using ChangSpaBeauty.Infrastructure.Persistence;
+using ChangSpaBeauty.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using ChangSpaBeauty.Domain.Interfaces;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// ── Services ─────────────────────────────────────
+builder.Services.AddControllersWithViews();
+
+// EF Core – SQL Server
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// DI – Repository & UnitOfWork
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
+builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<CategoryService>();
+// Application Services
+builder.Services.AddScoped<ProductService>();
+
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
+// Sesstion
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(8);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+}
+);
+
+// Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(option =>
+    {
+        option.LoginPath = "/Account/login";
+        option.LogoutPath = "/Account/Logout";
+        option.AccessDeniedPath = "/Account/AccessDenied";
+        option.ExpireTimeSpan = TimeSpan.FromHours(8);
+        option.SlidingExpiration = true;
+        option.Cookie.HttpOnly = true;
+        option.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    });
+builder.Services.AddAuthorization();
+
+var app = builder.Build();
+
+// ── Pipeline ─────────────────────────────────────
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseSession();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();

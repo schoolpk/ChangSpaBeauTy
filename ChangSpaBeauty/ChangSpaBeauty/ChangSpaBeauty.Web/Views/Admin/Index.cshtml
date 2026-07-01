@@ -18,14 +18,14 @@
     </div>
 </div>
 
-<div class="create-page">
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">
-            ✅ @TempData["Success"]
-        </div>
-    }
-</div>
+  <div class="create-page">
+        @if(TempData["Success"] != null)
+          {
+              <div class="alert alert-success">
+                  ✅ @TempData["Success"]
+              </div>
+          }
+  </div>
 <div class="admin-wrap">
 
     @* ===== STATS ===== *@
@@ -111,35 +111,12 @@
                                     }
                                 </td>
                                 <td>
-                                    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-                                        @* Nút đổi role *@
-                                        <form asp-controller="Admin" asp-action="ChangeRole" method="post"
-                                              onsubmit="return confirm('Đổi vai trò của @user.Name?')">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@user.Id" />
-                                            @if (user.Role == "Admin")
-                                            {
-                                                <button type="submit" class="btn-role btn-role-to-customer"
-                                                        title="Hạ xuống Customer">
-                                                    👤 → Customer
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <button type="submit" class="btn-role btn-role-to-admin"
-                                                        title="Nâng lên Admin">
-                                                    🔑 → Admin
-                                                </button>
-                                            }
-                                        </form>
-                                        @* Nút xóa *@
-                                        <form asp-controller="Admin" asp-action="DeleteUser" method="post"
-                                              onsubmit="return confirm('Xóa user này?')">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@user.Id" />
-                                            <button type="submit" class="btn-delete">Xóa</button>
-                                        </form>
-                                    </div>
+                                    <form asp-controller="Admin" asp-action="DeleteUser" method="post" 
+                                          onsubmit="return confirm('Xóa user này?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@user.Id" />
+                                        <button type="submit" class="btn-delete">Xóa</button>
+                                    </form>
                                 </td>
                             </tr>
 
@@ -169,7 +146,7 @@
                     <input type="text" placeholder="Tìm kiếm sản phẩm..."
                            oninput="filterTable('tbl-products', this.value)" />
                 </div>
-                <a asp-action="CreateProduct" class="btn-add">+ Thêm sản phẩm</a>
+                <a  asp-action="CreateProduct" class="btn-add">+ Thêm sản phẩm</a>
             </div>
             <table class="admin-table" id="tbl-products">
                 <thead>
@@ -196,9 +173,9 @@
                                             @if (!string.IsNullOrEmpty(pro.Image))
                                             {
                                                 <img src="~/images/products/@pro.Image"
-                                                     alt="@pro.Name"
-                                                     onerror="this.src='/images/placeholder.png'"
-                                                     style="width:100%;height:100%;object-fit:cover;" />
+                                                 alt="@pro.Name"
+                                                 onerror="this.src='/images/placeholder.png'"
+                                                 style="width:100%;height:100%;object-fit:cover;" />
                                             }
                                             else
                                             {
@@ -260,7 +237,7 @@
                     <input type="text" placeholder="Tìm kiếm danh mục..."
                            oninput="filterTable('tbl-categories', this.value)" />
                 </div>
-                <a asp-action="CreateCategory" class="btn-add">+ Thêm danh mục</a>
+                <a  asp-action="CreateCategory" class="btn-add">+ Thêm danh mục</a>
             </div>
             <table class="admin-table" id="tbl-categories">
                 <thead>
@@ -286,9 +263,9 @@
                                         @foreach (var tm in cat.Trademark.Split(',', StringSplitOptions.RemoveEmptyEntries))
                                         {
                                             <span style="display:inline-block;background:#FFF0F5;color:#D6336C;
-                                                border:1px solid #FFB6C1;border-radius:20px;
-                                                padding:2px 10px;font-size:.75rem;font-weight:600;
-                                                margin:2px;">
+                                                         border:1px solid #FFB6C1;border-radius:20px;
+                                                         padding:2px 10px;font-size:.75rem;font-weight:600;
+                                                         margin:2px;">
                                                 💄 @tm.Trim()
                                             </span>
                                         }
@@ -333,8 +310,7 @@
                 <div class="admin-search-wrap">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
                     </svg>
                     <input type="text" placeholder="Tìm kiếm đơn hàng..."
                            oninput="filterTable('tbl-orders', this.value)" />
@@ -400,14 +376,13 @@
                                 </td>
                                 <td>
                                     <span class="badge-status status-@ord.Status">
-                                        @(ord.Status switch
-                                        {
-                                            "pending" => "⏳ Chờ xác nhận",
+                                        @(ord.Status switch {
+                                            "pending"   => "⏳ Chờ xác nhận",
                                             "confirmed" => "✅ Đã xác nhận",
-                                            "shipping" => "🚚 Đang giao",
-                                            "done" => "✔️ Hoàn thành",
+                                            "shipping"  => "🚚 Đang giao",
+                                            "done"      => "✔️ Hoàn thành",
                                             "cancelled" => "❌ Đã hủy",
-                                            _ => ord.Status
+                                            _           => ord.Status
                                         })
                                     </span>
                                 </td>
@@ -415,7 +390,7 @@
                                 <td>
                                     @{
                                         string ordStatus = ord.Status?.ToString() ?? "pending";
-                                        var lockedStatuses = new[] { "cancelled", "done" };
+                                        var lockedStatuses = new[] { "cancelled", "done"};
                                         bool isLocked = lockedStatuses.Contains(ordStatus);
                                     }
 

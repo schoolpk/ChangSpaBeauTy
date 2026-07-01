@@ -1,0 +1,112 @@
+@model ChangSpaBeauty.Web.ViewModels.Product.ProductCreateViewModel
+@{
+    ViewData["Title"] = "Thêm sản phẩm mới";
+    Layout = "_Layout";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/create.css" />
+}
+
+<div class="create-page">
+    <div class="create-header">
+        <a asp-controller="Admin" asp-action="Index">← Quay lại</a>
+        <span style="color:#ccc">|</span>
+        <h1>✨ Thêm sản phẩm mới</h1>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+    {
+        <div class="alert alert-danger">
+            ⚠️ Vui lòng kiểm tra lại thông tin bên dưới.
+        </div>
+    }
+
+    <div class="create-card">
+        <form asp-controller="Admin" asp-action="CreateProduct" method="post"
+              enctype="multipart/form-data" id="createForm" novalidate>
+            @Html.AntiForgeryToken()
+
+            <!-- THÔNG TIN CƠ BẢN -->
+            <div class="form-section">
+                <div class="form-section-title">Thông tin cơ bản</div>
+
+                <div class="form-group">
+                    <label asp-for="Name">Tên sản phẩm <span class="required">*</span></label>
+                    <input asp-for="Name" class="form-control" placeholder="Tên sản phẩm" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Price">Giá (đ) <span class="required">*</span></label>
+                        <input asp-for="Price" class="form-control" type="number" min="0" step="1000"
+                               placeholder="VD: 285000" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Stock">Số lượng tồn kho</label>
+                        <input asp-for="Stock" class="form-control" type="number" min="0"
+                               placeholder="VD: 100" />
+                        <span asp-validation-for="Stock" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CategoryId">Danh mục <span class="required">*</span></label>
+                    <select asp-for="CategoryId" class="form-control"
+                            asp-items="ViewBag.Categories">
+                        <option value="">-- Chọn danh mục --</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description">Mô tả sản phẩm</label>
+                    <textarea asp-for="Description" class="form-control"
+                              placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- ẢNH SẢN PHẨM -->
+            <div class="form-section">
+                <div class="form-section-title">Ảnh sản phẩm</div>
+
+                <div class="img-upload-area" id="uploadArea">
+                    <input type="file" asp-for="ImageFile" accept="image/*" id="imageInput" />
+                    <div id="uploadPlaceholder">
+                        <div class="img-upload-icon">🖼️</div>
+                        <div class="img-upload-text">
+                            Kéo thả ảnh vào đây hoặc <strong>click để chọn file</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="img-preview-wrap" id="previewWrap">
+                    <img id="imgPreview" src="#" alt="Preview" />
+                    <button type="button" class="img-remove-btn" onclick="removeImage()" title="Xóa ảnh">✕</button>
+                </div>
+
+                <div class="img-hint">Hỗ trợ JPG, PNG, WebP. Tối đa 5MB.</div>
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="btn-row">
+                <a asp-controller="Admin" asp-action="Index" class="btn-cancel">Hủy</a>
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span class="spinner" id="spinner"></span>
+                    💾 Lưu sản phẩm
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/createt.js" asp-append-version="true"></script>
+}

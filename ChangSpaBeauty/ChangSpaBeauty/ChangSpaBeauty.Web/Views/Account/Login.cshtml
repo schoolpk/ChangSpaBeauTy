@@ -1,0 +1,72 @@
+﻿@model ChangSpaBeauty.Application.DTOs.UserLoginDTO
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css" />
+}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <span class="kb-sparkle" style="top:14px; right:20px; animation-duration:4.5s;">✨</span>
+        <span class="kb-sparkle" style="bottom:18px; left:16px; font-size:14px; animation-duration:5.5s;">💗</span>
+
+        <div class="auth-header">
+            <div class="auth-logo"><i class="fas fa-spa"></i></div>
+            <h2>Đăng nhập</h2>
+            <p>Chào mừng bạn quay trở lại ChangSpaBeauTy</p>
+        </div>
+
+        @* @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        } *@
+
+        <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Email">Email</label>
+                <div class="input-icon-wrap">
+                    <i class="fas fa-envelope form-icon"></i>
+                    <input asp-for="Email" class="form-control" placeholder="Nhập email của bạn" />
+                </div>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password">Mật khẩu</label>
+                <div class="input-icon-wrap">
+                    <i class="fas fa-lock form-icon"></i>
+                    <div class="input-password">
+                        <input asp-for="Password" class="form-control" placeholder="Nhập mật khẩu" id="passwordInput" />
+                        <button type="button" class="btn-toggle-password" onclick="togglePassword()">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group form-check">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label">Ghi nhớ đăng nhập</label>
+            </div>
+
+            <button type="submit" class="btn-auth"><i class="fas fa-sign-in-alt"></i> Đăng nhập</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Chưa có tài khoản? <a asp-action="Register">Đăng ký ngay</a></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/login.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,143 @@
+@using ChangSpaBeauty.Domain.Entities
+@using ChangSpaBeauty.Web.ViewModels.Product
+@model ProductListViewModel
+@{
+    ViewData["Title"] = "Sản phẩm";
+}
+
+<div class="container">
+    <div class="page-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-title">Danh mục</div>
+                @foreach (var cat in Model.Categories)
+                {
+                    <a asp-controller="Products" asp-action="Index"
+                       asp-route-category="@cat.CategoryId"
+                       class="sidebar-item @(Model.SelectedCategory == cat.CategoryId.ToString() ? "active" : "")">
+                        @cat.Name <span class="count">@cat.Total</span>
+                    </a>
+                }
+            </div>
+
+            <div class="sidebar-card">
+                <div class="sidebar-title">Thương hiệu</div>
+                @foreach (var tm in Model.Trademarks)
+                {
+                    <a asp-controller="Products" asp-action="Index"
+                       asp-route-trademark="@tm"
+                       class="sidebar-item @(Model.SelectedTrademark == tm ? "active" : "")">
+                        @tm
+                    </a>
+                }
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+            <div class="section-header">
+                <div class="section-title">
+                    @{
+                        var selectedCat = Model.Categories.FirstOrDefault(c => c.CategoryId.ToString() == Model.SelectedCategory);
+                    }
+                    @(selectedCat != null ? selectedCat.Name : "Tất cả sản phẩm")
+                </div>
+            </div>
+
+            <div class="filter-tabs">
+                <a asp-action="Index" asp-route-sort="popular" asp-route-category="@Model.SelectedCategory" asp-route-keyword="@Model.SearchKeyword"
+                   class="tab @(Model.SortBy == "popular" ? "active" : "")">Phổ biến</a>
+                <a asp-action="Index" asp-route-sort="newest" asp-route-category="@Model.SelectedCategory" asp-route-keyword="@Model.SearchKeyword"
+                   class="tab @(Model.SortBy == "newest" ? "active" : "")">Mới nhất</a>
+                <a asp-action="Index" asp-route-sort="bestselling" asp-route-category="@Model.SelectedCategory" asp-route-keyword="@Model.SearchKeyword"
+                   class="tab @(Model.SortBy == "bestselling" ? "active" : "")">Bán chạy</a>
+                <a asp-action="Index" asp-route-sort="price-asc" asp-route-category="@Model.SelectedCategory" asp-route-keyword="@Model.SearchKeyword"
+                   class="tab @(Model.SortBy == "price-asc" ? "active" : "")">Giá thấp ↑</a>
+                <a asp-action="Index" asp-route-sort="price-desc" asp-route-category="@Model.SelectedCategory" asp-route-keyword="@Model.SearchKeyword"
+                   class="tab @(Model.SortBy == "price-desc" ? "active" : "")">Giá cao ↓</a>
+            </div>
+
+            <div class="product-grid">
+                @if (!Model.Products.Any())
+                {
+                    <div class="no-result">
+                        <div class="no-result-icon">🔍</div>
+                        @if (!string.IsNullOrEmpty(Model.SearchKeyword))
+                        {
+                            <p>Không tìm thấy sản phẩm nào cho <strong>"@Model.SearchKeyword"</strong></p>
+                        }
+                        else
+                        {
+                            <p>Danh mục này hiện chưa có sản phẩm nào.</p>
+                        }
+
+                        <a asp-action="Index" class="btn-back">← Xem tất cả sản phẩm</a>
+                    </div>
+                }
+                @foreach (var p in Model.Products)
+                {
+                    <div class="product-card">
+                        <a asp-action="Details" asp-route-id="@p.ProductId">
+                            <div class="product-img" style="background:#FFF0F5;">
+                                @if (!string.IsNullOrEmpty(p.Image))
+                                {
+                                    <img src="~/images/products/@p.Image" alt="@p.Name" />
+                                }
+                                else
+                                {
+                                    <span>🧴</span>
+                                }
+                                <span class="product-fav" onclick="toggleFav(this); event.preventDefault();">♡</span>
+                            </div>
+                        </a>
+                        <div class="product-info">
+                            <div class="product-name">@p.Name</div>
+                            <div class="product-price">@p.Price.ToString("N0")đ</div>
+                            <div class="product-sold">@p.CategoryName · Đã bán @p.Sold</div>
+                            @if (!string.IsNullOrEmpty(p.Trademark))
+                            {
+                                <div class="product-trademark">🏷️ @p.Trademark</div>
+                            }
+                            
+
+                            @* Kiểm tra đăng nhập bên trong từng sản phẩm *@
+                            
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                if (p.Stock <= 0)
+                                {
+                                    <button class="product-add" disabled>🚫 Hết hàng</button>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@p.ProductId" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="product-add">+ Thêm vào giỏ</button>
+                                    </form>
+                                }
+                            }
+                            else
+                            {
+                                <a asp-controller="Account" asp-action="Login" class="product-add">
+                                    Đăng nhập để mua
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="pagination">
+                <button class="page-btn">‹</button>
+                <button class="page-btn active" onclick="setPage(this)">1</button>
+                <button class="page-btn" onclick="setPage(this)">2</button>
+                <button class="page-btn" onclick="setPage(this)">3</button>
+                <button class="page-btn">›</button>
+            </div>
+        </main>
+    </div>
+</div>
