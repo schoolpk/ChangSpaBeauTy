@@ -45,14 +45,14 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
             var cart = await _context.ShoppingCarts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
-            if (cart != null)
+            if (cart!=null)
             {
                 _context.CartItems.RemoveRange(cart.CartItems);
                 _context.ShoppingCarts.Remove(cart);
             }
 
             var user = await _context.Users.FindAsync(userId);
-            if (user != null)
+            if(user != null)
             {
                 _context.Users.Remove(user);
             }
@@ -91,16 +91,6 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
         public async Task SaveChangeAsync()
         {
             await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateRoleAsync(int userId, string newRole)
-        {
-            var user = await _context.Users.FindAsync(userId);
-            if (user != null)
-            {
-                user.Role = newRole;
-                await _context.SaveChangesAsync();
-            }
         }
     }
 }

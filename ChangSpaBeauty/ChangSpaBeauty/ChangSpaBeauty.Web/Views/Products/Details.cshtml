@@ -1,0 +1,194 @@
+@model ChangSpaBeauty.Application.DTOs.ProductDto
+@{
+    ViewData["Title"] = Model.Name;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/detail.css" /> 
+}
+
+<div class="detail-wrap">
+
+@* MAIN GRID 
+*@
+    <div class="detail-grid">
+
+        
+@* ẢNH SẢN PHẨM 
+*@
+        <div class="detail-img-box">
+            @if (Model.Sold > 50)
+            {
+                <span class="detail-img-badge">🔥 Bán chạy</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.Image))
+            {
+                <img src="~/images/products/@Model.Image" alt="@Model.Name" loading="lazy" />
+            }
+            else
+            {
+                <span class="detail-img-placeholder">🌸</span>
+            }
+        </div>
+
+        
+@* THÔNG TIN 
+*@
+        <div class="detail-info">
+
+            @if (!string.IsNullOrEmpty(Model.CategoryName) || !string.IsNullOrEmpty(Model.Trademark))
+            {
+                <span class="detail-category">🏷️ @Model.CategoryName - @Model.Trademark</span>
+            }
+
+            <h1 class="detail-name">@Model.Name</h1>
+
+            <div class="detail-meta">
+                <span class="meta-item">
+                    <span class="dot"></span>
+                    Đã bán: <strong>@Model.Sold</strong>
+                </span>
+                <span class="meta-item">
+                    <span class="dot"></span>
+                    Mã SP: <strong>#@Model.ProductId</strong>
+                </span>
+            </div>
+
+            <hr class="divider" />
+
+            <div class="detail-price-row">
+                <span class="detail-price">@Model.Price.ToString("N0") ₫</span>
+            </div>
+
+            
+@* STOCK BAR 
+*@
+            @{
+                var stockPercent = Model.Stock > 0
+                    ? Math.Min((int)((double)Model.Sold / (Model.Sold + Model.Stock) * 100), 95)
+                    : 100;
+            }
+            <div class="stock-row">
+                <div class="stock-bar-wrap">
+                    <div class="stock-bar" style="width: @stockPercent%"></div>
+                </div>
+                @if (Model.Stock > 0)
+                {
+                    <span class="stock-label">Còn <strong>@Model.Stock</strong> sản phẩm</span>
+                }
+                else
+                {
+                    <span class="stock-label" style="color:var(--pink-mid)">Hết hàng</span>
+                }
+            </div>
+
+            
+@* SỐ LƯỢNG + NÚT MUA 
+*@
+            @if (Model.Stock > 0)
+            {
+                <div class="qty-row">
+                    <span class="qty-label">Số lượng</span>
+                    <div class="qty-control">
+                        <button class="qty-btn" onclick="changeQty(-1)" type="button" aria-label="Giảm số lượng">−</button>
+                        <input class="qty-input" id="qty" type="number" value="1" min="1" max="@Model.Stock" readonly aria-label="Số lượng" />
+                        <button class="qty-btn" onclick="changeQty(1)" type="button" aria-label="Tăng số lượng">+</button>
+                    </div>
+                    <span class="stock-label">/ @Model.Stock có sẵn</span>
+                </div>
+
+                <div class="action-row">
+                    <button class="btn-cart" onclick="addToCart(@Model.ProductId)" type="button">
+                        🛒 Thêm vào giỏ
+                    </button>
+                    <button class="btn-buy" onclick="buyNow(@Model.ProductId)">
+                        ⚡ Mua ngay
+                    </button>
+
+                </div>
+            }
+            else
+            {
+                <div style="color:#dc3545;font-weight:700;padding:1rem 0">
+                    ❌ Sản phẩm đã hết hàng
+                </div>
+            }
+
+            <hr class="divider" />
+
+            
+@* CAM KẾT 
+*@
+            <div class="guarantee-row">
+                <div class="guarantee-item">
+                    <div class="guarantee-icon">🚚</div>
+                    <span>Giao hàng toàn quốc</span>
+                </div>
+                <div class="guarantee-item">
+                    <div class="guarantee-icon">✅</div>
+                    <span>Hàng chính hãng 100%</span>
+                </div>
+                <div class="guarantee-item">
+                    <div class="guarantee-icon">🔄</div>
+                    <span>Đổi trả trong 7 ngày</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    
+@* MÔ TẢ SẢN PHẨM 
+*@
+    <div class="section-card">
+        <div class="section-heading">Mô tả sản phẩm</div>
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="desc-content">
+                @Html.Raw(Model.Description.Replace("\n", "<br/>"))
+            </div>
+        }
+        else
+        {
+            <p class="desc-empty">Chưa có mô tả cho sản phẩm này.</p>
+        }
+    </div>
+
+    
+@* THÔNG TIN CHI TIẾT 
+*@
+    <div class="section-card">
+        <div class="section-heading">Thông tin chi tiết</div>
+        <table class="info-table">
+            <tr>
+                <td>Mã sản phẩm</td>
+                <td>#@Model.ProductId</td>
+            </tr>
+            <tr>
+                <td>Danh mục</td>
+                <td>@(Model.CategoryName ?? "—")</td>
+            </tr>
+            <tr>
+                <td>Giá bán</td>
+                <td style="color:var(--pink-dark)">@Model.Price.ToString("N0") ₫</td>
+            </tr>
+            <tr>
+                <td>Tồn kho</td>
+                <td>@Model.Stock sản phẩm</td>
+            </tr>
+            <tr>
+                <td>Đã bán</td>
+                <td>@Model.Sold sản phẩm</td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+
+@* TOAST 
+*@
+<div class="toast" id="toast">✅ Đã thêm vào giỏ hàng!</div>
+
+    <script src="~/js/detail.js" asp-append-version="true"></script>

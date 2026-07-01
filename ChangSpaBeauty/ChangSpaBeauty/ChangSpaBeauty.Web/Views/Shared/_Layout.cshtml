@@ -108,6 +108,24 @@
                     </div>
                 </div>
 
+                @if (User.IsInRole("Customer"))
+                {
+                    <a asp-controller="Order" asp-action="MyOrders" class="btn btn-ghost">
+                        🛒 Đơn hàng của tôi
+                    </a>
+                }
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Admin" asp-action="Index" class="btn btn-ghost">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                        </svg>
+                        Admin
+                    </a>
+                }
+
                 <!-- Bell -->
                 <div class="notif-wrap">
                     <button class="notif-bell" id="notifBtn" onclick="toggleNotif()" title="Thông báo" aria-label="Thông báo">

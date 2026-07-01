@@ -1,0 +1,171 @@
+﻿@model ChangSpaBeauty.Application.DTOs.Order.CheckoutDto
+@{
+    ViewData["Title"] = "Thanh toán";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var cart = ViewBag.Cart as ChangSpaBeauty.Application.DTOs.ShoppingCart.ShoppingCartDTO;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/checkout.css" asp-append-version="true" />
+}
+
+<div class="co-wrap">
+
+    @* STEP PROGRESS *@
+    <div class="co-hero">
+        <div class="co-steps">
+            <div class="step done">
+                <div class="step-dot">🛒</div>
+                <span>Giỏ hàng</span>
+            </div>
+            <div class="step-line done"></div>
+            <div class="step active">
+                <div class="step-dot">💳</div>
+                <span>Thanh toán</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+                <div class="step-dot">✅</div>
+                <span>Hoàn tất</span>
+            </div>
+        </div>
+    </div>
+
+    @* ALERT *@
+    @if (TempData["Error"] != null)
+    {
+        <div class="co-alert co-alert-error">
+            <span class="co-alert-icon">❌</span>
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="co-grid">
+
+        @* FORM *@
+        <div class="co-form-card">
+            <div class="co-card-title">
+                <span class="co-card-icon">📦</span> Thông tin giao hàng
+            </div>
+
+            <form asp-controller="Order" asp-action="PlaceOrder" method="post">
+                @Html.AntiForgeryToken()
+
+                @* Họ tên *@
+                <div class="co-field">
+                    <label class="co-label">Họ và tên</label>
+                    <div class="co-input-wrap co-readonly">
+                        <span class="co-input-icon">👤</span>
+                        <input type="text" value="@User.Identity?.Name" readonly />
+                    </div>
+                    <div class="co-hint">Tên tài khoản của bạn</div>
+                </div>
+
+                @* Số điện thoại *@
+                <div class="co-field">
+                    <label class="co-label" asp-for="Phone">
+                        Số điện thoại <span class="co-req">*</span>
+                    </label>
+                    <div class="co-input-wrap">
+                        <span class="co-input-icon">📞</span>
+                        <input asp-for="Phone" type="tel" placeholder="Ví dụ: 0901 234 567" required />
+                    </div>
+                    <span asp-validation-for="Phone" class="co-error"></span>
+                </div>
+
+                @* Địa chỉ *@
+                <div class="co-field">
+                    <label class="co-label" asp-for="Address">
+                        Địa chỉ giao hàng <span class="co-req">*</span>
+                    </label>
+                    <div class="co-textarea-wrap">
+                        <span class="co-textarea-icon">📍</span>
+                        <textarea asp-for="Address"
+                                  placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"
+                                  required></textarea>
+                    </div>
+                    <span asp-validation-for="Address" class="co-error"></span>
+                </div>
+
+                @* Phương thức thanh toán *@
+                <div class="co-payment-box">
+                    <div class="co-payment-label">Phương thức thanh toán</div>
+                    <div class="co-payment-option selected">
+                        <div class="co-payment-radio"></div>
+                        <span class="co-payment-icon">💵</span>
+                        <div>
+                            <div class="co-payment-name">Thanh toán khi nhận hàng (COD)</div>
+                            <div class="co-payment-desc">Vui lòng chuẩn bị tiền mặt khi nhận hàng</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="co-btn-order">
+                    ✅ Đặt hàng ngay
+                </button>
+            </form>
+
+            <a asp-controller="Cart" asp-action="Index" class="co-btn-back">
+                ← Quay lại giỏ hàng
+            </a>
+        </div>
+
+        @* ORDER SUMMARY *@
+        <div class="co-summary-card">
+            <div class="co-card-title">
+                <span class="co-card-icon">🛍️</span> Đơn hàng của bạn
+            </div>
+
+            @if (cart != null)
+            {
+                <div class="co-item-list">
+                    @foreach (var item in cart.Items)
+                    {
+                        <div class="co-item">
+                            <div class="co-item-img-wrap">
+                                <img src="~/images/products/@item.ProductImage"
+                                     alt="@item.ProductName"
+                                     onerror="this.src='/images/placeholder.png'" />
+                                <span class="co-item-qty-badge">@item.Quantity</span>
+                            </div>
+                            <div class="co-item-info">
+                                <div class="co-item-name">@item.ProductName</div>
+                                <div class="co-item-unit">@item.Price.ToString("N0") ₫ / sản phẩm</div>
+                            </div>
+                            <div class="co-item-price">
+                                @((item.Price * item.Quantity).ToString("N0")) ₫
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <hr class="co-divider" />
+
+                <div class="co-summary-rows">
+                    <div class="co-summary-row">
+                        <span>Số lượng sản phẩm</span>
+                        <span>@cart.TotalItems</span>
+                    </div>
+                    <div class="co-summary-row">
+                        <span>Phí vận chuyển</span>
+                        <span class="co-free">Miễn phí 🎉</span>
+                    </div>
+                </div>
+
+                <hr class="co-divider" />
+
+                <div class="co-total-row">
+                    <span>Tổng thanh toán</span>
+                    <span class="co-total-amount">@cart.GrandTotal.ToString("N0") ₫</span>
+                </div>
+
+                <div class="co-guarantee">
+                    <div class="co-guarantee-item">🔒 Bảo mật</div>
+                    <div class="co-guarantee-item">🚚 Giao nhanh</div>
+                    <div class="co-guarantee-item">↩️ Đổi trả dễ</div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>

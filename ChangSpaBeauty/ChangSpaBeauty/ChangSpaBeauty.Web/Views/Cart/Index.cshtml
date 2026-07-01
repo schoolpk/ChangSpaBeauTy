@@ -1,0 +1,112 @@
+@model ChangSpaBeauty.Application.DTOs.ShoppingCart.ShoppingCartDTO
+@{
+    ViewData["Title"] = "Giỏ hàng";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/cart.css" />
+}
+<div class="cart-page">
+    <div class="cart-container">
+        <h1 class="cart-title">🛒 Giỏ hàng của bạn</h1>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        }
+
+        @if (!Model.Items.Any())
+        {
+            <div class="cart-empty">
+                <div class="cart-empty-icon">🛍️</div>
+                <h3>Giỏ hàng trống</h3>
+                <p>Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+                <a asp-controller="Products" asp-action="Index" class="btn-shop-now">
+                    Mua sắm ngay
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="cart-layout">
+                <!-- DANH SÁCH SẢN PHẨM -->
+                <div class="cart-items">
+                    <div class="cart-items-header">
+                        <h3>Sản phẩm trong giỏ</h3>
+                        <span class="cart-items-count">@Model.Items.Count() sản phẩm</span>
+                    </div>
+
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="cart-item">
+                            <div class="cart-item-img-wrap">
+                                <img src="~/images/products/@item.ProductImage" alt="@item.ProductName" class="cart-item-img" loading="lazy" />
+                            </div>
+
+                            <div class="cart-item-info">
+                                <h4>@item.ProductName</h4>
+                                <p class="cart-item-price">@item.Price.ToString("N0") ₫</p>
+                            </div>
+
+                            <div class="cart-item-controls">
+                                <!-- Cập nhật số lượng -->
+                                <form asp-action="UpdateQuantity" method="post" class="qty-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="cartItemId" value="@item.CartItemId" />
+                                    <div class="qty-control">
+                                        <button type="button" class="qty-btn" onclick="changeQty(this, -1)" aria-label="Giảm số lượng">−</button>
+                                        <input type="number" name="quantity" value="@item.Quantity"
+                                               min="1" max="@item.Stock"
+                                               data-stock="@item.Stock"
+                                               class="qty-input"
+                                               aria-label="Số lượng"
+                                               onchange="this.form.submit()" />
+                                        <button type="button" class="qty-btn" onclick="changeQty(this, 1)" aria-label="Tăng số lượng">+</button>
+                                    </div>
+                                </form>
+
+                                <p class="cart-item-total">@item.Total.ToString("N0") ₫</p>
+
+                                <!-- Xóa sản phẩm -->
+                                <form asp-action="DeleteCartItem" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="cartItemId" value="@item.CartItemId" />
+                                    <button type="submit" class="btn-remove" title="Xóa" aria-label="Xóa sản phẩm">✕</button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Xóa toàn bộ -->
+                    <form asp-action="ClearCart" method="post" class="clear-form">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-clear"
+                                onclick="return confirm('Xóa toàn bộ giỏ hàng?')">
+                            🗑 Xóa tất cả
+                        </button>
+                    </form>
+                </div>
+
+                <!-- TỔNG TIỀN -->
+                <div class="cart-summary">
+                    <h3>Tóm tắt đơn hàng</h3>
+                    <div class="summary-row">
+                        <span>Số lượng sản phẩm:</span>
+                        <span>@Model.TotalItems</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Tổng tiền:</span>
+                        <span class="grand-total">@Model.GrandTotal.ToString("N0") ₫</span>
+                    </div>
+                    <a asp-controller="Order" asp-action="Checkout" class="btn-checkout">Thanh toán</a>
+                    <a asp-controller="Products" asp-action="Index" class="btn-continue">
+                        ← Tiếp tục mua sắm
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/cart.js" asp-append-version="true"></script>
+}

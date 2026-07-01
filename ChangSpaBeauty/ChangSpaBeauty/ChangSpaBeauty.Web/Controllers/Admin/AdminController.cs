@@ -1,4 +1,5 @@
-﻿using ChangSpaBeauty.Application.DTOs;
+﻿
+using ChangSpaBeauty.Application.DTOs;
 using ChangSpaBeauty.Application.Interfaces;
 using ChangSpaBeauty.Application.Services;
 using ChangSpaBeauty.Domain.Entities;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace ChangSpaBeauty.Web.Controllers;
 
-[Authorize(Roles = "Admin")]
+ [Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
     private readonly CategoryService _categoryService;
@@ -100,25 +101,6 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // USER - CHANGE ROLE
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ChangeRole(int id)
-    {
-        var user = await _userRepository.GetByIdAsync(id);
-        if (user == null)
-        {
-            TempData["Error"] = "Không tìm thấy người dùng.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        var newRole = user.Role == "Admin" ? "Customer" : "Admin";
-        await _userRepository.UpdateRoleAsync(id, newRole);
-
-        TempData["Success"] = $"Đã đổi vai trò của {user.Name} thành {newRole}.";
-        return RedirectToAction(nameof(Index));
-    }
-
 
 
     // CATEGORY - LIST
@@ -138,11 +120,11 @@ public class AdminController : Controller
     {
         if (!ModelState.IsValid) return View(model);
         var (success, message) = await _categoryService.CreateAsync(model.Name, model.TradeMark);
-        if (!success)
-        {
+        if (!success) 
+        { 
             ModelState.AddModelError(nameof(model.Name), message);
             ModelState.AddModelError(nameof(model.TradeMark), message);
-            return View(model);
+            return View(model); 
         }
         TempData["Success"] = message;
         return RedirectToAction(nameof(Index));
@@ -206,18 +188,12 @@ public class AdminController : Controller
         {
             var allowedExt = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
             var ext = Path.GetExtension(model.ImageFile.FileName).ToLowerInvariant();
-            if (!allowedExt.Contains(ext))
-            {
-                ModelState.AddModelError(nameof(model.ImageFile), "Chỉ chấp nhận JPG, PNG, WebP, GIF.");
-                await LoadCategoriesAsync();
-                return View(model);
-            }
-            if (model.ImageFile.Length > 5 * 1024 * 1024)
-            {
-                ModelState.AddModelError(nameof(model.ImageFile), "Ảnh không được vượt quá 5MB.");
-                await LoadCategoriesAsync();
-                return View(model);
-            }
+            if (!allowedExt.Contains(ext)) { ModelState.AddModelError(nameof(model.ImageFile), "Chỉ chấp nhận JPG, PNG, WebP, GIF."); 
+                await LoadCategoriesAsync(); 
+                return View(model); }
+            if (model.ImageFile.Length > 5 * 1024 * 1024) { ModelState.AddModelError(nameof(model.ImageFile), "Ảnh không được vượt quá 5MB."); 
+                await LoadCategoriesAsync(); 
+                return View(model); }
             savedFileName = $"{Guid.NewGuid()}{ext}";
             var folder = Path.Combine(_env.WebRootPath, "images", "products");
             Directory.CreateDirectory(folder);
@@ -274,14 +250,14 @@ public class AdminController : Controller
             return View(model);
         }
         string? saveFileName = null;
-        if (model.ImageFile != null && model.ImageFile.Length > 0)
+        if(model.ImageFile != null && model.ImageFile.Length > 0)
         {
             var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
             var ext = Path.GetExtension(model.ImageFile.FileName).ToLowerInvariant();
             if (!allowed.Contains(ext))
             {
                 ModelState.AddModelError(nameof(model.ImageFile), "Chỉ chấp nhận JPG, PNG, WebP, GIF.");
-                await LoadCategoriesAsync();
+                await LoadCategoriesAsync(); 
                 return View(model);
             }
             saveFileName = $"{Guid.NewGuid()}{ext}";
@@ -296,7 +272,7 @@ public class AdminController : Controller
             Name = model.Name,
             Price = model.Price,
             CategoryId = model.CategoryId,
-            Stock = model.Stock,
+            Stock = model.Stock,       
             Description = model.Description,
             Image = saveFileName
         };
@@ -310,11 +286,11 @@ public class AdminController : Controller
     public async Task<IActionResult> DeleteProductAsync(int id)
     {
         var products = await _productService.GetAllProductsAsync();
-        var product = products.FirstOrDefault(p => p.ProductId == id);
-        if (product?.Image != null)
+        var product = products.FirstOrDefault(p=>p.ProductId == id);
+        if(product?.Image != null)
         {
-            var image = Path.Combine(_env.WebRootPath, "images", "products", product.Image);
-            if (System.IO.File.Exists(image))
+            var image = Path.Combine(_env.WebRootPath,"images","products",product.Image);
+            if(System.IO.File.Exists(image))
             {
                 System.IO.File.Delete(image);
             }
@@ -337,19 +313,19 @@ public class AdminController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        if (status == "cancelled")
+        if(status == "cancelled")
         {
             var order = await _orderRepository.GetOrderWithDetailAsync(orderId);
-            if (order != null && order.Status != "cancelled")
+            if(order != null && order.Status != "cancelled")
             {
-                foreach (var detail in order.OrderDetails)
+                foreach(var detail in order.OrderDetails)
                 {
                     var product = await _productService.GetProductByIdAsync(detail.ProductId);
-                    if (product != null)
+                    if(product != null)
                     {
                         product.Sold -= detail.Quantity;
                         product.Stock += detail.Quantity;
-                        if (product.Sold < 0)
+                        if(product.Sold < 0)
                         {
                             product.Sold = 0;
                         }
