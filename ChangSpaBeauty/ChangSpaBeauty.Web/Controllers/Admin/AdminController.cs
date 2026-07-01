@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace ChangSpaBeauty.Web.Controllers;
 
- [Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
     private readonly CategoryService _categoryService;
@@ -91,6 +91,23 @@ public class AdminController : Controller
         ViewBag.SelectedStatus = status ?? "all";
 
         return View();
+    }
+    // USER - ROLE
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangeRole(int id)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+        {
+            TempData["Error"] = "Không tìm thấy người dùng";
+            return RedirectToAction(nameof(Index));
+        }
+        var newRole = user.Role == "Admin" ? "Customer" : "Admin";
+        await _userRepository.UpdateRoleAsync(id, newRole);
+
+        TempData["Success"] = $"Đã đổi vai trò của {user.Name} thành {newRole}";
+        return RedirectToAction(nameof(Index));
     }
 
     // USER - DELETE

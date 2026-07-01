@@ -92,5 +92,15 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
+        public async Task UpdateRoleAsync(int userId, string newRole)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if(user != null)
+            {
+                user.Role = newRole;
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }
