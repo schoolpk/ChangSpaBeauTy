@@ -9,7 +9,7 @@ namespace ChangSpaBeauty.Application.Interfaces
 {
     public interface IUserRepository
     {
-
+        
         Task<User?> GetByEmailAsync(string email);
         Task<User?> GetByIdAsync(int id);
         Task<User?> GetAdminAsync();
@@ -18,7 +18,6 @@ namespace ChangSpaBeauty.Application.Interfaces
         Task SaveChangeAsync();
         Task<bool> EmailExistAsync(string email);
         Task<IEnumerable<User>> GetAllAsync();
-        Task UpdateRoleAsync(int userId, string newRole);
 
     }
 }
