@@ -55,10 +55,16 @@
                 </select>
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
 
+                <label class="form-label" asp-for="Trademark">Nhãn hiệu</label>
+                <input asp-for="Trademark" class="form-control"
+                       placeholder="Nhãn hiệu" maxlength="100" />
+                <span asp-validation-for="Trademark" class="text-danger"></span>
+
                 <label class="form-label" asp-for="Description">Mô tả</label>
                 <input asp-for="Description" class="form-control"
                        placeholder="Mô tả" maxlength="100" />
                 <span asp-validation-for="Description" class="text-danger"></span>
+
             </div>
 
             @* ── TỒN KHO ── *@

@@ -25,6 +25,9 @@ namespace ChangSpaBeauty.Web.ViewModels.Product
         [Display(Name ="Mo ta")]
         public string? Description { get; set; }
 
+        [Display(Name="Thuong hieu")]
+        public string? Trademark { get; set; }
+
         [Display(Name ="Anh san pham")]
         public IFormFile? ImageFile { get; set; }
     }

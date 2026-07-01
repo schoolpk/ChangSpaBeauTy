@@ -68,12 +68,24 @@ public class ProductsController : BaseController
             Slug = c.CategoryId.ToString()
         }).ToList();
 
+        // ProductsController.cs — action Index
+
+        // ── SIDEBAR TRADEMARKS:lấy từ Category (split dấu phẩy) ──
         var trademarks = allCategories
             .Where(c => !string.IsNullOrEmpty(c.Trademark))
             .SelectMany(c => c.Trademark!.Split(',', StringSplitOptions.RemoveEmptyEntries))
             .Select(t => t.Trim())
             .Distinct()
             .ToList();
+
+        // ── FILTER theo trademark: lọc theo Product.Trademark ──
+        if (!string.IsNullOrEmpty(trademark))
+        {
+            // ← Đổi từ p.Trademark == trademark
+            products = products.Where(p =>
+                !string.IsNullOrEmpty(p.Trademark) &&
+                p.Trademark.Contains(trademark, StringComparison.OrdinalIgnoreCase));
+        }
 
         ViewData["Keyword"] = keyword;
 

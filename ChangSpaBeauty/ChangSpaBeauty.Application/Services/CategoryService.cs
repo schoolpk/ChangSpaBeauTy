@@ -7,10 +7,12 @@ namespace ChangSpaBeauty.Application.Services;
 public class CategoryService
 {
     private readonly ICategoryRepository _categoryRepo;
+    private readonly IProductRepository _productRepo;
 
-    public CategoryService(ICategoryRepository categoryRepo)
+    public CategoryService(ICategoryRepository categoryRepo, IProductRepository productRepo)
     {
         _categoryRepo = categoryRepo;
+        _productRepo = productRepo;
     }
 
     public Task<IEnumerable<Category>> GetAllAsync() =>
@@ -42,6 +44,52 @@ public class CategoryService
 
         if (await _categoryRepo.NameExistsAsync(name, excludeId: id))
             return (false, $"Tên \"{name}\" đã được dùng bởi danh mục khác.");
+
+        // ── KIỂM TRA TRADEMARK BỊ XÓA ──
+        if (!string.IsNullOrWhiteSpace(category.Trademark))
+        {
+            // Trademark cũ của category
+            var oldTrademarks = category.Trademark
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(t => t.Trim())
+                .ToList();
+
+            // Trademark mới admin vừa nhập
+            var newTrademarks = (trademark ?? "")
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(t => t.Trim())
+                .ToList();
+
+            // Tìm trademark bị xóa khỏi category
+            var removedTrademarks = oldTrademarks
+                .Except(newTrademarks, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (removedTrademarks.Any())
+            {
+                // Lấy sản phẩm thuộc category này
+                var products = await _productRepo.GetAllAsync();
+                var productsInCategory = products
+                    .Where(p => p.CategoryId == id)
+                    .ToList();
+
+                // Kiểm tra có sản phẩm nào đang dùng trademark bị xóa không
+                var affectedProducts = productsInCategory
+                    .Where(p => !string.IsNullOrEmpty(p.Trademark) &&
+                                removedTrademarks.Any(tm =>
+                                    tm.Equals(p.Trademark.Trim(), StringComparison.OrdinalIgnoreCase)))
+                    .ToList();
+
+                if (affectedProducts.Any())
+                {
+                    var affectedNames = string.Join(", ", affectedProducts.Select(p => $"\"{p.Name}\""));
+                    var removedNames = string.Join(", ", removedTrademarks);
+                    return (false,
+                        $"Không thể xóa thương hiệu [{removedNames}] vì còn {affectedProducts.Count} sản phẩm đang dùng: {affectedNames}. " +
+                        $"Vui lòng cập nhật thương hiệu của các sản phẩm đó trước.");
+                }
+            }
+        }
 
         category.Name = name.Trim();
         category.Trademark = trademark?.Trim() ?? "";

@@ -226,7 +226,8 @@ public class AdminController : Controller
             Image = savedFileName,
             Sold = 0,
             Stock = model.Stock,
-            Description = model.Description
+            Description = model.Description,
+            Trademark = model.Trademark,
         };
         await _productService.AddProductAsync(productDto);
         TempData["Success"] = $"Đã thêm sản phẩm \"{model.Name}\" thành công!";
@@ -291,6 +292,7 @@ public class AdminController : Controller
             CategoryId = model.CategoryId,
             Stock = model.Stock,       
             Description = model.Description,
+            Trademark = model.Trademark,
             Image = saveFileName
         };
         await _productService.UpdateProductAsync(productDto);

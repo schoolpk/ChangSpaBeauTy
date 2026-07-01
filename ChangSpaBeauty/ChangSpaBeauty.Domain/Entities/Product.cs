@@ -11,4 +11,5 @@ public class Product
     public string? Description { get; set; }
     public int Stock { get; set; }
     public DateTime? CreatedAt { get; set; }
+    public string? Trademark { get; set; }
 }

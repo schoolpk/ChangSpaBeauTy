@@ -25,7 +25,8 @@ public class ProductService
             Sold = productDto.Sold,
             CategoryId = productDto.CategoryId,
             Stock = productDto.Stock,
-            Description = productDto.Description
+            Description = productDto.Description,
+            Trademark = productDto.Trademark,
         };
         await _unitOfWork.Products.AddAsync(product);
 
@@ -34,6 +35,7 @@ public class ProductService
         {
             category.Total += 1;
         }
+        await SyncTrademarkToCategoryAsync(productDto.CategoryId, productDto.Trademark);
 
         await _unitOfWork.SaveChangesAsync();
         return productDto;
@@ -53,7 +55,7 @@ public class ProductService
             Sold = p.Sold,
             Stock = p.Stock,
             Description = p.Description,
-            Trademark = p.Category?.Trademark,
+            Trademark = p.Trademark,
         });
     }
     public async Task<Product?> GetProductByIdAsync(int productId)
@@ -92,9 +94,11 @@ public class ProductService
         product.CategoryId = productDto.CategoryId;
         product.Stock = productDto.Stock;
         product.Description = productDto.Description;
+        product.Trademark = productDto.Trademark;
         if (productDto.Image != null)
             product.Image = productDto.Image;
 
+        await SyncTrademarkToCategoryAsync(productDto.CategoryId, productDto.Trademark);
         await _unitOfWork.SaveChangesAsync();
     }
 
@@ -113,4 +117,26 @@ public class ProductService
         await _unitOfWork.Products.DeleteWithCartItemAsync(id);
     }
 
+    private async Task SyncTrademarkToCategoryAsync(int categoryId, string? trademark)
+    {
+        if (string.IsNullOrWhiteSpace(trademark)) return;
+
+        var category = await _unitOfWork.Categories.GetByIdAsync(categoryId);
+        if (category == null) return;
+
+        // Split trademark hiện tại của category thành list
+        var existing = (category.Trademark ?? "")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(t => t.Trim())
+            .ToList();
+
+        // Nếu chưa có trademark này → thêm vào
+        if (!existing.Contains(trademark.Trim(), StringComparer.OrdinalIgnoreCase))
+        {
+            existing.Add(trademark.Trim());
+            category.Trademark = string.Join(", ", existing);
+            _unitOfWork.Categories.UpdateAsync(category);
+        }
+    }
 }
+

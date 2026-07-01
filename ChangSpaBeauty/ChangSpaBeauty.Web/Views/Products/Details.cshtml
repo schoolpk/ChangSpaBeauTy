@@ -5,18 +5,15 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/detail.css" /> 
+    <link rel="stylesheet" href="~/css/detail.css" />
 }
 
 <div class="detail-wrap">
 
-@* MAIN GRID 
-*@
+    @* MAIN GRID *@
     <div class="detail-grid">
 
-        
-@* ẢNH SẢN PHẨM 
-*@
+        @* ẢNH SẢN PHẨM *@
         <div class="detail-img-box">
             @if (Model.Sold > 50)
             {
@@ -32,15 +29,18 @@
             }
         </div>
 
-        
-@* THÔNG TIN 
-*@
+        @* THÔNG TIN *@
         <div class="detail-info">
 
-            @if (!string.IsNullOrEmpty(Model.CategoryName) || !string.IsNullOrEmpty(Model.Trademark))
-            {
-                <span class="detail-category">🏷️ @Model.CategoryName - @Model.Trademark</span>
-            }
+            
+            <span class="detail-category">
+                🏷️ @Model.CategoryName
+                @if (!string.IsNullOrEmpty(Model.Trademark))
+                {
+                    <span style="color:#aaa;margin:0 4px;">·</span>
+                    <span>@Model.Trademark</span>
+                }
+            </span>
 
             <h1 class="detail-name">@Model.Name</h1>
 
@@ -61,13 +61,11 @@
                 <span class="detail-price">@Model.Price.ToString("N0") ₫</span>
             </div>
 
-            
-@* STOCK BAR 
-*@
+            @* STOCK BAR *@
             @{
                 var stockPercent = Model.Stock > 0
-                    ? Math.Min((int)((double)Model.Sold / (Model.Sold + Model.Stock) * 100), 95)
-                    : 100;
+                ? Math.Min((int)((double)Model.Sold / (Model.Sold + Model.Stock) * 100), 95)
+                : 100;
             }
             <div class="stock-row">
                 <div class="stock-bar-wrap">
@@ -83,9 +81,7 @@
                 }
             </div>
 
-            
-@* SỐ LƯỢNG + NÚT MUA 
-*@
+            @* SỐ LƯỢNG + NÚT MUA *@
             @if (Model.Stock > 0)
             {
                 <div class="qty-row">
@@ -105,7 +101,6 @@
                     <button class="btn-buy" onclick="buyNow(@Model.ProductId)">
                         ⚡ Mua ngay
                     </button>
-
                 </div>
             }
             else
@@ -117,9 +112,7 @@
 
             <hr class="divider" />
 
-            
-@* CAM KẾT 
-*@
+            @* CAM KẾT *@
             <div class="guarantee-row">
                 <div class="guarantee-item">
                     <div class="guarantee-icon">🚚</div>
@@ -134,13 +127,10 @@
                     <span>Đổi trả trong 7 ngày</span>
                 </div>
             </div>
-
         </div>
     </div>
 
-    
-@* MÔ TẢ SẢN PHẨM 
-*@
+    @* MÔ TẢ SẢN PHẨM *@
     <div class="section-card">
         <div class="section-heading">Mô tả sản phẩm</div>
         @if (!string.IsNullOrWhiteSpace(Model.Description))
@@ -155,40 +145,24 @@
         }
     </div>
 
-    
-@* THÔNG TIN CHI TIẾT 
-*@
+    @* THÔNG TIN CHI TIẾT *@
     <div class="section-card">
         <div class="section-heading">Thông tin chi tiết</div>
         <table class="info-table">
-            <tr>
-                <td>Mã sản phẩm</td>
-                <td>#@Model.ProductId</td>
-            </tr>
-            <tr>
-                <td>Danh mục</td>
-                <td>@(Model.CategoryName ?? "—")</td>
-            </tr>
-            <tr>
-                <td>Giá bán</td>
-                <td style="color:var(--pink-dark)">@Model.Price.ToString("N0") ₫</td>
-            </tr>
-            <tr>
-                <td>Tồn kho</td>
-                <td>@Model.Stock sản phẩm</td>
-            </tr>
-            <tr>
-                <td>Đã bán</td>
-                <td>@Model.Sold sản phẩm</td>
-            </tr>
+            <tr><td>Mã sản phẩm</td><td>#@Model.ProductId</td></tr>
+            <tr><td>Danh mục</td><td>@(Model.CategoryName ?? "—")</td></tr>
+            @if (!string.IsNullOrEmpty(Model.Trademark))
+            {
+                <tr><td>Thương hiệu</td><td>@Model.Trademark</td></tr>
+            }
+            <tr><td>Giá bán</td><td style="color:var(--pink-dark)">@Model.Price.ToString("N0") ₫</td></tr>
+            <tr><td>Tồn kho</td><td>@Model.Stock sản phẩm</td></tr>
+            <tr><td>Đã bán</td><td>@Model.Sold sản phẩm</td></tr>
         </table>
     </div>
-
 </div>
 
-
-@* TOAST 
-*@
+@* TOAST *@
 <div class="toast" id="toast">✅ Đã thêm vào giỏ hàng!</div>
 
-    <script src="~/js/detail.js" asp-append-version="true"></script>
+<script src="~/js/detail.js" asp-append-version="true"></script>
