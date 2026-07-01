@@ -458,3 +458,35 @@
         box-shadow: 0 2px 8px rgba(214,51,108,.3);
     }
 
+.btn-role {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    border: 1.5px solid;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-role-to-admin {
+    background: #FFF8E1;
+    color: #E65100;
+    border-color: #FFCC80;
+}
+
+    .btn-role-to-admin:hover {
+        background: #FFE0B2;
+        transform: translateY(-1px);
+    }
+
+.btn-role-to-customer {
+    background: var(--pink-pale);
+    color: var(--pink-dark);
+    border-color: var(--pink-border);
+}
+
+    .btn-role-to-customer:hover {
+        background: var(--pink-light);
+        transform: translateY(-1px);
+    }
