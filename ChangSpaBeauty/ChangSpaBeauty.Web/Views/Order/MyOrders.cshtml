@@ -1,10 +1,8 @@
-﻿
-@model List<ChangSpaBeauty.Application.DTOs.Order.OrderDto>
+﻿@model List<ChangSpaBeauty.Application.DTOs.Order.OrderDto>
 @{
     ViewData["Title"] = "Đơn hàng của tôi";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var selectedStatus = ViewBag.SelectedStatus as string ?? "all";
-
 }
 
 @section Styles {
@@ -29,40 +27,26 @@
         <div class="mo-alert mo-alert-error">❌ @TempData["Error"]</div>
     }
 
-
     @* ── TABS LỌC THEO TRẠNG THÁI ── *@
     <div class="mo-tabs">
         <a asp-action="MyOrders" asp-route-status=""
-           class="mo-tab @(selectedStatus == "all" ? "active" : "")">
-            Tất cả
-        </a>
+           class="mo-tab @(selectedStatus == "all" ? "active" : "")">Tất cả</a>
         <a asp-action="MyOrders" asp-route-status="pending"
-           class="mo-tab @(selectedStatus == "pending" ? "active" : "")">
-            ⏳ Chờ xác nhận
-        </a>
+           class="mo-tab @(selectedStatus == "pending" ? "active" : "")">⏳ Chờ xác nhận</a>
         <a asp-action="MyOrders" asp-route-status="confirmed"
-           class="mo-tab @(selectedStatus == "confirmed" ? "active" : "")">
-            ✅ Đã xác nhận
-        </a>
+           class="mo-tab @(selectedStatus == "confirmed" ? "active" : "")">✅ Đã xác nhận</a>
         <a asp-action="MyOrders" asp-route-status="shipping"
-           class="mo-tab @(selectedStatus == "shipping" ? "active" : "")">
-            🚚 Đang giao
-        </a>
+           class="mo-tab @(selectedStatus == "shipping" ? "active" : "")">🚚 Đang giao</a>
         <a asp-action="MyOrders" asp-route-status="done"
-           class="mo-tab @(selectedStatus == "done" ? "active" : "")">
-            ✔️ Hoàn thành
-        </a>
+           class="mo-tab @(selectedStatus == "done" ? "active" : "")">✔️ Hoàn thành</a>
         <a asp-action="MyOrders" asp-route-status="cancelled"
-           class="mo-tab @(selectedStatus == "cancelled" ? "active" : "")">
-            ❌ Đã hủy
-        </a>
+           class="mo-tab @(selectedStatus == "cancelled" ? "active" : "")">❌ Đã hủy</a>
     </div>
 
     @if (!Model.Any())
     {
         <div class="mo-empty">
             <div class="mo-empty-icon">📭</div>
-
             <h3>Không có đơn hàng nào</h3>
             <p>
                 @if (selectedStatus != "all")
@@ -143,7 +127,6 @@
                                         @item.UnitPrice.ToString("N0") ₫ × @item.Quantity
                                     </div>
                                 </div>
-
                                 <div class="mo-item-sub">@item.Subtotal.ToString("N0") ₫</div>
                             </div>
                         }
@@ -163,28 +146,21 @@
                             <div class="mo-total-label">Tổng tiền</div>
                             <div class="mo-total">@order.TotalPrice.ToString("N0") ₫</div>
 
-                            @if (order.Status == "pending" || order.Status == "confirmed")
+                            @* Chỉ pending → vào EditOrder (có cả nút hủy bên trong) *@
+                            @if (order.Status == "pending")
                             {
-                                <form asp-controller="Order" asp-action="CancelOrder" method="post"
-                                      onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn hàng #@order.OrderId?')">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="orderId" value="@order.OrderId" />
-                                    <button type="submit" class="mo-btn-cancel">🗑️ Hủy đơn hàng</button>
-                                </form>
-                            }
-                            else if (order.Status == "done" || order.Status == "shipping")
-                            {
-                                <span class="mo-cancel-locked">🔒 Không thể hủy</span>
-                            }
-
-                            @if(order.Status == "pending")
-                            {
-                                <a asp-action="EditOrder" asp-route-id="@order.OrderId" class="mo-btn-cancel"
-                                   style="submit">
-                                    ✏️ Sửa đơn hàng
+                                <a asp-action="EditOrder" asp-route-id="@order.OrderId"
+                                   class="mo-btn-cancel"
+                                   style="display:inline-block;text-align:center;text-decoration:none;
+                                          color:#D6336C;border-color:#D6336C;">
+                                    ✏️ Xem & Sửa đơn hàng
                                 </a>
                             }
-                            else if (order.Status == "done" || order.Status == "shipping")
+                            else if (order.Status == "confirmed")
+                            {
+                                <span class="mo-cancel-locked">🔒 Đang xử lý</span>
+                            }
+                            else if (order.Status == "shipping" || order.Status == "done")
                             {
                                 <span class="mo-cancel-locked">🔒 Không thể sửa</span>
                             }
