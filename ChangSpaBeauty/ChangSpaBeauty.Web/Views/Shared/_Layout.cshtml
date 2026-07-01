@@ -54,14 +54,59 @@
 
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <!-- Greeting -->
-                <span class="user-greeting">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                    @User.Identity.Name
-                </span>
+                <!-- Greeting + hover dropdown -->
+                
+                var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+                var userRoleLabel = User.IsInRole("Admin") ? "Quản trị viên" : "Khách hàng";
+                var userInitial = !string.IsNullOrEmpty(User.Identity.Name) ? User.Identity.Name.Trim().Substring(0, 1).ToUpper() : "?";
+                
+                <div class="user-menu-wrap" tabindex="0">
+                    <span class="user-greeting">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        @User.Identity.Name
+                        <svg class="user-caret" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </span>
+
+                    <div class="user-dropdown" role="menu">
+                        <div class="user-dropdown-header">
+                            <div class="user-avatar">@userInitial</div>
+                            <div class="user-dropdown-info">
+                                <div class="user-dropdown-name">@User.Identity.Name</div>
+                                <div class="user-dropdown-role">@userRoleLabel</div>
+                                @if (!string.IsNullOrEmpty(userEmail))
+                                {
+                                    <div class="user-dropdown-email">@userEmail</div>
+                                }
+                            </div>
+                        </div>
+                        <div class="user-dropdown-body">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-controller="Admin" asp-action="Index" class="user-dropdown-item">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                                        <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                                    </svg>
+                                    Trang quản trị
+                                </a>
+                            }
+                            @if (User.IsInRole("Customer"))
+                            {
+                                <a asp-controller="Order" asp-action="MyOrders" class="user-dropdown-item">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                                    </svg>
+                                    Đơn hàng của tôi
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
 
                 @if (User.IsInRole("Customer"))
                 {

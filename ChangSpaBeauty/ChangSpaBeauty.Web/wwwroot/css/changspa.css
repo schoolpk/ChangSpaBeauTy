@@ -1548,7 +1548,7 @@ footer {
         margin-left: 0;
     }
 
-    .user-greeting {
+    .user-menu-wrap {
         display: none;
     }
 
@@ -1604,3 +1604,141 @@ footer {
         transform: translateY(0);
     }
 }
+/* ══ USER MENU — dropdown thông tin khi hover vào tên user ════
+   Dán đoạn này vào changspa.css, gợi ý đặt ngay sau phần
+   "══ NOTIFICATION ══" cho gần ngữ cảnh liên quan.            */
+
+.user-menu-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.user-greeting {
+    cursor: pointer;
+}
+
+.user-caret {
+    margin-left: 1px;
+    transition: transform var(--transition);
+    flex-shrink: 0;
+}
+
+.user-menu-wrap:hover .user-caret,
+.user-menu-wrap:focus-within .user-caret {
+    transform: rotate(180deg);
+}
+
+/* vùng đệm vô hình để hover không bị rớt khi rê chuột xuống dropdown */
+.user-menu-wrap::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 12px;
+}
+
+.user-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 0;
+    width: 230px;
+    background: var(--white);
+    border: 2px solid var(--pink-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 600;
+    overflow: hidden;
+    animation: dropIn 0.25s cubic-bezier(.34,1.56,.64,1);
+}
+
+.user-menu-wrap:hover .user-dropdown,
+.user-menu-wrap:focus-within .user-dropdown {
+    display: block;
+}
+
+.user-dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: var(--pink-pale);
+    border-bottom: 2px solid var(--pink-border);
+}
+
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--gradient-pink);
+    color: white;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.user-dropdown-info {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.user-dropdown-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-dropdown-role {
+    font-size: 11px;
+    color: var(--pink-dark);
+    font-weight: 700;
+    margin-top: 1px;
+}
+
+.user-dropdown-email {
+    font-size: 11px;
+    color: var(--text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+.user-dropdown-body {
+    padding: 6px;
+}
+
+.user-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-mid);
+    text-decoration: none;
+    transition: background var(--transition), color var(--transition);
+}
+
+    .user-dropdown-item:hover {
+        background: var(--pink-pale);
+        color: var(--pink-dark);
+    }
+
+/* ── Cập nhật rule responsive cũ: đổi .user-greeting → .user-menu-wrap
+   để ẩn cả icon caret/dropdown trên mobile, không chỉ ẩn chữ tên.
+   Tìm trong @media (max-width: 700px) đoạn:
+       .user-greeting { display: none; }
+   và đổi selector thành:
+       .user-menu-wrap { display: none; }
+*/
