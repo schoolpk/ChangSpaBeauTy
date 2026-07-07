@@ -43,7 +43,7 @@ function addToCart(productId) {
                 showToast('❌ Có lỗi xảy ra!');
             }
         })
-        .catch(() => showToast('❌ Không thể kết nối, thử lại nhé!'));
+        .catch(() => showToast('Bạn cần đăng nhập hoặc đăng ký!'));
 }
 
 // ── Cập nhật badge giỏ hàng trên header ────────────────────────────
@@ -93,7 +93,7 @@ function buyNow(productId) {
                 showToast('❌ Có lỗi xảy ra!');
             }
         })
-        .catch(() => showToast('❌ Không thể kết nối!'));
+        .catch(() => showToast('Bạn cần đăng nhập hoặc đăng ký!'));
 }
 
 // --Stock error---------------------------------
