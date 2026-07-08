@@ -73,7 +73,8 @@ public class ProductService
             Price = p.Price,
             Sold = p.Sold,
             CategoryName = p.Category?.Name ?? "",
-            Image = p.Image
+            Image = p.Image,
+            Trademark = p.Trademark
         });
     }
 

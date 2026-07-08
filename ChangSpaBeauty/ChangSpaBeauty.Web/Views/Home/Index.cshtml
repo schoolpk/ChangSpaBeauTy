@@ -67,6 +67,10 @@
                             </a>
                             <div class="product-info">
                                 <div class="product-name">@p.Name</div>
+                                @if (!string.IsNullOrEmpty(p.Trademark))
+                                {
+                                    <div class="product-trademark">🏷️ @p.Trademark</div>
+                                }
                                 <div class="product-price">@p.Price.ToString("N0")đ</div>
                                 <div class="product-sold">Đã bán @p.Sold</div>
                                 @if (User.Identity?.IsAuthenticated == true)
