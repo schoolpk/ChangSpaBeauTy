@@ -165,4 +165,35 @@
 @* TOAST *@
 <div class="toast" id="toast">✅ Đã thêm vào giỏ hàng!</div>
 
+<div class="toast" id="toast">✅ Đã thêm vào giỏ hàng!</div>
+
+@* Toast đăng nhập *@
+<div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);
+     z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;padding:2rem 2.5rem;max-width:360px;
+                width:90%;text-align:center;box-shadow:0 8px 32px rgba(214,51,108,.2);">
+        <div style="font-size:2.5rem;margin-bottom:.8rem;">🔒</div>
+        <h3 style="color:#D6336C;font-size:1.1rem;margin-bottom:.5rem;">Bạn chưa đăng nhập</h3>
+        <p style="color:#888;font-size:.9rem;margin-bottom:1.4rem;">
+            Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng hoặc mua ngay.
+        </p>
+        <div style="display:flex;gap:.8rem;justify-content:center;">
+            <button onclick="document.getElementById('login-overlay').style.display='none'"
+                    style="padding:.6rem 1.4rem;border:1.5px solid #FFB6C1;border-radius:20px;
+                           background:#fff;color:#D6336C;font-weight:600;cursor:pointer;">
+                Để sau
+            </button>
+            <a href="/Account/Login?returnUrl=@Uri.EscapeDataString(Context.Request.Path)"
+               style="padding:.6rem 1.4rem;border-radius:20px;background:#D6336C;
+                      color:#fff;font-weight:600;text-decoration:none;">
+                Đăng nhập
+            </a>
+        </div>
+    </div>
+</div>
+
+@* Truyền trạng thái đăng nhập xuống JS *@
+<script>
+    const IS_AUTHENTICATED = @(User.Identity?.IsAuthenticated == true ? "true" : "false");
+</script>
 <script src="~/js/detail.js" asp-append-version="true"></script>
