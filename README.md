@@ -73,7 +73,7 @@ Tầng Application không phụ thuộc trực tiếp vào Infrastructure (AppDb
        "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=ChangSpaBeauTy;Trusted_Connection=True;TrustServerCertificate=True"
      }
      ```
-   - (Tùy chọn) Cấu hình mục `Email` nếu muốn bật gửi email thông báo đơn hàng (SMTP Gmail App Password).
+
 
 4. **Khôi phục các gói NuGet:**
    ```bash
