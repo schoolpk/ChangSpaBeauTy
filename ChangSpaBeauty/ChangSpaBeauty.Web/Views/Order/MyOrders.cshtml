@@ -145,25 +145,12 @@
                         <div class="mo-footer-right">
                             <div class="mo-total-label">Tổng tiền</div>
                             <div class="mo-total">@order.TotalPrice.ToString("N0") ₫</div>
-
-                            @* Chỉ pending → vào EditOrder (có cả nút hủy bên trong) *@
-                            @if (order.Status == "pending")
-                            {
-                                <a asp-action="EditOrder" asp-route-id="@order.OrderId"
+                            <a asp-action="EditOrder" asp-route-id="@order.OrderId"
                                    class="mo-btn-cancel"
                                    style="display:inline-block;text-align:center;text-decoration:none;
                                           color:#D6336C;border-color:#D6336C;">
                                     ✏️ Xem & Sửa đơn hàng
                                 </a>
-                            }
-                            else if (order.Status == "confirmed")
-                            {
-                                <span class="mo-cancel-locked">🔒 Đang xử lý</span>
-                            }
-                            else if (order.Status == "shipping" || order.Status == "done")
-                            {
-                                <span class="mo-cancel-locked">🔒 Không thể sửa</span>
-                            }
                         </div>
                     </div>
                 </div>

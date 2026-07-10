@@ -43,18 +43,11 @@ namespace ChangSpaBeauty.Web.Controllers
             return View(dto);
         }
 
-
         [HttpGet]
         public async Task<IActionResult> EditOrder(int id)
         {
             var order = await _orderService.GetOrderAsync(id, GetUserId());
             if (order == null) return NotFound();
-
-            if (order.Status != "pending")
-            {
-                TempData["Error"] = "Chỉ có thể sửa đơn hàng khi đang chờ xác nhận";
-                return RedirectToAction("MyOrders");
-            }
 
             return View(order);
         }

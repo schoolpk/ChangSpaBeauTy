@@ -107,18 +107,34 @@
 
             @* ── ACTIONS ── *@
             <div style="display:flex;flex-direction:column;gap:.7rem;margin-top:.5rem;">
-                <button type="submit" class="co-btn-order">
-                    💾 Lưu thay đổi
-                </button>
-
+                @if (Model.Status == "pending")
+                {
+                    <button type="submit" class="co-btn-order">
+                        💾 Lưu thay đổi
+                    </button>
+                }
+                else
+                {
+                    <span class="co-btn-order">
+                        🔒 Không thể sửa đơn hàng
+                    </span>
+                }
                 @* Nút hủy đơn hàng *@
-                <button type="button"
-                        onclick="confirmCancel(@Model.OrderId)"
-                        style="width:100%;padding:.85rem;background:#fff;color:#dc3545;
-                               border:1.5px solid #dc3545;border-radius:12px;font-size:.95rem;
-                               font-weight:700;cursor:pointer;transition:all .2s;">
-                    🗑️ Hủy đơn hàng
-                </button>
+                @if (Model.Status == "pending" || Model.Status == "confirmed")
+                {
+                    <button type="button"
+                    onclick="confirmCancel(@Model.OrderId)" class="co-btn-order">
+                        🗑️ Hủy đơn hàng
+                    </button>
+                }
+                else
+                {
+                    {
+                        <span class="co-btn-order">
+                               🔒 Không thể hủy đơn hàng
+                        </span>
+                    }
+                }
 
                 <a asp-action="MyOrders" class="co-btn-back">← Quay lại đơn hàng của tôi</a>
             </div>
