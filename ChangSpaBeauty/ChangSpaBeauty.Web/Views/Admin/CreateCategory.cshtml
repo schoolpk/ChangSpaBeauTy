@@ -31,15 +31,6 @@
                     <input asp-for="Name" class="form-control" placeholder="Tên danh mục">
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <label class="form-label" asp-for="TradeMark">Thương hiệu</label>
-                    <input asp-for="TradeMark" class="form-control"
-                           placeholder="VD: LOREAL, MAC, Dove" maxlength="500" />
-                    <div style="font-size:.75rem;color:#aaa;margin-top:.3rem;">
-                        💡 Nhập nhiều thương hiệu cách nhau bằng dấu <strong>,</strong>
-                    </div>
-                    <div id="tm-preview" style="margin-top:.6rem;display:flex;flex-wrap:wrap;gap:4px;"></div>
-                </div>
             </div>
             <div class="btn-row">
                 <a asp-controller="Admin" asp-action="Index" class="btn-cancel">Hủy</a>

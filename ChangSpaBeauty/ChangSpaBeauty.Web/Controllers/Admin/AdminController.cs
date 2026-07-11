@@ -55,6 +55,22 @@ public class AdminController : Controller
         ViewBag.Users = userList;
         ViewBag.TotalUsers = userList.Count;
         ViewBag.NewUsersThisMounth = 0;
+        var orders = await _orderRepository.GetAllAsync();
+        var orderUserList = orders.ToList();
+
+        var userWithOrders = userList.Select(u => new
+        {
+            u.Id,
+            u.Name,
+            u.Email,
+            u.Phone,
+            u.Address,
+            u.Role,
+            TotalOrders = orderUserList.Count(o => o.UserId == u.Id && o.Status != "cancelled"),
+            PendingOrders = orderUserList.Count(o => o.UserId == u.Id && o.Status == "pending")
+        }).ToList();
+
+        ViewBag.Users = userWithOrders;
 
         var products = await _productService.GetAllProductsAsync();
         var productList = products.ToList();
@@ -70,7 +86,6 @@ public class AdminController : Controller
 
 
         // Order
-        var orders = await _orderRepository.GetAllAsync();
         var orderList = orders.ToList();
 
         // Stats (luôn tính trên toàn bộ)

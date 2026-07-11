@@ -80,6 +80,8 @@
                         <th>Email</th>
                         <th>Điện thoại</th>
                         <th>Địa chỉ</th>
+                        <th>Đơn đã mua</th>
+                        <th>Chờ xử lý</th> 
                         <th>Vai trò</th>
                         <th>Thao tác</th>
                     </tr>
@@ -100,6 +102,25 @@
                                 <td>@user.Email</td>
                                 <td>@user.Phone</td>
                                 <td>@user.Address</td>
+                                <td>
+                                    <span style="font-weight:700;color:#2e7d32;">
+                                        @user.TotalOrders
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (user.PendingOrders > 0)
+                                    {
+                                        <span style="font-weight:700;color:#D6336C;
+                                                     background:#fce4ec;padding:2px 8px;
+                                                     border-radius:20px;font-size:.78rem;">
+                                            ⏳ @user.PendingOrders
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:#ccc;font-size:.82rem;">—</span>
+                                    }
+                                </td>
                                 <td>
                                     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
                                         @* Nút đổi role *@
@@ -139,7 +160,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="7" class="empty-state">Không có dữ liệu người dùng</td>
+                            <td colspan="9" class="empty-state">Không có dữ liệu người dùng</td>
                         </tr>
                     }
                 </tbody>
@@ -377,7 +398,19 @@
                                     <div style="font-size:.82rem;color:#888">@ord.Address</div>
                                     <div style="font-size:.82rem;color:#888">📞 @ord.Phone</div>
                                 </td>
-                                <td>@ord.OrderDetails?.Count</td>
+                                <td>
+                                    @if (ord.OrderDetails != null)
+                                    {
+                                        @foreach (var od in ord.OrderDetails)
+                                        {
+                                            <div style="font-size:.82rem;display:flex;align-items:center;
+                                                        gap:.4rem;margin-bottom:2px;">
+                                                <span style="color:#D6336C;font-weight:600;">×@od.Quantity</span>
+                                                <span>@od.Product?.Name</span>
+                                            </div>
+                                        }
+                                    }
+                                </td>
                                 <td>
                                     @{
                                         var details = ord.OrderDetails as IEnumerable<ChangSpaBeauty.Domain.Entities.OrderDetail>;
