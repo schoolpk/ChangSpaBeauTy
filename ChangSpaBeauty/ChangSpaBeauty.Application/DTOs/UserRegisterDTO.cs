@@ -29,6 +29,7 @@ namespace ChangSpaBeauty.Application.DTOs
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Vui long nhap so dien thoai")]
         public string Phone {  get; set; }
         public string Address { get; set; }
 

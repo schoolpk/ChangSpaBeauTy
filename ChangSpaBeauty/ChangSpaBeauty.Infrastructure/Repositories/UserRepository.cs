@@ -88,6 +88,11 @@ namespace ChangSpaBeauty.Infrastructure.Repositories
             return await _context.Users.FindAsync(id);
         }
 
+        public async Task<bool> PhoneExistAsync(string phone)
+        {
+            return await _context.Users.AnyAsync(u => u.Phone == phone);
+        }
+
         public async Task SaveChangeAsync()
         {
             await _context.SaveChangesAsync();
