@@ -45,6 +45,10 @@ namespace ChangSpaBeauty.Application.Services
             {
                 return (false, "Email da duoc su dung");
             }
+            if(await _userRepository.PhoneExistAsync(dto.Phone))
+            {
+                return (false, "So dien thoai da duoc su dung");
+            }
             var hashPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             var user = new User
             {
