@@ -42,7 +42,7 @@ Tầng Application không phụ thuộc trực tiếp vào Infrastructure (AppDb
 | Kiểm thử | NUnit 4 + Moq |
 | Xác thực | Cookie Authentication + BCrypt (hash mật khẩu) |
 | Quản lý mã nguồn | Git – GitHub Flow |
-| Giao diện | CSS thuần (custom properties) – tông màu hồng/rose (`#D6336C`, `#FF4081`, `#FFB6C1`, `#FFF5F8`), font Google Fonts (Playfair Display + DM Sans) |
+| Giao diện | CSS thuần (custom properties) – tông màu candy hồng đậm (`#FF4D88`, `#FF7FA8`, `#FFC2D6`, `#FFF8F2`), font Google Fonts (Nunito,DM Sans) |
 
 ### Tính năng chính
 
