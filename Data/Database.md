@@ -99,6 +99,5 @@ Nếu đủ các bảng và có dữ liệu → khôi phục thành công, có t
 |---|---|---|
 | `Cannot connect to (localdb)\MSSQLLocalDB` | Chưa cài LocalDB | Cài lại theo hướng dẫn Mục 1 |
 | `The media family on device ... is incorrectly formed` | File `.bak` bị lỗi/tải thiếu (Git LFS chưa pull đủ, hoặc file bị corrupt khi commit) | Pull lại repo, kiểm tra dung lượng file `.bak` có đúng như trên máy gốc không |
-| `Database 'ChangSpaBeauTy' already exists` (khi Import .bacpac) | DB cùng tên đã tồn tại | Xóa DB cũ trước khi Import, hoặc đổi tên DB đích |
 | Restore xong nhưng bảng rỗng | File backup gốc lấy nhầm lúc DB chưa có dữ liệu mẫu | Xin lại file backup mới nhất từ người tạo repo |
 | `Access is denied` khi restore | Không có quyền ghi vào thư mục Data của LocalDB | Chạy SSMS với quyền Administrator, hoặc đổi đường dẫn file đích trong tab **Files** khi restore |
