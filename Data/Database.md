@@ -46,7 +46,6 @@ Trong đó sẽ có loại file:
 
 - `ChangSpaBeauTy.bak` → làm theo **Mục 4**
 
-(Chỉ cần làm 1 trong 2, tùy loại file có sẵn trong repo.)
 
 ---
 
